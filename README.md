@@ -22,5 +22,6 @@ Every tool supports `--help`.
 - [CONTRIBUTING.md](CONTRIBUTING.md): code structure, tests, rules for changes.
 - [AGENTS.md](AGENTS.md): short instructions for AI agents.
 - [CHANGELOG.md](CHANGELOG.md)
+- License: [MIT](LICENSE)
 
 Data comes from Arsha.io, a free community API; please be gentle with it. Black Desert Online is a trademark of Pearl Abyss. This project isn't affiliated with Pearl Abyss or Arsha.io.

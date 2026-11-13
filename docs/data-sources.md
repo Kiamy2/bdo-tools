@@ -23,7 +23,7 @@ Behaviour to know:
 
 | Source | Findings |
 |---|---|
-| **bdomarket** (PyPI, Fizzor96/bdomarket, v0.3.2, **GPL-3.0**) | A Python client for Arsha. It has no retry handling and has renamed its API between versions. Extras not from Arsha: a client for `api.blackdesertmarket.com` (server-side name search, item details, item stats per enhancement level; status unverified), boss timers (scraped from mmotimer.com), Pig Cave status, item icons (official image server). A good reference for endpoint parameters. Mind its license before reusing code (see CONTRIBUTING). |
+| **bdomarket** (PyPI, Fizzor96/bdomarket, v0.3.2, **GPL-3.0**) | A Python client for Arsha. It has no retry handling and has renamed its API between versions. Extras not from Arsha: a client for `api.blackdesertmarket.com` (server-side name search, item details, item stats per enhancement level; status unverified), boss timers (scraped from mmotimer.com), Pig Cave status, item icons (official image server). A good reference for endpoint parameters. Its code must not be copied into this MIT repo (see CONTRIBUTING). |
 | **bdoworkshop.com** | Market prices from `/market-prices/2/{serverId}` (NA = server 2), using a cookie session and an `X-Market-Prices-Token` header taken from the page's `data-page` JSON (`props.marketPricesToken`). Same prices as Arsha. Its FS cost and Valks estimates are computed in the browser. No license stated. |
 | **bdolytics.com** | Prices are rendered by JavaScript, so a plain HTTP fetch returns no data. |
 | **garmoth.com** | Refuses automated fetches. Has a Failstack Optimizer (up to 350 FS). |

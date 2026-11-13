@@ -18,7 +18,7 @@ These tools are mostly run by AI agents and read in chat, so **compact, reliable
 5. **Never print large data** (the item list, raw API dumps) to stdout. Cache it to files.
 6. **Be gentle with free APIs:** batch requests, cache, and retry with backoff.
 7. **Standard library only,** unless a dependency clearly pays off. If you add one, pin its exact version.
-8. **Licenses:** before porting code from another project, check that its license is compatible with this repo's. If it isn't, or no license is stated, don't copy the code: re-implement from the maths or a description. Game mechanics and formulas are fine to re-implement.
+8. **Licenses:** this repo is MIT. Only port code from projects under MIT-compatible permissive licenses (MIT, BSD, Apache-2.0, ISC...), and keep their copyright notice. **Never copy code from GPL/AGPL/LGPL projects (e.g. `bdomarket`) or from projects with no license**: re-implement from the maths or a description instead. Game mechanics and formulas are fine to re-implement.
 9. **Docs and changelog:** update `docs/` and `CHANGELOG.md` in the same commit as any change to behaviour or options. Commit messages say what changed and why.
 
 ## Running
