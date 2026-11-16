@@ -16,7 +16,7 @@ failures = 0
 
 
 def run(*args):
-    p = subprocess.run([sys.executable, "-I", *args], cwd=ROOT, capture_output=True, text=True, timeout=600)
+    p = subprocess.run([sys.executable, "-I", *args], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=600)
     return p.returncode, p.stdout + p.stderr
 
 
@@ -51,6 +51,27 @@ code, out = run("items.py", "Vell's Heart", "4998", "Vells Hart")
 check("items: resolve + typo", code == 2 and "45332\tVell's Heart" in out and "4998\tSharp Black Crystal Shard" in out and "NOT FOUND" in out, out)
 code, out = run("items.py", "--search", "Dehkia's Artifact")
 check("items --search", code == 0 and "748022\tDehkia's Artifact - All Evasion" in out, out)
+
+# --- languages and loose matching (both tools share bdo/items.py) -------------
+code, out = run("items.py", "--lang", "fr", "Coeur de Vell", "eclat de cristal noir tranchant", "Lingot d'or 1000G")
+check("items --lang fr: oe, accents, spaces", code == 0 and "45332\tCœur de Vell" in out
+      and "4998\tÉclat de cristal noir tranchant" in out and "5\tLingot d'or 1 000 G" in out, out)
+code, out = run("items.py", "Vells Heart", "Hashashin BD9 Armor N")
+check("items: compact match; loose match on different names refused", "45332\tVell's Heart" in out and code == 2 and re.search(r"Hashashin BD9 Armor N\tNOT FOUND.*BD9\+ Armor N", out), out)
+code, out = run("items.py", "--lang", "en,fr", "Vell's Heart", "Pierre de Caphras")
+check("items --lang en,fr: both columns, either language", code == 0 and out.startswith("id\tname_en\tname_fr\tnote")
+      and "45332\tVell's Heart\tCœur de Vell" in out and "721003\tCaphras Stone\tPierre de Caphras" in out, out)
+code, out = run("items.py", "--lang", "en,fr", "--search", "coeur de vell")
+check("items --search in French", code == 0 and "45332\tVell's Heart\tCœur de Vell" in out, out)
+code, out = run("items.py", "--lang", "xx", "4998")
+check("items: unknown language", code == 2 and "UNKNOWN LANGUAGE" in out, out)
+code, out = run("prices.py", "--lang", "fr", "Coeur de Vell", "4998")
+check("prices --lang fr", code == 0 and re.search(r"^45332\tCœur de Vell\t[\d,]+", out, re.M)
+      and re.search(r"^4998\tÉclat de cristal noir tranchant\t[\d,]+", out, re.M), out)
+code, out = run("prices.py", "--lang", "en,fr", "Pierre de Caphras")
+check("prices --lang en,fr", code == 0 and re.search(r"^721003\tCaphras Stone\tPierre de Caphras\t[\d,]+", out, re.M), out)
+code, out = run("prices.py", "--lang", "xx", "4998")
+check("prices: unknown language", code == 2 and "UNKNOWN LANGUAGE" in out, out)
 
 print("ALL OK" if not failures else f"{failures} CHECK(S) FAILED")
 sys.exit(1 if failures else 0)

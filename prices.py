@@ -6,9 +6,10 @@
   python3 -I prices.py --latest "Vell's Heart"            # most recent sale, any age
   python3 -I prices.py --avg 30 "Vell's Heart"            # 30-day average
   python3 -I prices.py --details "Vell's Heart"           # + base/max/last sale/stock/trades
+  python3 -I prices.py --lang fr "Coeur de Vell"           # French names in and out (accents optional)
 
 Default price: last sale if < 24 h old, else 7-day average, else base price (flagged).
-Exit codes: 0 ok; 2 some rows NOT FOUND / UNKNOWN ID / FETCH FAILED; 3 network blocked.
+Exit codes: 0 ok; 2 some rows NOT FOUND / UNKNOWN ID / FETCH FAILED, or UNKNOWN LANGUAGE; 3 network blocked.
 """
 import argparse
 import datetime as dt
@@ -22,10 +23,13 @@ from bdo.net import NetworkBlocked, blocked_message  # noqa: E402
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):  # item names in any script, even when piped on Windows
+        sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description="BDO Central Market prices (Arsha.io)")
-    ap.add_argument("items", nargs="+", help="exact item names (quoted) or numeric IDs")
+    ap.add_argument("items", nargs="+", help="item names (quoted) or numeric IDs")
     ap.add_argument("--region", default="na", help="na (default), eu, sea, mena, kr, ru, jp, th, tw, sa, console_na, console_eu, console_asia")
-    ap.add_argument("--lang", default="en")
+    ap.add_argument("--lang", default="en", help="name language(s), comma-separated: en (default), fr, en,fr... "
+                    "Names given are matched in any of them; output has one name column per language")
     ap.add_argument("--sid", type=int, default=None, help="gear: only this enhancement band (0 = base)")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--latest", action="store_true", help="price = most recent sale, whatever its age")
@@ -44,23 +48,37 @@ def main():
     except NetworkBlocked as e:
         print(blocked_message("api.arsha.io", e), file=sys.stderr)
         return 3
+    except items.UnknownLanguage as e:
+        print(items.unknown_language_message(e.args[0]), file=sys.stderr)
+        return 2
 
 
 def run(a):
     region = a.region.lower()
-    db = items.load_db(a.lang, a.refresh_db) if any(not s.strip().isdigit() for s in a.items) else []
-    names = items.names_by_id(db)
+    langs = items.parse_langs(a.lang)
+    need_db = langs != ["en"] or any(not s.strip().isdigit() for s in a.items)
+    dbs = items.load_dbs(langs, a.refresh_db) if need_db else [[]]
+    lang_names = [items.names_by_id(db) for db in dbs]
+    name_cols = ["name"] if len(langs) == 1 else [f"name_{l}" for l in langs]
+
+    def add_names(r, iid, fallback=""):
+        """Name column(s) from the item lists; Arsha's English name if the list lacks the ID."""
+        for col, lang, n in zip(name_cols, langs, lang_names):
+            r[col] = n.get(iid) or (fallback if lang == "en" else "")
+        return r
     keep = market.TAX_NO_VP if a.no_vp else market.TAX_VP
     mode = "latest" if a.latest else ("avg" if a.avg else "auto")
 
-    resolved = [(q, *items.resolve(q, db)) for q in a.items]
+    resolved = [(q, *items.resolve_any(q, dbs)) for q in a.items]
     ids = [i for _, found, _ in resolved for i in found if i not in market.FIXED_VALUES]
-    prices, errors = market.get_prices(ids, region, a.lang, mode, a.avg, a.fallback_days, a.sid)
+    # Market data always in English: Arsha marks unknown IDs 'NONAME', and names come from the item lists.
+    prices, errors = market.get_prices(ids, region, "en", mode, a.avg, a.fallback_days, a.sid)
 
     def row(q, iid, e):
         if e.get("name") == "NONAME":
             return {"query": q, "id": iid, "note": "UNKNOWN ID - no item with this ID"}
-        r = {"query": q, "id": iid, "sid": e.get("sid", 0), "name": e.get("name") or names.get(iid, ""), "note": ""}
+        r = add_names({"query": q, "id": iid, "sid": e.get("sid", 0)}, iid, e.get("name") or "")
+        r["note"] = ""
         if market.is_untradeable(e):
             r["note"] = "NOT ON MARKET - no market price; value it another way"
             return r
@@ -81,14 +99,14 @@ def run(a):
         for iid in found:
             if iid in market.FIXED_VALUES:
                 v = market.FIXED_VALUES[iid]
-                r = {"query": q, "id": iid, "sid": 0, "name": names.get(iid, str(iid)), "price": v,
-                     "basis": "fixed NPC value", "note": ""}
+                r = add_names({"query": q, "id": iid, "sid": 0}, iid, str(iid))
+                r.update(price=v, basis="fixed NPC value", note="")
                 if a.tax:
                     r["after_tax"] = v  # NPC sale: no market tax
                 item_rows.append(r)
             elif iid not in prices:
                 failed = True
-                item_rows.append({"query": q, "id": iid, "name": names.get(iid, ""),
+                item_rows.append({**add_names({"query": q, "id": iid}, iid),
                                   "note": f"FETCH FAILED after retries - rerun later: {errors.get(iid, 'no data returned')[:160]}"})
             else:
                 item_rows += [row(q, iid, e) for e in prices[iid]]
@@ -109,7 +127,7 @@ def run(a):
         print(json.dumps({"region": region, "fetched": fetched, "tax": tax_txt, "rows": rows}, indent=1))
         return 2 if failed else 0
     print(f"# region={region} fetched={fetched} source=api.arsha.io silver, {tax_txt}")
-    cols = ["id", "name", "price"] + (["after_tax"] if a.tax else []) + ["basis"]
+    cols = ["id"] + name_cols + ["price"] + (["after_tax"] if a.tax else []) + ["basis"]
     if a.sid is None and any(r.get("sid") for r in rows):
         cols.insert(1, "sid")
     if a.details:
@@ -121,7 +139,7 @@ def run(a):
         out = [f"{r[c]:,}" if isinstance(r.get(c), int) and c in money else str(r.get(c) if r.get(c) is not None else "")
                for c in cols]
         if not r.get("id"):
-            out[cols.index("name")] = r["query"]
+            out[cols.index(name_cols[0])] = r["query"]
         print("\t".join(out).rstrip("\t"))
     return 2 if failed else 0
 

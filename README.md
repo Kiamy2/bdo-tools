@@ -12,7 +12,7 @@ python3 -I prices.py "Vell's Heart" "Sharp Black Crystal Shard"
 | Tool | What it does | Docs |
 |---|---|---|
 | `prices.py` | Market prices via [Arsha.io](https://api.arsha.io): last sale if under 24 h old, else 7-day average, else base price. Optional after-tax column, averages, more details, any region. | [docs/prices.md](docs/prices.md) |
-| `items.py` | Item name ↔ ID lookup and name search (no prices). | [docs/items.md](docs/items.md) |
+| `items.py` | Item name ↔ ID lookup, name search and translation between game languages (no prices). | [docs/items.md](docs/items.md) |
 
 Every tool supports `--help`.
 

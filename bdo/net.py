@@ -12,7 +12,7 @@ class NetworkBlocked(Exception):
 def get_json(url, tries=5):
     """GET a JSON URL. Retries on network errors and on Arsha error payloads
     (e.g. status 500 'probably blocked by Imperva' - frequent and temporary),
-    waiting 2/4/8/16 s between tries. Raises NetworkBlocked on a proxy refusal,
+    waiting 2/4/8/16 s between tries; HTTP 400 fails at once. Raises NetworkBlocked on a proxy refusal,
     RuntimeError with the last error otherwise."""
     last = None
     for i in range(tries):
@@ -26,6 +26,8 @@ def get_json(url, tries=5):
                 return data
         except urllib.error.HTTPError as e:
             last = f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:200]}"
+            if e.code == 400:  # bad request (e.g. unknown lang): retrying can't help
+                break
         except urllib.error.URLError as e:
             if "Tunnel connection failed: 403" in str(e.reason):
                 raise NetworkBlocked(str(e.reason))

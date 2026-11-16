@@ -15,7 +15,8 @@ A free community **cached wrapper** around the official BDO Central Market API. 
 Behaviour to know:
 - **Frequent temporary errors:** `{"status":500,"message":"...probably blocked by Imperva..."}`. Arsha fetches from the official market, which is behind Imperva bot protection, and gets throttled in bursts; uncached items fail for everyone for a while. `bdo/net.py` retries 5 times (2/4/8/16 s), `bdo/market.py` then retries a failed batch item by item and makes a last pass after 20 s.
 - **Untradeable items** come back with `basePrice 0` and `totalTrades 0`.
-- **Unknown IDs** come back with `name "NONAME"`.
+- **Unknown IDs** come back with `name "NONAME"`. So does **every** item if `lang` is unknown to Arsha, so `bdo-tools` always asks the market endpoints for `lang=en` and takes names in other languages from `/util/db`.
+- **Languages:** `/util/db?lang=` accepted `en, de, fr, ru, es, sp, pt, jp, kr, cn, tw, th, tr, id` (checked 2026-11-16; `se`, `gx`, `it`, `pl`, `mx` were rejected). An unknown code gets HTTP 400 `Invalid locale: xx`. Every language list has the same IDs (71,454 items), so translating is ID → name in another list. About 1,900 names are identical in English and French (proper names, untranslated Korean names).
 - Other v2 endpoints exist but aren't used here: search list, bidding info (pre-orders), wait list (registration queue), hot list, category lists, pearl items.
 - Docs: <https://documenter.getpostman.com/view/4028519/TzK2bEVg> (marked outdated by Arsha). The linked source host `git.arsha.io` returned 404 in Nov 2026.
 
