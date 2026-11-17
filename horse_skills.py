@@ -183,11 +183,13 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
               point_bonus=a.point_bonus, points=a.points)
     t0 = time.time()
     res = H.optimize(horse, M, a.optimize, seed=a.seed,
-                     progress=lambda i, n: i % 100 == 0 and print(f"# stage 1: {i}/{n} plans", file=sys.stderr), **kw)
+                     progress=lambda lab, i, n: (i % 100 == 0 or i == n) and print(f"# {lab}: {i}/{n} plans",
+                                                                                file=sys.stderr), **kw)
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
           f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
+    print("# Searched: a grid of plans, then every start level and spending cap around the best ones.")
     print("# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the")
     print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup.")
     print("# The spans cover the tied plans; not every combination inside a span is tied.")

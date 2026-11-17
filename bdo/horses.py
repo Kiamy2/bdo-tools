@@ -425,32 +425,57 @@ def plan_name(plan, budget=None):
     return f"{st} from lvl {lv}, spend <= {cap}{keep}"
 
 
+def _neighbors(value, grid, lo, hi):
+    """Every integer strictly between value's neighbors on the grid (value included), within lo..hi."""
+    below = max([g for g in grid if g < value], default=lo - 1)
+    above = min([g for g in grid if g > value], default=hi + 1)
+    return range(max(lo, below + 1), min(hi, above - 1) + 1)
+
+
 def optimize(horse, M, max_budget=50, strategies=("coursier", "once", "hard"), levels=None, caps=None,
-             runs=(1000, 4000), top=6, max_close=15, seed=1, progress=None, **kw):
+             runs=(1000, 4000), top=6, max_close=15, refine=True, seed=1, progress=None, **kw):
     """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
-    'wanted' (average wanted skills). Stage 1: every plan of the grid with runs[0]. Stage 2: for each budget and
-    goal, the top plans of stage 1, and every plan close to the best, again with runs[1] and a fresh seed (to avoid
-    picking a lucky winner, and to know which plans are tied).
+    'wanted' (average wanted skills).
+    Stage 1: every plan of the grid with runs[0].
+    Refine: around the best and close plans of stage 1, every start level and spending cap between their grid
+    neighbors (step 1), also with runs[0].
+    Stage 2: for each budget and goal, the top plans so far and every plan close to the best (up to max_close),
+    again with runs[1] and a fresh seed (to avoid picking a lucky winner, and to know which plans are tied).
     Returns {plan: simulate_plan result} for the stage-2 plans."""
     levels = PLAN_LEVELS if levels is None else levels
     caps = PLAN_CAPS if caps is None else caps
-    plans = [("at30", 1, 0)] + [(st, lv, cap) for st in strategies for lv in levels for cap in caps
-                                if cap <= max_budget]
-    stage1 = {}
-    for i, p in enumerate(plans):
-        stage1[p] = simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[0], seed=seed, **kw)
-        if progress:
-            progress(i + 1, len(plans))
-    keep = {("at30", 1, 0)}
-    for B in range(max_budget + 1):
-        for goal, margin in (("full", 0.03), ("wanted", 0.1)):     # ~2 standard errors at 1000 runs
-            ok = [p for p in plans if stage1[p][goal][B] is not None]
-            ranked = sorted(ok, key=lambda p: -stage1[p][goal][B])
-            keep.update(ranked[:top])
-            close = [p for p in ranked if stage1[p][goal][B] >= stage1[ranked[0]][goal][B] - margin]
-            keep.update(close[:max_close])
+    max_level = kw.get("max_level", 30)
+    found = {}
+
+    def run_all(plans, label):
+        todo = [p for p in plans if p not in found]
+        for i, p in enumerate(todo):
+            found[p] = simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[0], seed=seed, **kw)
+            if progress:
+                progress(label, i + 1, len(todo))
+
+    def promising():
+        keep = {("at30", 1, 0)}
+        for B in range(max_budget + 1):
+            for goal, margin in (("full", 0.03), ("wanted", 0.1)):     # ~2 standard errors at 1000 runs
+                ok = [p for p in found if found[p][goal][B] is not None]
+                ranked = sorted(ok, key=lambda p: -found[p][goal][B])
+                keep.update(ranked[:top])
+                close = [p for p in ranked if found[p][goal][B] >= found[ranked[0]][goal][B] - margin]
+                keep.update(close[:max_close])
+        return keep
+
+    run_all([("at30", 1, 0)] + [(st, lv, cap) for st in strategies for lv in levels for cap in caps
+                                if cap <= max_budget], "grid")
+    if refine:
+        near = set()
+        for st, lv, cap in promising():
+            if st in strategies:
+                near.update((st, l2, c2) for l2 in _neighbors(lv, levels, 1, max_level - 1)
+                            for c2 in _neighbors(cap, caps, 1, max_budget))
+        run_all(sorted(near), "refine")
     return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000, **kw)
-            for p in sorted(keep)}
+            for p in sorted(promising())}
 
 
 def tied_plans(res, B, goal, margin):
