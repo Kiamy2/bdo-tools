@@ -1,0 +1,27 @@
+# In-game growth simulator reading, Mythical Diné, horse level 2, no skills toggled (2026-11-17).
+# The first 8 rows were read with no boxes; the others were read with 'Set équin' on and divided by 16.4321/15.1844.
+# name: Mythical Diné (simulator)
+# training: Artisan 7
+# boxes: none
+# learned: Sprint
+none,10.7826
+Ruade,15.1844
+Cabrade,13.3166
+Dérapage,3.76
+Accélérer,5.3662
+Saut haut,3.531
+Arrêt d'urgence,4.7358
+Accél. Fulgurante,1.4554
+Charge,2.6319
+Pas latéraux,0.7260
+Recul rapide,5.7503
+Sauts continus,3.9145
+Hurlement de cheval,3.6059
+Prudence,2.4243
+Brève chevauchée,3.3178
+S : Ruade,3.1967
+S : Cabrade,3.0000
+S : Accél. Fulgurante,0.4394
+S : Pas latéraux,0.2294
+S : Charge,9.0226
+Terre de Protection,3.6090
