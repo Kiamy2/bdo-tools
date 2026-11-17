@@ -73,5 +73,42 @@ check("prices --lang en,fr", code == 0 and re.search(r"^721003\tCaphras Stone\tP
 code, out = run("prices.py", "--lang", "xx", "4998")
 check("prices: unknown language", code == 2 and "UNKNOWN LANGUAGE" in out, out)
 
+# --- horse_skills.py (offline) -------------------------------------------------
+# In-game growth simulator readings (2026-11-17): the model must reproduce them.
+D = "Mythical Diné"
+for args, obs in [
+    (["--training", "Artisan 7"], ["Ruade=15.1844", "none=10.7826", "Accél. Fulgurante=1.4554"]),
+    (["--training", "Professionnel 10"], ["Ruade=14.5731", "none=14.3746"]),
+    (["--training", "Artisan 7", "--brand"], ["Ruade=16.4321", "none=3.4516"]),
+    (["--training", "Artisan 7", "--gear", "--brand"], ["Ruade=17.0196", "none=0"]),       # cap
+    (["--training", "Gourou 57"], ["Ruade=17.0194", "none=0"]),
+    (["--training", "Artisan 7", "--learned", "Saut haut"], ["Ruade=15.6382", "none=11.7532"]),
+]:
+    code, out = run("horse_skills.py", D, *args, "--check", *obs)
+    check(f"horse_skills --check {' '.join(args)}", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Professional 10", "--check",
+                "none=27.3544", "Ruade=10.5304", "Accél. Fulgurante=1.6668")
+check("horse_skills --check T8", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", "Doom (T9)", "--training", "Artisan 7", "--check", "none=2.8289", "Deux places=3.7851", "Galop funeste=2.7253")
+check("horse_skills --check T9 Doom", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--check", "Ruade=16")
+check("horse_skills --check mismatch exits 1", code == 1 and "MISMATCH" in out, out)
+code, out = run("horse_skills.py", "--horse-file", "tests/data/sim_mythical_dine_artisan7.csv", "--training", "Professional 10",
+                "--check", "Ruade=14.5731", "none=14.3746")
+check("horse_skills --horse-file (simulator reading)", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "300", "--coupons", "20")
+rows = {l.split("\t")[0]: l.split("\t") for l in out.splitlines() if not l.startswith("#")}
+ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "hard", "ideal"}
+if ok:
+    first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
+    ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
+check("horse_skills simulation table", ok, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
+check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
+code, out = run("horse_skills.py", D, "--training", "Expert 3")
+check("horse_skills: bad Training level exits 2", code == 2 and "unknown Training level" in out, out)
+code, out = run("horse_skills.py", "Pegasus", "--training", "Artisan 7")
+check("horse_skills: unknown horse exits 2", code == 2 and "unknown horse" in out, out)
+
 print("ALL OK" if not failures else f"{failures} CHECK(S) FAILED")
 sys.exit(1 if failures else 0)
