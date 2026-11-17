@@ -110,6 +110,10 @@ check("horse_skills --target (coupons needed)", code == 0 and m and all(10 <= in
       and re.search(r"^at30\t\d+/\d+/\d+$", out, re.M), out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--target", "0")
 check("horse_skills: bad --target exits 2", code == 2 and "--target" in out, out)
+code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Guru 20", "--optimize", "3")
+m = re.findall(r"^(\d+)\t[^\t]+\t([\d.]+)%", out, re.M)
+check("horse_skills --optimize", code == 0 and [b for b, _ in m] == ["0", "1", "2", "3"]
+      and float(m[3][1]) >= float(m[0][1]) and "coupons for a 50%" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")

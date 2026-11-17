@@ -42,6 +42,9 @@ def main():
     ap.add_argument("--sweep", metavar="N,N,..", help="run several coupon budgets instead of --coupons")
     ap.add_argument("--target", metavar="PCT,PCT,..", help="instead of a coupon budget: coupons needed to end "
                     "with every wanted skill in PCT%% of runs, e.g. 50,80,90")
+    ap.add_argument("--optimize", type=int, metavar="MAX_COUPONS",
+                    help="search the best plan (strategy, level to start swapping, coupons to keep) for every "
+                    "budget from 0 to MAX_COUPONS, for the full set and for the most wanted skills")
     ap.add_argument("--tickets", type=int, default=0, help="Mount Level Down Tickets (used on level-ups that teach nothing)")
     ap.add_argument("--strategy", help="comma-separated subset (default all): "
                     + "; ".join(f"{k} = {v}" for k, v in H.STRATEGY_HELP.items()))
@@ -130,6 +133,8 @@ def main():
                 return 1
         return 0
 
+    if a.optimize is not None:
+        return optimize_report(a, horse, bonus, learned, wanted, fodder, head)
     budgets = [int(x) for x in a.sweep.split(",")] if a.sweep else [a.coupons]
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
     print(head)
@@ -168,6 +173,37 @@ def main():
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")
             allw = "/".join(f"{100 * r['all_wanted']:.0f}%" for r in res)
             print(f"{strat}\t{cp}\t{cell('skills', '{:.1f}')}\t{cell('wanted', '{:.1f}')}\t{allw}\t{used}")
+    return 0
+
+
+def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
+    import time
+    M = horse.M(bonus, a.gear, a.brand)
+    kw = dict(tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted, fodder=fodder,
+              point_bonus=a.point_bonus, points=a.points)
+    t0 = time.time()
+    res = H.optimize(horse, M, a.optimize, seed=a.seed,
+                     progress=lambda i, n: i % 50 == 0 and print(f"# stage 1: {i}/{n} plans", file=sys.stderr), **kw)
+    nw = next(iter(res.values()))["wanted_total"]
+    print(head)
+    print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
+          f"wanted: {nw} skills | {time.time() - t0:.0f}s")
+    print("# best plan per budget (stage 2: 6000 runs, fresh seed). 'ties' = other plans within 1 point / 0.05 skill")
+    print("coupons\tbest for full set\tchance\tties\tbest for most wanted\twanted avg\tties\tat30 chance\tat30 wanted")
+    at30 = res[("at30", 1, 0)]
+    best_full = []
+    for B in range(a.optimize + 1):
+        ok = [p for p in res if res[p]["full"][B] is not None]
+        bf = max(ok, key=lambda p: (res[p]["full"][B], res[p]["wanted"][B]))
+        bw = max(ok, key=lambda p: (res[p]["wanted"][B], res[p]["full"][B]))
+        tf = sum(res[p]["full"][B] >= res[bf]["full"][B] - 0.01 for p in ok) - 1
+        tw = sum(res[p]["wanted"][B] >= res[bw]["wanted"][B] - 0.05 for p in ok) - 1
+        best_full.append(res[bf]["full"][B])
+        print(f"{B}\t{H.plan_name(bf, B)}\t{100 * res[bf]['full'][B]:.1f}%\t{tf}\t{H.plan_name(bw, B)}\t"
+              f"{res[bw]['wanted'][B]:.2f}\t{tw}\t{100 * at30['full'][B]:.1f}%\t{at30['wanted'][B]:.2f}")
+    for t in (0.5, 0.8, 0.9, 0.95):
+        b = next((B for B, x in enumerate(best_full) if x >= t), None)
+        print(f"# coupons for a {t:.0%} chance of the full set with the best plan: {b if b is not None else '> max'}")
     return 0
 
 

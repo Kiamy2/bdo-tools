@@ -302,3 +302,148 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
         else:
             lo = mid
     return hi
+
+
+# --- plans and optimizer ---------------------------------------------------------------------------------------
+# A plan = (strategy, swap_from, spend_cap): swap while leveling from level swap_from on, spending at most spend_cap
+# coupons, then do the level-30 cleanup with whatever is left. For a budget B >= spend_cap this is the same as
+# "keep B - spend_cap coupons for level 30". One simulation of a plan gives its result for every budget at once:
+# the cleanup is run with as many coupons as it takes, and a budget B simply stops it after B coupons in total.
+
+def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
+                  wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30):
+    """Monte Carlo of one plan for every budget 0..max_budget.
+
+    Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
+    for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
+    needed per run for the full set, inf when the horse has too few skills); skill_counts (sorted, per run).
+    """
+    rng = random.Random(seed)
+    pool = list(horse.weights)
+    wt = horse.weights
+    wanted = set(TRAVEL_SET if wanted is None else wanted) & set(pool)
+    fodder = [s for s in (CLASSIC_FODDER if fodder is None else fodder) if s in wt and s not in wanted]
+    if strategy == "at30":
+        spend_cap = 0
+    nb = max_budget + 1
+    full_n, wanted_sum = [0] * nb, [0] * nb
+    needed, counts = [], []
+    for _ in range(runs):
+        have = set(s for s in learned if s in wt)
+        spent, t, pts = 0, tickets, points
+
+        def swap(out):
+            nonlocal spent, pts
+            cands = [s for s in pool if s not in have and s != out]
+            if not cands:
+                return None
+            target = min((s for s in wanted if s in cands), key=lambda s: wt[s], default=None)
+            ws = [wt[s] * (1 + point_bonus * pts) if s == target else wt[s] for s in cands]
+            new = _draw(rng, cands, ws)
+            have.discard(out)
+            have.add(new)
+            spent += 1
+            pts += 1
+            return new
+
+        for _lvl in range(start_level, max_level):
+            while True:
+                un = [s for s in pool if s not in have]
+                su = sum(wt[s] for s in un)
+                k = min(M / (su + horse.W), 1 / su) if su else 0
+                x, got = rng.random(), None
+                for s in un:
+                    x -= k * wt[s]
+                    if x < 0:
+                        got = s
+                        break
+                if got or t == 0:
+                    break
+                t -= 1
+            if got:
+                have.add(got)
+            if _lvl + 1 < swap_from or spent >= spend_cap:
+                continue
+            if strategy == "coursier":
+                for s in fodder:
+                    if s in have and spent < spend_cap:
+                        swap(s)
+            elif strategy == "once":
+                todo = sorted(have - wanted, key=lambda s: wt[s]) if _lvl + 1 == swap_from > 1 else [got]
+                for s in todo:
+                    if s and s not in wanted and s in have and spent < spend_cap:
+                        swap(s)
+            elif strategy == "hard":
+                for s in sorted(have - wanted, key=lambda s: wt[s]):
+                    slot = s
+                    while slot is not None and slot not in wanted and slot in have and spent < spend_cap:
+                        slot = swap(slot)
+        counts.append(len(have))
+        base = spent
+        traj = [len(have & wanted)]                  # wanted skills after 0, 1, 2... cleanup coupons
+        if strategy != "natural":
+            for s in sorted(have - wanted, key=lambda s: wt[s]):     # rarest unwanted first (see simulate)
+                slot = s
+                while slot is not None and slot not in wanted and not wanted <= have:
+                    slot = swap(slot)
+                    traj.append(len(have & wanted))
+                if wanted <= have:
+                    break
+        need = base + len(traj) - 1 if wanted <= have else float("inf")
+        needed.append(need)
+        last = len(traj) - 1
+        for B in range(spend_cap, nb):
+            j = B - base
+            if strategy == "natural":
+                j = 0
+            wanted_sum[B] += traj[min(j, last)]
+            full_n[B] += need <= B if strategy != "natural" else traj[0] == len(wanted)
+    needed.sort()
+    counts.sort()
+    return {"full": [full_n[B] / runs if B >= spend_cap else None for B in range(nb)],
+            "wanted": [wanted_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
+            "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
+
+
+def percentile(sorted_values, p):
+    """Value below which a share p (0-1) of the sorted values falls (nearest rank)."""
+    if not sorted_values:
+        return None
+    i = min(len(sorted_values) - 1, max(0, int(round(p * len(sorted_values) + 0.5)) - 1))
+    return sorted_values[i]
+
+
+PLAN_LEVELS = [1, 4, 7, 10, 13, 16, 18, 20, 22, 24, 26, 28]
+PLAN_CAPS = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 22, 26, 30]
+
+
+def plan_name(plan, budget=None):
+    st, lv, cap = plan
+    if st in ("at30", "natural"):
+        return st
+    keep = f", keep {budget - cap}" if budget is not None else ""
+    return f"{st} from lvl {lv}, spend <= {cap}{keep}"
+
+
+def optimize(horse, M, max_budget=50, strategies=("coursier", "once", "hard"), levels=None, caps=None,
+             runs=(1000, 6000), top=6, seed=1, progress=None, **kw):
+    """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
+    'wanted' (average wanted skills). Stage 1: every plan of the grid with runs[0]. Stage 2: for each budget and
+    goal, the top plans of stage 1 again with runs[1] and a fresh seed (to avoid picking a lucky winner).
+    Returns {plan: simulate_plan result} for the stage-2 plans."""
+    levels = PLAN_LEVELS if levels is None else levels
+    caps = PLAN_CAPS if caps is None else caps
+    plans = [("at30", 1, 0)] + [(st, lv, cap) for st in strategies for lv in levels for cap in caps
+                                if cap <= max_budget]
+    stage1 = {}
+    for i, p in enumerate(plans):
+        stage1[p] = simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[0], seed=seed, **kw)
+        if progress:
+            progress(i + 1, len(plans))
+    keep = {("at30", 1, 0)}
+    for B in range(max_budget + 1):
+        for goal in ("full", "wanted"):
+            ok = [p for p in plans if stage1[p][goal][B] is not None]
+            keep.update(sorted(ok, key=lambda p: -stage1[p][goal][B])[:top])
+    return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000, **kw)
+            for p in sorted(keep)}
