@@ -1,0 +1,52 @@
+# Mythical Diné (T10) | Training bonus 21.7% | data 2026-11-17: bdolytics.com/en/training/horse-skills (T10 tab)
+# level 2 -> 30 | learned: High Jump | tickets 4 | wanted: 13 skills | 159 plans in stage 2 | 216s
+# Searched: a grid of plans, then every start level and spending cap around the best ones.
+# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the
+# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup.
+# The spans cover the tied plans; not every combination inside a span is tied.
+coupons	full set: chance	tied plans	most wanted: avg	tied plans	at30: chance, avg
+0	0.4%	at30	10.01	at30	0.4%, 10.01
+1	4.3%	at30 | hard from lvl 28-29, keep 0 | once from lvl 28-29, keep 0 | coursier from lvl 28-29, keep 0	10.78	at30 | hard from lvl 29, keep 0 | once from lvl 29, keep 0	4.3%, 10.78
+2	13.6%	coursier from lvl 25-27, keep 1	11.25	coursier from lvl 24-28, keep 1	8.2%, 11.11
+3	19.4%	coursier from lvl 25-27, keep 2	11.53	coursier from lvl 24-28, keep 2	12.7%, 11.36
+4	24.6%	coursier from lvl 24-27, keep 3	11.73	coursier from lvl 23-27, keep 3	18.0%, 11.57
+5	31.6%	coursier from lvl 24-27, keep 4	11.92	coursier from lvl 23-27, keep 4	23.2%, 11.73
+6	37.8%	coursier from lvl 24-27, keep 5	12.06	coursier from lvl 23-27, keep 5	28.6%, 11.89
+7	44.2%	coursier from lvl 24-26, keep 6	12.20	coursier from lvl 22-27, keep 6	34.6%, 12.02
+8	50.6%	coursier from lvl 24-25, keep 5-7	12.30	coursier from lvl 22-26, keep 5-7	40.4%, 12.14
+9	56.9%	coursier from lvl 23-25, keep 6-8	12.41	coursier from lvl 21-26, keep 6-8	45.8%, 12.24
+10	62.1%	coursier from lvl 23-25, keep 7-9	12.48	coursier from lvl 20-26, keep 5-9	51.2%, 12.34
+11	67.3%	coursier from lvl 21-23, keep 6-8	12.56	coursier from lvl 19-26, keep 5-10	56.2%, 12.42
+12	71.9%	coursier from lvl 21-23, keep 7-9	12.63	coursier from lvl 18-25, keep 6-11 | once from lvl 19, keep 2	60.8%, 12.49
+13	76.5%	coursier from lvl 21-23, keep 8-10	12.69	coursier from lvl 16-25, keep 6-12 | once from lvl 17-19, keep 2-3	65.5%, 12.56
+14	80.4%	coursier from lvl 21, keep 9	12.75	coursier from lvl 16-25, keep 5-13 | once from lvl 17-19, keep 0-4	69.0%, 12.61
+15	83.4%	coursier from lvl 17-22, keep 6-10 | once from lvl 17-19, keep 4-5	12.79	coursier from lvl 15-25, keep 5-14 | once from lvl 16-19, keep 0-5	72.9%, 12.67
+16	86.2%	coursier from lvl 16-23, keep 7-13 | once from lvl 17-19, keep 5-6	12.83	coursier from lvl 13-25, keep 5-15 | once from lvl 16-19, keep 0-7	76.3%, 12.71
+17	88.8%	coursier from lvl 16-21, keep 6-12 | once from lvl 17-19, keep 6-7	12.86	coursier from lvl 12-25, keep 4-16 | once from lvl 16-19, keep 0-8	79.1%, 12.75
+18	90.7%	coursier from lvl 14-21, keep 7-13 | once from lvl 17-19, keep 7-8	12.89	coursier from lvl 10-25, keep 5-17 | once from lvl 14-19, keep 0-9	81.6%, 12.78
+19	93.0%	coursier from lvl 13-19, keep 8-12	12.91	coursier from lvl 8-25, keep 5-18 | once from lvl 14-19, keep 1-10	84.2%, 12.81
+20	94.3%	coursier from lvl 13-19, keep 8-12	12.93	coursier from lvl 7-25, keep 4-19 | once from lvl 14-19, keep 2-11	86.5%, 12.84
+21	95.5%	coursier from lvl 10-18, keep 7-13	12.95	coursier from lvl 1-25, keep 4-20 | once from lvl 14-21, keep 3-12	88.1%, 12.86
+22	96.5%	coursier from lvl 10-18, keep 8-14	12.96	coursier from lvl 1-25, keep 3-21 | once from lvl 14-21, keep 4-13	89.8%, 12.88
+23	97.2%	coursier from lvl 8-18, keep 6-16	12.97	coursier from lvl 1-25, keep 3-22 | once from lvl 14-21, keep 5-14	91.0%, 12.90
+24	97.8%	coursier from lvl 6-18, keep 7-17	12.97	coursier from lvl 1-25, keep 2-23 | once from lvl 14-21, keep 6-15	91.8%, 12.91
+25	98.3%	coursier from lvl 1-18, keep 7-18	12.98	coursier from lvl 1-26, keep 3-24 | once from lvl 14-21, keep 7-16	93.0%, 12.92
+26	98.8%	coursier from lvl 1-20, keep 6-19	12.99	coursier from lvl 1-26, keep 1-25 | once from lvl 14-21, keep 8-17	93.8%, 12.93
+27	99.0%	coursier from lvl 1-20, keep 5-20 | once from lvl 17, keep 16	12.99	coursier from lvl 1-27, keep 1-26 | once from lvl 14-29, keep 9-26 | hard from lvl 25-29, keep 26 | at30	94.7%, 12.94
+28	99.2%	coursier from lvl 1-20, keep 3-24 | once from lvl 17-19, keep 17-18	12.99	coursier from lvl 1-27, keep 2-27 | once from lvl 14-29, keep 10-27 | hard from lvl 25-29, keep 27 | at30	95.5%, 12.95
+29	99.4%	coursier from lvl 1-21, keep 3-25 | once from lvl 16-19, keep 11-19	12.99	coursier from lvl 1-28, keep 0-28 | once from lvl 14-29, keep 11-28 | at30 | hard from lvl 25-29, keep 28	96.0%, 12.96
+30	99.6%	coursier from lvl 1-22, keep 4-26 | once from lvl 17-19, keep 12-20	12.99	coursier from lvl 1-28, keep 1-29 | once from lvl 14-29, keep 12-29 | at30 | hard from lvl 25-29, keep 29	96.6%, 12.96
+31	99.7%	coursier from lvl 1-22, keep 2-28 | once from lvl 16-19, keep 13-21	13.00	coursier from lvl 1-29, keep 2-30 | once from lvl 14-29, keep 13-30 | hard from lvl 25-29, keep 30 | at30	96.9%, 12.97
+32	99.8%	coursier from lvl 1-24, keep 3-29 | once from lvl 14-19, keep 14-23	13.00	coursier from lvl 1-29, keep 3-31 | once from lvl 14-29, keep 14-31 | at30 | hard from lvl 25-29, keep 31	97.2%, 12.97
+33	99.9%	coursier from lvl 1-24, keep 4-30 | once from lvl 14-21, keep 15-24	13.00	coursier from lvl 1-29, keep 4-32 | once from lvl 14-29, keep 15-32 | hard from lvl 25-29, keep 32 | at30	97.4%, 12.97
+34	99.9%	coursier from lvl 1-25, keep 5-33 | once from lvl 14-21, keep 16-25	13.00	coursier from lvl 1-29, keep 5-33 | once from lvl 14-29, keep 16-33 | hard from lvl 25-29, keep 33 | at30	97.7%, 12.97
+35	99.9%	coursier from lvl 1-25, keep 6-34 | once from lvl 14-21, keep 17-26	13.00	coursier from lvl 1-29, keep 6-34 | once from lvl 14-29, keep 17-34 | hard from lvl 25-29, keep 34 | at30	97.9%, 12.98
+36	99.9%	coursier from lvl 1-26, keep 7-35 | once from lvl 14-21, keep 18-27	13.00	coursier from lvl 1-29, keep 7-35 | once from lvl 14-29, keep 18-35 | hard from lvl 25-29, keep 35 | at30	98.3%, 12.98
+37	100.0%	coursier from lvl 1-26, keep 8-36 | once from lvl 14-21, keep 19-28	13.00	coursier from lvl 1-29, keep 8-36 | once from lvl 14-29, keep 19-36 | hard from lvl 25-29, keep 36 | at30	98.4%, 12.98
+38	100.0%	coursier from lvl 1-26, keep 9-37 | once from lvl 14-29, keep 20-37 | hard from lvl 29, keep 37	13.00	coursier from lvl 1-29, keep 9-37 | once from lvl 14-29, keep 20-37 | hard from lvl 25-29, keep 37 | at30	98.6%, 12.99
+39	100.0%	coursier from lvl 1-27, keep 10-38 | once from lvl 14-29, keep 21-38 | hard from lvl 25-29, keep 38	13.00	coursier from lvl 1-29, keep 10-38 | once from lvl 14-29, keep 21-38 | hard from lvl 25-29, keep 38 | at30	98.8%, 12.99
+40	100.0%	coursier from lvl 1-28, keep 11-39 | once from lvl 14-29, keep 22-39 | hard from lvl 25-29, keep 39	13.00	coursier from lvl 1-29, keep 11-39 | once from lvl 14-29, keep 22-39 | hard from lvl 25-29, keep 39 | at30	98.9%, 12.99
+# coupons for a 50% chance of the full set: 8 with the best plan, 10 with at30
+# coupons for a 80% chance of the full set: 14 with the best plan, 18 with at30
+# coupons for a 90% chance of the full set: 18 with the best plan, 23 with at30
+# coupons for a 95% chance of the full set: 21 with the best plan, 28 with at30
