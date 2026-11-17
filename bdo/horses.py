@@ -426,10 +426,11 @@ def plan_name(plan, budget=None):
 
 
 def optimize(horse, M, max_budget=50, strategies=("coursier", "once", "hard"), levels=None, caps=None,
-             runs=(1000, 6000), top=6, seed=1, progress=None, **kw):
+             runs=(1000, 4000), top=6, max_close=15, seed=1, progress=None, **kw):
     """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
     'wanted' (average wanted skills). Stage 1: every plan of the grid with runs[0]. Stage 2: for each budget and
-    goal, the top plans of stage 1 again with runs[1] and a fresh seed (to avoid picking a lucky winner).
+    goal, the top plans of stage 1, and every plan close to the best, again with runs[1] and a fresh seed (to avoid
+    picking a lucky winner, and to know which plans are tied).
     Returns {plan: simulate_plan result} for the stage-2 plans."""
     levels = PLAN_LEVELS if levels is None else levels
     caps = PLAN_CAPS if caps is None else caps
@@ -442,8 +443,36 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "once", "hard"), l
             progress(i + 1, len(plans))
     keep = {("at30", 1, 0)}
     for B in range(max_budget + 1):
-        for goal in ("full", "wanted"):
+        for goal, margin in (("full", 0.03), ("wanted", 0.1)):     # ~2 standard errors at 1000 runs
             ok = [p for p in plans if stage1[p][goal][B] is not None]
-            keep.update(sorted(ok, key=lambda p: -stage1[p][goal][B])[:top])
+            ranked = sorted(ok, key=lambda p: -stage1[p][goal][B])
+            keep.update(ranked[:top])
+            close = [p for p in ranked if stage1[p][goal][B] >= stage1[ranked[0]][goal][B] - margin]
+            keep.update(close[:max_close])
     return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000, **kw)
             for p in sorted(keep)}
+
+
+def tied_plans(res, B, goal, margin):
+    """Plans within margin of the best for budget B (goal 'full' or 'wanted'), best first."""
+    ok = [p for p in res if res[p][goal][B] is not None]
+    best = max(res[p][goal][B] for p in ok)
+    return sorted((p for p in ok if res[p][goal][B] >= best - margin), key=lambda p: -res[p][goal][B])
+
+
+def describe_plans(plans, budget):
+    """Short text for a set of tied plans: per strategy, the span of start levels and of coupons kept."""
+    parts, seen = [], []
+    for p in plans:
+        if p[0] not in seen:
+            seen.append(p[0])
+    for st in seen:
+        ps = [p for p in plans if p[0] == st]
+        if st == "at30":
+            parts.append("at30")
+            continue
+        lv = sorted({p[1] for p in ps})
+        kp = sorted({budget - p[2] for p in ps})
+        span = lambda v: f"{v[0]}" if v[0] == v[-1] else f"{v[0]}-{v[-1]}"
+        parts.append(f"{st} from lvl {span(lv)}, keep {span(kp)}")
+    return " | ".join(parts)

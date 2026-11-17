@@ -183,29 +183,30 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
               point_bonus=a.point_bonus, points=a.points)
     t0 = time.time()
     res = H.optimize(horse, M, a.optimize, seed=a.seed,
-                     progress=lambda i, n: i % 50 == 0 and print(f"# stage 1: {i}/{n} plans", file=sys.stderr), **kw)
+                     progress=lambda i, n: i % 100 == 0 and print(f"# stage 1: {i}/{n} plans", file=sys.stderr), **kw)
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
-          f"wanted: {nw} skills | {time.time() - t0:.0f}s")
-    print("# best plan per budget (stage 2: 6000 runs, fresh seed). 'ties' = other plans within 1 point / 0.05 skill")
-    print("coupons\tbest for full set\tchance\tties\tbest for most wanted\twanted avg\tties\tat30 chance\tat30 wanted")
+          f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
+    print("# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the")
+    print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup.")
+    print("# The spans cover the tied plans; not every combination inside a span is tied.")
+    print("coupons\tfull set: chance\ttied plans\tmost wanted: avg\ttied plans\tat30: chance, avg")
     at30 = res[("at30", 1, 0)]
     best_full = []
     for B in range(a.optimize + 1):
-        ok = [p for p in res if res[p]["full"][B] is not None]
-        bf = max(ok, key=lambda p: (res[p]["full"][B], res[p]["wanted"][B]))
-        bw = max(ok, key=lambda p: (res[p]["wanted"][B], res[p]["full"][B]))
-        tf = sum(res[p]["full"][B] >= res[bf]["full"][B] - 0.01 for p in ok) - 1
-        tw = sum(res[p]["wanted"][B] >= res[bw]["wanted"][B] - 0.05 for p in ok) - 1
-        best_full.append(res[bf]["full"][B])
-        print(f"{B}\t{H.plan_name(bf, B)}\t{100 * res[bf]['full'][B]:.1f}%\t{tf}\t{H.plan_name(bw, B)}\t"
-              f"{res[bw]['wanted'][B]:.2f}\t{tw}\t{100 * at30['full'][B]:.1f}%\t{at30['wanted'][B]:.2f}")
+        tf = H.tied_plans(res, B, "full", 0.01)
+        tw = H.tied_plans(res, B, "wanted", 0.05)
+        best_full.append(res[tf[0]]["full"][B])
+        print(f"{B}\t{100 * res[tf[0]]['full'][B]:.1f}%\t{H.describe_plans(tf, B)}\t"
+              f"{res[tw[0]]['wanted'][B]:.2f}\t{H.describe_plans(tw, B)}\t"
+              f"{100 * at30['full'][B]:.1f}%, {at30['wanted'][B]:.2f}")
     for t in (0.5, 0.8, 0.9, 0.95):
         b = next((B for B, x in enumerate(best_full) if x >= t), None)
-        print(f"# coupons for a {t:.0%} chance of the full set with the best plan: {b if b is not None else '> max'}")
+        b30 = next((B for B, x in enumerate(at30["full"]) if x >= t), None)
+        print(f"# coupons for a {t:.0%} chance of the full set: {b if b is not None else '> max'} with the best plan, "
+              f"{b30 if b30 is not None else '> max'} with at30")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
