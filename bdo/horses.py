@@ -37,7 +37,9 @@ _TIERS = {
 _TIER_FR = {"debutant": "Beginner", "apprenti": "Apprentice", "qualifie": "Skilled", "professionnel": "Professional",
             "artisan": "Artisan", "maitre": "Master", "gourou": "Guru"}
 GEAR = BRAND = 0.10
-BOXES = {"none": (0, 0), "gear": (1, 0), "brand": (0, 1), "both": (1, 1)}
+# Learn-chance boosts: the Pearl horse gear set and the Mount Brand Spell Stone (+10% each).
+BOOSTS = {"none": (0, 0), "gear": (1, 0), "brand": (0, 1), "both": (1, 1)}
+BOXES = BOOSTS  # older name
 
 # Default wanted list: skills for travel. Skills a horse can't learn are ignored.
 TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump", "Streak Leap", "Start Accel",
@@ -139,7 +141,7 @@ def skill_resolver(data):
 def horse_from_sim_file(path, resolve):
     """A horse from an in-game simulator reading (CSV 'skill,percent' rows plus '# key: value' headers).
 
-    Headers: name, training (e.g. Artisan 7), boxes (none/gear/brand/both), learned (skills marked learned or
+    Headers: name, training (e.g. Artisan 7), boosts (none/gear/brand/both; 'boxes' also accepted), learned (skills marked learned or
     'base skill', comma-separated). Needs a 'none' row (Compétence non apprise) above 0%.
     """
     meta, rows = {}, {}
@@ -156,8 +158,11 @@ def horse_from_sim_file(path, resolve):
             rows[name.strip()] = float(val.strip().rstrip("%"))
     none = next((v for k, v in rows.items() if compact(k) in (compact("none"), compact("Compétence non apprise"))), None)
     if none is None or none <= 0:
-        raise DataError("the reading needs a 'none' row above 0% (take it at a lower Training level, without boxes)")
-    gear, brand = BOXES[meta.get("boxes", "none").lower()]
+        raise DataError("the reading needs a 'none' row above 0% (take it at a lower Training level, without boosts)")
+    boosts = meta.get("boosts", meta.get("boxes", "none")).lower()
+    if boosts not in BOOSTS:
+        raise DataError(f"boosts must be one of {', '.join(BOOSTS)}, not {boosts!r}")
+    gear, brand = BOOSTS[boosts]
     M = 1 + training_bonus(meta.get("training", "")) / 100 + GEAR * gear + BRAND * brand
     learned = [resolve(s) for s in meta.get("learned", "").split(",") if s.strip()]
     w = {resolve(k): v / M for k, v in rows.items() if compact(k) not in (compact("none"), compact("Compétence non apprise"))}

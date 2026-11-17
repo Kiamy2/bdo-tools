@@ -32,10 +32,10 @@ strategy  coupons  skills at 30   wanted at 30   all wanted   coupons used
 coursier  30       18.8/19.3/19.6 12.9/12.9/13.0 90%/94%/97%  27/25/24
 ```
 
-- Each cell is **a/b/c**: a = no boxes, b = Pearl horse gear **or** Mount Brand Spell Stone (both are +10%), c = both.
+- Each cell is **a/b/c**: a = no learn-chance boost, b = Pearl horse gear set **or** Mount Brand Spell Stone (both are +10%), c = both.
 - `skills at 30`: learnable skills the horse has at level 30 (innate ones not counted). `wanted at 30`: how many of those are wanted. `all wanted`: chance of ending with every wanted skill. `coupons used`: average.
-- `--odds` prints the next level-up's chances like the in-game simulator, with `--gear`/`--brand` for the boxes.
-- `--check` compares numbers you read in the in-game simulator with the model (`none` = "no skill"). It exits with 1 on a mismatch, which means the data is outdated or the settings differ (same Training level, boxes and learned skills as in the game?).
+- `--odds` prints the next level-up's chances like the in-game simulator, with `--gear`/`--brand` for the learn-chance boosts.
+- `--check` compares numbers you read in the in-game simulator with the model (`none` = "no skill"). It exits with 1 on a mismatch, which means the data is outdated or the settings differ (same Training level, boosts and learned skills as in the game?).
 
 ## Your own horse (`--horse-file`)
 
@@ -44,13 +44,13 @@ Any horse can be added from one reading of the in-game simulator (Horse info →
 ```
 # name: My horse
 # training: Artisan 7
-# boxes: none
+# boosts: none
 # learned: Sprint
 none,10.7826
 Ruade,15.1844
 ...
 ```
 
-`boxes` is `none`, `gear`, `brand` or `both`; `learned` lists the skills shown as innate ("base skill") or toggled. Skill names in English or French.
+`boosts` is `none`, `gear`, `brand` or `both` (`boxes` is also accepted); `learned` lists the skills shown as innate ("base skill") or toggled. Skill names in English or French.
 
 Exit codes: `0` OK · `1` `--check` mismatch · `2` bad input (unknown horse, skill, strategy or Training level).

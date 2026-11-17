@@ -8,7 +8,7 @@
   python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --odds --gear      # next level-up odds
   python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --check "Ruade=15.1844" "none=10.7826"
 
-a/b/c columns: a = no boxes, b = Pearl horse gear OR Mount Brand Spell Stone (both are +10%), c = both.
+a/b/c columns: a = no learn-chance boost, b = Pearl horse gear set OR Mount Brand Spell Stone (both are +10%), c = both.
 Exit codes: 0 ok; 2 bad input (unknown horse, skill or Training level); 1 --check found a mismatch.
 """
 import argparse
@@ -125,7 +125,7 @@ def main():
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(map(show, learned)) or '-'} | tickets {a.tickets} | "
           f"{a.runs} runs | reserve {a.reserve} | wanted: {len(W)} skills, learnable: {len(horse.weights)}")
-    print("# cells a/b/c = no boxes / gear or brand stone / both")
+    print("# cells a/b/c = no boost / gear set or brand stone / both")
     print("strategy\tcoupons\tskills at 30\twanted at 30\tall wanted\tcoupons used")
     for budget in budgets:
         for strat in strategies:

@@ -1,8 +1,8 @@
 # In-game growth simulator reading, Mythical Diné, horse level 2, no skills toggled (2026-11-17).
-# The first 8 rows were read with no boxes; the others were read with 'Set équin' on and divided by 16.4321/15.1844.
+# The first 8 rows were read with no boosts; the others were read with 'Set équin' on and divided by 16.4321/15.1844.
 # name: Mythical Diné (simulator)
 # training: Artisan 7
-# boxes: none
+# boosts: none
 # learned: Sprint
 none,10.7826
 Ruade,15.1844
