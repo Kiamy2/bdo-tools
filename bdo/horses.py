@@ -48,13 +48,14 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               "Wings of Freedom", "Earth of Protection", "Dark Sprint", "Lightning Charge",
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
 CLASSIC_FODDER = ["Hind Kick", "Fore Chop"]
-STRATEGIES = ["natural", "at30", "coursier", "hard", "ideal"]
+STRATEGIES = ["natural", "at30", "coursier", "once", "hard", "ideal"]
 STRATEGY_HELP = {
     "natural": "no coupons used",
     "at30": "level naturally, spend all coupons at level 30 on unwanted skills",
     "coursier": "swap Hind Kick/Fore Chop each time they're learned (keeping a reserve), rest at 30",
+    "once": "swap every unwanted skill once when it's learned (keeping a reserve), rest at 30",
     "hard": "swap every unwanted skill until a wanted one comes (keeping a reserve), rest at 30",
-    "ideal": "upper bound: unlimited coupons, always holding the rarest skills",
+    "ideal": "unlimited coupons: always hold the rarest skills, for the most skills at 30",
 }
 
 
@@ -184,10 +185,11 @@ def _draw(rng, items, weights):
 
 
 def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(), wanted=None, fodder=None,
-             point_bonus=0.25, points=0, runs=5000, seed=1, max_level=30, reserve=0):
+             point_bonus=0.25, points=0, runs=5000, seed=1, max_level=30, reserve=0, swap_from=1):
     """Monte Carlo of leveling start_level -> max_level. Returns averages over runs.
 
-    reserve: coupons the coursier/hard strategies keep for the level-30 cleanup (no swaps while leveling below it).
+    reserve: coupons the coursier/once/hard strategies keep for the level-30 cleanup (no swaps while leveling below it).
+    swap_from: horse level from which coursier/once/hard start swapping while leveling (before it, they wait).
     """
     rng = random.Random(seed)
     pool = list(horse.weights)
@@ -240,20 +242,30 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                 have.add(got)
             if strategy == "ideal":
                 have = set(rare[:len(have)])
+            elif _lvl + 1 < swap_from:                 # level just reached is below swap_from: no swaps yet
+                pass
             elif strategy == "coursier":
                 for s in fodder:
                     if s in have and c > reserve:
                         swap(s)
+            elif strategy == "once":
+                # swap each unwanted skill once when it's learned; at swap_from, also those learned while waiting
+                todo = sorted(have - wanted, key=lambda s: wt[s]) if _lvl + 1 == swap_from > 1 else [got]
+                for s in todo:
+                    if s and s not in wanted and s in have and c > reserve:
+                        swap(s)
             elif strategy == "hard":
-                for s in sorted(have - wanted, key=lambda s: -wt[s]):
+                for s in sorted(have - wanted, key=lambda s: wt[s]):
                     if s in have and c > reserve:
                         slot = s
                         while slot not in wanted and c > reserve:
                             slot = swap(slot)
                             if slot is None:
                                 break
-        if strategy in ("at30", "coursier", "hard"):
-            for s in sorted(have - wanted, key=lambda s: -wt[s]):
+        if strategy in ("at30", "coursier", "once", "hard"):
+            # level-30 cleanup, rarest unwanted skill first: a swapped-away skill goes back into the coupon draw,
+            # so common ones (Hind Kick...) are kept until last to keep their big weight out of the other swaps
+            for s in sorted(have - wanted, key=lambda s: wt[s]):
                 if s in have:
                     fix(s)
         n = len(have)
@@ -264,3 +276,29 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
         used_sum += 0 if strategy in ("natural", "ideal") else coupons - c
     return {"skills": tot_sum / runs, "wanted": wanted_sum / runs, "all_wanted": all_count / runs,
             "coupons_used": used_sum / runs, "wanted_total": len(wanted), "pool_total": len(pool)}
+
+
+def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw):
+    """Smallest coupon budget whose chance of ending with every wanted skill is at least target (0-1).
+
+    Bisection over the budget; returns None if max_coupons isn't enough. kw goes to simulate(). Pass the same
+    cache dict for several targets to reuse simulations. Assumes the chance grows with the budget, which holds
+    up to simulation noise (so the answer is good to about +/-1 coupon).
+    """
+    cache = {} if cache is None else cache
+
+    def chance(n):
+        if n not in cache:
+            cache[n] = simulate(horse, M, strategy, n, **kw)["all_wanted"]
+        return cache[n]
+
+    if chance(max_coupons) < target:
+        return None
+    lo, hi = -1, max_coupons                      # chance(lo) < target <= chance(hi)
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if mid >= 0 and chance(mid) >= target:
+            hi = mid
+        else:
+            lo = mid
+    return hi

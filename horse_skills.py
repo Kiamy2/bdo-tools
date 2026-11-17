@@ -40,11 +40,15 @@ def main():
     ap.add_argument("--level", type=int, default=1, help="current horse level (default 1)")
     ap.add_argument("--coupons", type=int, default=30, help="Mount Skill Change Coupons available (default 30)")
     ap.add_argument("--sweep", metavar="N,N,..", help="run several coupon budgets instead of --coupons")
+    ap.add_argument("--target", metavar="PCT,PCT,..", help="instead of a coupon budget: coupons needed to end "
+                    "with every wanted skill in PCT%% of runs, e.g. 50,80,90")
     ap.add_argument("--tickets", type=int, default=0, help="Mount Level Down Tickets (used on level-ups that teach nothing)")
     ap.add_argument("--strategy", help="comma-separated subset (default all): "
                     + "; ".join(f"{k} = {v}" for k, v in H.STRATEGY_HELP.items()))
     ap.add_argument("--wanted", help="wanted skills, comma-separated (default: the travel set, see docs)")
-    ap.add_argument("--reserve", type=int, default=5, help="coupons coursier/hard keep for level 30 (default 5)")
+    ap.add_argument("--reserve", type=int, default=5, help="coupons coursier/once/hard keep for level 30 (default 5)")
+    ap.add_argument("--swap-from", type=int, default=1, metavar="LEVEL",
+                    help="coursier/once/hard only start swapping once the horse reaches this level (default 1)")
     ap.add_argument("--fodder", help="skills the 'coursier' strategy swaps out (default: Hind Kick,Fore Chop)")
     ap.add_argument("--points", type=int, default=0, help="Skill Change Points the horse already has (default 0)")
     ap.add_argument("--point-bonus", type=float, default=0.25, help="desired-skill weight bonus per point (default 0.25)")
@@ -78,6 +82,12 @@ def main():
         for s in strategies:
             if s not in H.STRATEGIES:
                 raise H.DataError(f"unknown strategy {s!r}")
+        try:
+            targets = [float(x) for x in a.target.split(",")] if a.target else []
+        except ValueError:
+            raise H.DataError(f"--target takes percentages like 50,80,90, not {a.target!r}")
+        if any(not 0 < x <= 100 for x in targets):
+            raise H.DataError("--target percentages must be above 0 and at most 100")
     except H.DataError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 2
@@ -124,8 +134,27 @@ def main():
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(map(show, learned)) or '-'} | tickets {a.tickets} | "
-          f"{a.runs} runs | reserve {a.reserve} | wanted: {len(W)} skills, learnable: {len(horse.weights)}")
+          f"{a.runs} runs | reserve {a.reserve} | swaps from level {a.swap_from} | wanted: {len(W)} skills, learnable: {len(horse.weights)}")
     print("# cells a/b/c = no boost / gear set or brand stone / both")
+    if targets:
+        print("# coupons needed to end with every wanted skill in the given share of runs (+/-1 coupon; >150 = not reached)")
+        print("strategy\t" + "\t".join(f"for {t:g}%" for t in targets))
+        for strat in strategies:
+            if strat in ("natural", "ideal"):
+                continue
+            caches = [{} for _ in range(3)]
+            cols = []
+            for t in targets:
+                vals = []
+                for i, (gear, brand) in enumerate([(0, 0), (1, 0), (1, 1)]):
+                    n = H.coupons_needed(horse, horse.M(bonus, gear, brand), strat, t / 100, cache=caches[i],
+                                         tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted,
+                                         fodder=fodder, point_bonus=a.point_bonus, points=a.points, runs=a.runs,
+                                         seed=a.seed, reserve=a.reserve, swap_from=a.swap_from)
+                    vals.append(">150" if n is None else str(n))
+                cols.append("/".join(vals))
+            print(f"{strat}\t" + "\t".join(cols))
+        return 0
     print("strategy\tcoupons\tskills at 30\twanted at 30\tall wanted\tcoupons used")
     for budget in budgets:
         for strat in strategies:
@@ -133,7 +162,7 @@ def main():
             for gear, brand in [(0, 0), (1, 0), (1, 1)]:
                 res.append(H.simulate(horse, horse.M(bonus, gear, brand), strat, budget, a.tickets, a.level, learned,
                                       wanted, fodder, a.point_bonus, a.points, a.runs, a.seed,
-                                      reserve=a.reserve))
+                                      reserve=a.reserve, swap_from=a.swap_from))
             cell = lambda k, f: "/".join(f.format(r[k]) for r in res)
             cp = "-" if strat == "natural" else ("unlimited" if strat == "ideal" else str(budget))
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")

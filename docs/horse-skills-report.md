@@ -35,10 +35,11 @@ Everything here can be reproduced with [horse_skills.py](horse_skills.md), a com
 
 ## How a level-up picks a skill
 
-**In short:** each level-up teaches one skill or nothing.
+**In short:** each level-up is a single draw with one outcome: one skill, or nothing. It's not a separate roll for each skill; the game's own numbers rule that out ([How this was checked](#how-this-was-checked)).
 - Every skill has a fixed **weight** for each horse type. Common skills like Hind Kick have big weights; rare ones like S: Sideways have tiny ones.
+- **The chance of learning anything at all depends on how much weight the unlearned skills still add up to.** A fresh horse learns something on most level-ups. Once the common skills are learned, only small weights are left, and most level-ups teach nothing.
+- That's why the Coursier method works. Swapping Hind Kick away puts its big weight back into the draw, so later level-ups keep teaching something. And each time the horse relearns Hind Kick, that's one more coupon draw, which can't give Hind Kick back and favors the skill you want.
 - Your Training level and the boosts raise every skill's chance in the same proportion.
-- Learning a skill takes it out of the draw, which makes the remaining skills slightly more likely.
 - The horse's own level doesn't matter: a level-up at 25 has the same odds as one at 5, for the same learned skills.
 
 **The formula**, for each skill the horse hasn't learned yet:
@@ -70,6 +71,7 @@ The formula was compared with what the simulator shows on 2026-11-17:
 - **Weights:** taken from bdolytics and stored in `data/horse_skills.json`.
 - **W:** fitted to the simulator for each horse checked.
 - **Result:** every number below matches, within the rounding of bdolytics' weights (0.01).
+- **One draw, not one roll per skill:** the simulator's chances, "nothing" included, always add up to 100%, and "nothing" drops to exactly 0% at the cap. With a separate roll per skill, the Diné at Artisan 7 would get nothing 39.5% of the time at the chances shown, not 10.8%. Even tuned to give 10.8%, separate rolls would put Hind Kick at 16.2% instead of the 15.2% shown.
 
 | Horse | Simulator settings compared | Numbers compared |
 |---|---|---|

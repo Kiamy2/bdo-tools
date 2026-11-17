@@ -103,6 +103,13 @@ if ok:
     first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "200", "--target", "50",
+               "--strategy", "at30,coursier")
+m = re.search(r"^coursier\t(\d+)/(\d+)/(\d+)$", out, re.M)
+check("horse_skills --target (coupons needed)", code == 0 and m and all(10 <= int(x) <= 30 for x in m.groups())
+      and re.search(r"^at30\t\d+/\d+/\d+$", out, re.M), out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--target", "0")
+check("horse_skills: bad --target exits 2", code == 2 and "--target" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")
