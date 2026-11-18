@@ -341,8 +341,12 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
 
 def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
                   wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30,
-                  switch_at=DEFAULT_SWITCH_AT):
+                  switch_at=DEFAULT_SWITCH_AT, coupon=None):
     """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate().
+    coupon: a Mount Skill Selection Coupon used at the very end on the last missing skill, if the horse holds an
+    unwanted skill to change (at least as many learned skills as wanted ones). 'planned': every Change Coupon keeps
+    the rarest missing skill for it (desired skill = the second rarest missing); 'fallback': only the level-30
+    cleanup does (a choice made at level 30); None: no Selection Coupon. 'natural' uses no coupon of any kind.
 
     Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
     tails[B] (chances of missing at most 0..TAILS - 1 wanted skills), for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
@@ -366,12 +370,13 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
         spent, t, pts = 0, tickets, points
         latched = False
 
-        def swap(out):
+        def swap(out, keep=False):
             nonlocal spent, pts
             cands = [s for s in pool if s not in have and s != out]
             if not cands:
                 return None
-            target = min((s for s in wanted if s in cands), key=lambda s: wt[s], default=None)
+            missing = sorted((s for s in wanted if s in cands), key=lambda s: rank[s])
+            target = (missing[1] if keep and len(missing) >= 2 else missing[0]) if missing else None
             ws = [wt[s] * (1 + point_bonus * pts) if s == target else wt[s] for s in cands]
             new = _draw(rng, cands, ws)
             have.discard(out)
@@ -400,33 +405,39 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 continue
             if strategy == "coursier_switch" and len(have) >= switch_at:
                 latched = True                       # from now on, V2 swaps only
+            kp = coupon == "planned"
             if strategy == "coursier" or (strategy == "coursier_switch" and not latched):
                 for s in fodder:
                     if s in have and spent < spend_cap:
-                        swap(s)
+                        swap(s, kp)
             elif strategy in ("coursier_v2", "coursier_switch"):
                 if cyc in have and spent < spend_cap:
-                    swap(cyc)
+                    swap(cyc, kp)
             elif strategy == "once":
                 todo = sorted(have - wanted, key=lambda s: wt[s]) if _lvl + 1 == swap_from > 1 else [got]
                 for s in todo:
                     if s and s not in wanted and s in have and spent < spend_cap:
-                        swap(s)
+                        swap(s, kp)
             elif strategy == "hard":
                 for s in sorted(have - wanted, key=lambda s: wt[s]):
                     slot = s
                     while slot is not None and slot not in wanted and slot in have and spent < spend_cap:
-                        slot = swap(slot)
+                        slot = swap(slot, kp)
         counts.append(len(have))
         base = spent
+        sel = coupon is not None and strategy != "natural"
+        spare = sel and len(have) >= len(wanted)     # an unwanted skill for the Selection Coupon to change
+        stop = 1 if sel else 0                       # with it, the cleanup stops at one missing skill
         traj = [len(have & wanted)]                  # wanted skills after 0, 1, 2... cleanup coupons
         if strategy != "natural":
-            while not wanted <= have and len(traj) < 100000:      # level-30 cleanup (see _rarest_unwanted)
+            while len(wanted - have) > stop and len(traj) < 100000:      # level-30 cleanup (see _rarest_unwanted)
                 out = _rarest_unwanted(have, wanted, rank)
-                if out is None or swap(out) is None:
+                if out is None or swap(out, sel) is None:
                     break
                 traj.append(len(have & wanted))
-        need = base + len(traj) - 1 if wanted <= have else float("inf")
+        if spare:                                    # the Selection Coupon fills the last missing skill
+            traj = [min(len(wanted), x + 1) for x in traj]
+        need = base + len(traj) - 1 if traj[-1] == len(wanted) else float("inf")
         needed.append(need)
         last = len(traj) - 1
         for B in range(spend_cap, nb):
@@ -434,7 +445,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             if strategy == "natural":
                 j = 0
             wanted_sum[B] += traj[min(j, last)]
-            full_n[B] += need <= B if strategy != "natural" else traj[0] == len(wanted)
+            full_n[B] += traj[min(j, last)] == len(wanted)
             miss = len(wanted) - traj[min(j, last)]
             for t in range(miss, TAILS):
                 tail_n[B][t] += 1

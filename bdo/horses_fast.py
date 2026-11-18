@@ -52,16 +52,31 @@ if nb is not None:
             c += 1
         return c
 
-    @nb.njit(cache=True)
-    def _swap(out, have, pts, state, w, n, rare, pb):
-        """Coupon: replace skill 'out' by a draw among unlearned skills (not 'out'); desired = rarest missing
-        wanted skill, weight x (1 + pb * points). Returns (new skill or -1, have, state)."""
-        free = ~have & ~(np.int64(1) << out)
-        target = -1
+    @nb.njit(cache=True, inline="always")
+    def _target(free, rare, keep):
+        """Desired skill of a coupon: the rarest missing wanted skill; with keep (a Selection Coupon is kept for the
+        end), the second rarest when two or more are missing."""
+        first = -1
         for i in rare:
             if (free >> i) & 1:
-                target = i
-                break
+                if not keep:
+                    return i
+                if first < 0:
+                    first = i
+                else:
+                    return i
+        return first
+
+    @nb.njit(cache=True)
+    def _swap(out, have, pts, state, w, n, rare, pb):
+        return _swap_k(out, have, pts, state, w, n, rare, pb, False)
+
+    @nb.njit(cache=True)
+    def _swap_k(out, have, pts, state, w, n, rare, pb, keep):
+        """Coupon: replace skill 'out' by a draw among unlearned skills (not 'out'); desired skill (see _target)
+        weight x (1 + pb * points). Returns (new skill or -1, have, state)."""
+        free = ~have & ~(np.int64(1) << out)
+        target = _target(free, rare, keep)
         boost = 1.0 + pb * pts
         tot = 0.0
         for i in range(n):
@@ -83,11 +98,11 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                 rare, pb, points, max_level, switch_at):
+                 rare, pb, points, max_level, switch_at, keep):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
-        coursier_v2 for good).
+        coursier_v2 for good). keep: coupons keep the rarest missing skill for a Selection Coupon (see _target).
         Returns (held skills, coupons spent while leveling, Skill Change Points)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
@@ -127,13 +142,13 @@ if nb is not None:
             if st == 1 or (st == 7 and not latched):
                 for s in fod:
                     if (have >> s) & 1 and spent < spend_cap:
-                        nw, have, state = _swap(s, have, pts, state, w, n, rare, pb)
+                        nw, have, state = _swap_k(s, have, pts, state, w, n, rare, pb, keep)
                         if nw >= 0:
                             spent += 1
                             pts += 1
             elif st == 6 or st == 7:
                 if cyc >= 0 and (have >> cyc) & 1 and spent < spend_cap:
-                    nw, have, state = _swap(cyc, have, pts, state, w, n, rare, pb)
+                    nw, have, state = _swap_k(cyc, have, pts, state, w, n, rare, pb, keep)
                     if nw >= 0:
                         spent += 1
                         pts += 1
@@ -148,12 +163,12 @@ if nb is not None:
                     for q in range(m):
                         s = todo[q]
                         if (have >> s) & 1 and not (wmask >> s) & 1 and spent < spend_cap:
-                            nw, have, state = _swap(s, have, pts, state, w, n, rare, pb)
+                            nw, have, state = _swap_k(s, have, pts, state, w, n, rare, pb, keep)
                             if nw >= 0:
                                 spent += 1
                                 pts += 1
                 elif got >= 0 and not (wmask >> got) & 1 and (have >> got) & 1 and spent < spend_cap:
-                    nw, have, state = _swap(got, have, pts, state, w, n, rare, pb)
+                    nw, have, state = _swap_k(got, have, pts, state, w, n, rare, pb, keep)
                     if nw >= 0:
                         spent += 1
                         pts += 1
@@ -167,7 +182,7 @@ if nb is not None:
                 for q in range(m):
                     slot = todo[q]
                     while slot >= 0 and not (wmask >> slot) & 1 and (have >> slot) & 1 and spent < spend_cap:
-                        slot, have, state = _swap(slot, have, pts, state, w, n, rare, pb)
+                        slot, have, state = _swap_k(slot, have, pts, state, w, n, rare, pb, keep)
                         if slot >= 0:
                             spent += 1
                             pts += 1
@@ -175,13 +190,13 @@ if nb is not None:
 
     @nb.njit(cache=True, parallel=True)
     def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
-                order, rare, pb, points, max_level, switch_at=0):
+                order, rare, pb, points, max_level, switch_at=0, keep=False):
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
         for r in nb.prange(runs):
             a, b, c = _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
-                               fod, cyc, order, rare, pb, points, max_level, switch_at)
+                               fod, cyc, order, rare, pb, points, max_level, switch_at, keep)
             S[r] = a
             base[r] = b
             pts[r] = c
@@ -205,13 +220,14 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _trans(S, p, out, w, n, rare, pb, nxt, prb):
+        return _trans_k(S, p, out, w, n, rare, pb, nxt, prb, False)
+
+    @nb.njit(cache=True)
+    def _trans_k(S, p, out, w, n, rare, pb, nxt, prb, keep):
+        """Next held-skill sets and their chances for one coupon swapping 'out' (desired skill: see _target)."""
         full = (np.int64(1) << n) - 1
         free = ~S & ~(np.int64(1) << out) & full
-        target = -1
-        for i in rare:
-            if (free >> i) & 1:
-                target = i
-                break
+        target = _target(free, rare, keep)
         boost = 1.0 + pb * p
         tot = 0.0
         for i in range(n):
@@ -228,8 +244,10 @@ if nb is not None:
         return m
 
     @nb.njit(cache=True)
-    def _succ(keys, bound, w, n, wmask, order, rare, pb):
-        """Successor keys (points p + 1) of the states that can still use a coupon (p < bound)."""
+    def _succ(keys, bound, w, n, wmask, order, rare, pb, sel):
+        """Successor keys (points p + 1) of the states that can still use a coupon (p < bound). sel = 1: a Selection
+        Coupon is kept for the end, so the cleanup stops at one missing skill and keeps the rarest for it."""
+        nW = _pop(wmask)
         out = np.empty(len(keys) * n, np.int64)
         m_tot = 0
         nxt = np.empty(n, np.int64)
@@ -237,18 +255,18 @@ if nb is not None:
         for k in keys:
             S = k >> PBITS
             p = k & ((1 << PBITS) - 1)
-            if (S & wmask) == wmask or p >= bound:
+            if _pop(S & wmask) >= nW - sel or p >= bound:
                 continue
             o = _slot(S, wmask, order)
             if o < 0:
                 continue
-            m = _trans(S, p, o, w, n, rare, pb, nxt, prb)
+            m = _trans_k(S, p, o, w, n, rare, pb, nxt, prb, sel > 0)
             for i in range(m):
                 out[m_tot] = (nxt[i] << PBITS) | (p + 1)
                 m_tot += 1
         return out[:m_tot]
 
-    def _levels(start, bound, w, n, wmask, order, rare, pb, chunk=200_000):
+    def _levels(start, bound, w, n, wmask, order, rare, pb, sel=0, chunk=200_000):
         """Sorted keys of every state reachable from the start keys, per points level."""
         start = np.unique(start)
         ps = start & ((1 << PBITS) - 1)
@@ -256,15 +274,16 @@ if nb is not None:
         for p in range(int(ps.min()), bound + 1):
             cur = np.union1d(nxt, start[ps == p])
             levels[p] = cur
-            parts = [np.unique(_succ(cur[i:i + chunk], bound, w, n, wmask, order, rare, pb))
+            parts = [np.unique(_succ(cur[i:i + chunk], bound, w, n, wmask, order, rare, pb, sel))
                      for i in range(0, len(cur), chunk)]
             nxt = np.unique(np.concatenate(parts)) if parts else np.empty(0, np.int64)
         return levels
 
     @nb.njit(cache=True, parallel=True)
-    def _sweep_level(K, Kn, Vn, V, cmax, J, enc, dec, q, w, n, wmask, order, rare, pb):
+    def _sweep_level(K, Kn, Vn, V, cmax, J, enc, dec, q, w, n, wmask, order, rare, pb, sel):
         """Values V[row, c, t] of the states K at one points level (c = 0..cmax), from those of the next level
-        (keys Kn, values Vn). q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t]."""
+        (keys Kn, values Vn). q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t].
+        sel: see _succ (the values are then those of the cleanup alone, before the Selection Coupon)."""
         nW = _pop(wmask)
         for b in nb.prange((len(K) + 4095) // 4096):
             nxt = np.empty(n, np.int64)
@@ -278,10 +297,10 @@ if nb is not None:
                 hw = _pop(S & wmask)
                 miss = nW - hw
                 m = 0
-                if miss > 0 and cmax > 0:
+                if miss > sel and cmax > 0:
                     o = _slot(S, wmask, order)
                     if o >= 0:
-                        m = _trans(S, p, o, w, n, rare, pb, nxt, prb)
+                        m = _trans_k(S, p, o, w, n, rare, pb, nxt, prb, sel > 0)
                 for i in range(m):
                     rows2[i] = np.searchsorted(Kn, (nxt[i] << PBITS) | (p + 1))
                 for c in range(cmax + 1):
@@ -310,7 +329,7 @@ if nb is not None:
                 for t in range(acc.shape[2]):
                     acc[plan[i], B, t] += V[r, B - base[i], t] * dec[t]
 
-    def cleanup_values(hkeys, base, plan, cap, nplans, C, bound, J, low_memory, w, n, wmask, order, rare, pb):
+    def cleanup_values(hkeys, base, plan, cap, nplans, C, bound, J, low_memory, w, n, wmask, order, rare, pb, sel=0):
         """Sums over the horses of each plan of the exact cleanup values, per budget: acc[plan, B, t] (see above).
         hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling."""
         nv = J + 1
@@ -322,13 +341,13 @@ if nb is not None:
             enc = dec = np.ones(nv)
             dt = np.float32
         acc = np.zeros((nplans, C + 1, nv))
-        levels = _levels(hkeys, bound, w, n, wmask, order, rare, pb)
+        levels = _levels(hkeys, bound, w, n, wmask, order, rare, pb, sel)
         hl = hkeys & ((1 << PBITS) - 1)
         Kn, Vn = np.empty(0, np.int64), np.zeros((0, 1, nv), dt)
         for p in sorted(levels, reverse=True):
             K = levels.pop(p)
             V = np.empty((len(K), bound - p + 1, nv), dt)
-            _sweep_level(K, Kn, Vn, V, bound - p, J, enc, dec, low_memory, w, n, wmask, order, rare, pb)
+            _sweep_level(K, Kn, Vn, V, bound - p, J, enc, dec, low_memory, w, n, wmask, order, rare, pb, sel)
             idx = np.nonzero(hl == p)[0]
             if len(idx):
                 _accumulate(hkeys, base, plan, cap, idx, K, V, dec, C, acc)
@@ -369,14 +388,20 @@ if nb is not None:
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
             self.low_memory = low_memory
 
-        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False):
+        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None):
             """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
             seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
             B = 0..max_budget (None below spend_cap), skills (average skills at 30); with tails=True also
-            tails[B] = [P(missing <= t wanted skills) for t = 0..TAILS - 1] (a bit slower)."""
+            tails[B] = [P(missing <= t wanted skills) for t = 0..TAILS - 1] (a bit slower).
+            coupon: a Mount Skill Selection Coupon used at the very end (on the last missing skill; the horse needs
+            an unwanted skill to change, i.e. at least as many learned skills as wanted ones). 'planned': every
+            Change Coupon (leveling and level 30) keeps the rarest missing skill for it (desired skill = the second
+            rarest missing); 'fallback': only the level-30 cleanup does (decided at 30); None: no Selection Coupon.
+            The 'natural' strategy uses no coupon of any kind."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
-            C, out, batch = self.C, {}, []
+            C, out, batch, nW = self.C, {}, [], self.n_wanted
+            sel = coupon is not None
             hk, hb, hp, hc = [], [], [], []
             for i, p in enumerate(plans):
                 strategy, swap_from, spend_cap, switch_at = p
@@ -385,12 +410,12 @@ if nb is not None:
                     spend_cap = 0
                 S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets,
                                        self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
-                                       self.max_level, switch_at)
-                res = {"skills": float(_popcounts(S).mean()), "wanted_total": self.n_wanted}
+                                       self.max_level, switch_at, coupon == "planned")
+                res = {"skills": float(_popcounts(S).mean()), "wanted_total": nW}
                 out[p] = res
-                if st == 4:                                              # natural: no cleanup
-                    miss = self.n_wanted - _popcounts(S & wmask)
-                    res["full"], res["wanted"] = [float((miss == 0).mean())] * (C + 1), [float((self.n_wanted - miss).mean())] * (C + 1)
+                if st == 4:                                              # natural: no cleanup, no coupon
+                    miss = nW - _popcounts(S & wmask)
+                    res["full"], res["wanted"] = [float((miss == 0).mean())] * (C + 1), [float((nW - miss).mean())] * (C + 1)
                     if tails:
                         res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
                 else:
@@ -401,32 +426,50 @@ if nb is not None:
                     batch.append((p, spend_cap))
                 if progress:
                     progress(label, i + 1, len(plans))
-            if batch:
-                J = TAILS if tails else 1
-                acc = cleanup_values(np.concatenate(hk), np.concatenate(hb), np.concatenate(hp), np.concatenate(hc),
-                                     len(batch), C, self.points + C, J, self.low_memory, w, n, wmask, order, rare,
-                                     self.pb)
-                for j, (p, cap) in enumerate(batch):
-                    out[p]["full"] = [float(acc[j, B, 0] / runs) if B >= cap else None for B in range(C + 1)]
-                    out[p]["wanted"] = [float(acc[j, B, J] / runs) if B >= cap else None for B in range(C + 1)]
-                    if tails:
-                        out[p]["tails"] = [[float(acc[j, B, t] / runs) for t in range(J)] if B >= cap else None
-                                           for B in range(C + 1)]
+            if not batch:
+                return out
+            hk, hb, hp, hc = map(np.concatenate, (hk, hb, hp, hc))
+            nb_ = len(batch)
+            T = TAILS if tails else 1
+            if not sel:
+                acc = cleanup_values(hk, hb, hp, hc, nb_, C, self.points + C, T, self.low_memory, w, n, wmask, order,
+                                     rare, self.pb)
+                full = lambda j, B: acc[j, B, 0]
+                wanted = lambda j, B: acc[j, B, T]
+                tail = lambda j, B, t: acc[j, B, t]
+            else:
+                # horses with a spare skill (j) use the coupon on the last missing skill: their result is the cleanup's
+                # (which stops at one missing skill) shifted by one; the others (j + nb_) can't use it
+                spare = _popcounts(hk >> PBITS) >= nW
+                J = T + 1
+                acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, self.points + C, J,
+                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1)
+                n_sp = np.bincount(hp[spare], minlength=nb_)
+                full = lambda j, B: acc[j, B, 1] + acc[j + nb_, B, 0]
+                wanted = lambda j, B: acc[j, B, J] + n_sp[j] - acc[j, B, 0] + acc[j + nb_, B, J]
+                tail = lambda j, B, t: acc[j, B, t + 1] + acc[j + nb_, B, t]
+            for j, (p, cap) in enumerate(batch):
+                out[p]["full"] = [float(full(j, B) / runs) if B >= cap else None for B in range(C + 1)]
+                out[p]["wanted"] = [float(wanted(j, B) / runs) if B >= cap else None for B in range(C + 1)]
+                if tails:
+                    out[p]["tails"] = [[float(tail(j, B, t) / runs) for t in range(T)] if B >= cap else None
+                                       for B in range(C + 1)]
             return out
 
-        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0):
+        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0, coupon=None):
             """One plan (see plans())."""
             p = (strategy, swap_from, spend_cap, switch_at)
-            return self.plans([p], runs, seed)[p]
+            return self.plans([p], runs, seed, coupon=coupon)[p]
 
 
 def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "coursier_switch"), runs=(1000, 4000),
-             top=6, max_close=25, seed=1, progress=None, start_level=1, **kw):
+             top=6, max_close=25, seed=1, progress=None, start_level=1, coupon=None, **kw):
     """Like bdo.horses.optimize, but tries every plan: at30, and each strategy with every start level (from the
     next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
     (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
     and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses, and the
     general rule's plan for every budget (H.rule_plan), with the chances of missing at most 0..4 wanted skills.
+    coupon: see Evaluator.plans (the search then aims at the full set with the Selection Coupon).
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
@@ -442,7 +485,7 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     s1 = {}
 
     def run(todo, label):
-        s1.update(ev.plans([p for p in todo if p not in s1], runs[0], seed, progress, label))
+        s1.update(ev.plans([p for p in todo if p not in s1], runs[0], seed, progress, label, coupon=coupon))
 
     def promising():
         keep = {("at30", 1, 0, 0)}
@@ -459,4 +502,4 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
     final = promising() | {H.rule_plan(B, start_level) for B in range(max_budget + 1)}
-    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True)
+    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon)

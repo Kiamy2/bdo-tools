@@ -108,6 +108,17 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
 check("rule_plan: fitted, formula, nearest fitted below, partway horse", code == 0 and out.strip() ==
       "('coursier_switch', 10, 15, 11) ('coursier_v2', 16, 9, 0) ('coursier_switch', 9, 22, 14) "
       "('coursier_switch', 16, 15, 11)", out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--selection-coupon", "planned")
+check("horse_skills: --selection-coupon without --optimize exits 2", code == 2 and "--optimize" in out, out)
+code, out = run("-c", """
+import sys
+sys.path.insert(0, ".")
+from bdo import horses as H
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(7.1, 0, 0)
+f = lambda c: H.simulate_plan(h, M, "coursier_v2", 10, 12, 20, runs=1500, seed=5, coupon=c)["full"][20]
+print(f(None) + 0.1 < f("fallback") <= 1, f(None) + 0.1 < f("planned") <= 1)
+""")
+check("bdo.horses simulate_plan with a Selection Coupon (planned / fallback beat none)", code == 0 and out.strip() == "True True", out)
 # coursier_switch with a threshold never reached is coursier, with 0 it's coursier_v2 (same random numbers)
 code, out = run("-c", """
 import sys
@@ -173,6 +184,20 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
     check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best; "
           "full set <= missing 1 <= missing 2)", sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0
           and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
+    sugrow = lambda o, B: next((l.split("\t") for l in o.splitlines() if l.startswith(f"{B}\tfrom lvl")), None)
+    pct = lambda x: float(x.rstrip("%"))
+    T8 = "T8 example (bdolytics icon horse_71)"
+    code, out = run("horse_skills.py", T8, "--training", "Skilled 1", "--optimize", "12", "--selection-coupon", "planned")
+    code0, out0 = run("horse_skills.py", T8, "--training", "Skilled 1", "--optimize", "12")
+    r, r0 = sugrow(out, 12), sugrow(out0, 12)
+    check("--selection-coupon planned: full set with it well above without (T8 Skilled 1, 12 coupons)",
+          code == 0 and "Selection Coupon PLANNED" in out and r and r0 and pct(r[2]) >= pct(r0[2]) + 15, out + out0)
+    code, out = run("horse_skills.py", T8, "--training", "Skilled 1", "--optimize", "12", "--selection-coupon", "fallback",
+                    "--tickets", "2")
+    rows = [sugrow(out, B) for B in (8, 10, 12)]
+    check("--selection-coupon fallback and --tickets: extra columns (with the coupon >= without; keeping the tickets "
+          "<= using them, within noise)", code == 0 and all(rows) and all(pct(x[6]) >= pct(x[2]) and pct(x[7]) <= pct(x[2]) + 1
+                                                            for x in rows), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba", "--low-memory")

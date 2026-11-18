@@ -68,6 +68,12 @@ def main():
     ap.add_argument("--engine", default="auto", choices=["auto", "python", "numba"],
                     help="--optimize engine: numba (fast, exact cleanup; needs numba), python, or auto (default: "
                     "numba if installed)")
+    ap.add_argument("--selection-coupon", choices=["planned", "fallback"],
+                    help="--optimize with one Mount Skill Selection Coupon, used at the very end on the last missing "
+                    "skill (the horse needs an unwanted skill to change). planned: you'll use it for sure; every Change "
+                    "Coupon then aims at the second rarest missing skill and keeps the rarest for it (a bit better, "
+                    "but only if you do use it). fallback: a safety net; plans as without it, plus your chance if you "
+                    "decide at level 30 to use it (from then on, the cleanup keeps the rarest for it)")
     ap.add_argument("--low-memory", action="store_true",
                     help="--optimize, fast engine: keep the level-30 values as 16-bit numbers (less memory, results "
                     "within about 0.001 points; speed about the same)")
@@ -149,6 +155,9 @@ def main():
 
     if a.optimize is not None:
         return optimize_report(a, horse, bonus, learned, wanted, fodder, head)
+    if a.selection_coupon:
+        print("ERROR: --selection-coupon works with --optimize", file=sys.stderr)
+        return 2
     budgets = [int(x) for x in a.sweep.split(",")] if a.sweep else [a.coupons]
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
     print(head)
@@ -212,13 +221,25 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         return 2
     progress = lambda lab, i, n: (i % 500 == 0 or i == n) and print(f"# {lab}: {i}/{n} plans", file=sys.stderr)
     t0 = time.time()
+    planned = "planned" if a.selection_coupon == "planned" else None
+
+    def evaluate(plans, coupon=None, **override):
+        """The given plans again, on the same horses as the final check (for the extra columns)."""
+        k = dict(kw, **override)
+        if engine == "numba":
+            ev = HF.Evaluator(horse, M, max_budget=a.optimize, low_memory=a.low_memory, **k)
+            return ev.plans(sorted(set(plans)), 4000, a.seed + 1000, tails=True, coupon=coupon)
+        return {p: H.simulate_plan(horse, M, p[0], p[1], p[2], a.optimize, runs=4000, seed=a.seed + 1000,
+                                   switch_at=p[3], coupon=coupon, **k) for p in set(plans)}
+
     if engine == "numba":
-        res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, low_memory=a.low_memory, **kw)
+        res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, low_memory=a.low_memory,
+                          coupon=planned, **kw)
         searched = ("every plan: at30, and coursier / coursier_v2 with every start level and spending cap; "
                     f"coursier_switch with every start level and threshold {H.SWITCH_TS[0]}-{H.SWITCH_TS[-1]}, on a "
                     "grid of spending caps refined around the best; level-30 cleanup computed exactly (fast engine)")
     else:
-        res = H.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
+        res = H.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, coupon=planned, **kw)
         searched = ("a grid of plans (coursier, coursier_v2, coursier_switch, once, hard), then every start level, "
                     "spending cap and threshold around the best ones (plain-Python engine)")
     nw = next(iter(res.values()))["wanted_total"]
@@ -226,6 +247,11 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
           f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
     print(f"# Searched: {searched}.")
+    if planned:
+        print("# With a Selection Coupon PLANNED: every chance below includes it, used at the very end on the last")
+        print("# missing skill (needs an unwanted skill to change); every Change Coupon, while leveling and at level 30,")
+        print("# aims at the SECOND rarest missing skill (the rarest is kept for the Selection Coupon). That targeting is")
+        print("# only better if you do use the coupon; as a mere safety net, use --selection-coupon fallback.")
     print("# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the")
     print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup;")
     print("# coursier_switch: V0 = coursier swaps, V2 = coursier_v2 swaps, learned skills don't count innate ones.")
@@ -251,16 +277,30 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     print("# only); learned skills don't count innate ones; keep = coupons kept for the level-30 cleanup.")
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more).")
-    print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%\tsource")
+    sug = {B: H.suggested_plan(res, B, 0.01, a.level) for B in range(1, a.optimize + 1)}
+    extra_head, extras = "", []
+    if a.selection_coupon == "fallback":
+        print("# with Selection Coupon: the full-set chance if, at level 30, you decide to use your Selection Coupon")
+        print("# at the end (from then on, Change Coupons aim at the second rarest missing skill, the coupon fills")
+        print("# the last one). Leveling and the plans above don't change: decide at 30, depending on how it went.")
+        extra_head += "\twith Selection Coupon"
+        extras.append(evaluate([v[0] for v in sug.values()], coupon="fallback"))
+    if a.tickets:
+        print(f"# keeping tickets: the full-set chance if you don't use your {a.tickets} Level Down Ticket(s) (the same")
+        print("# plan); the other columns use them on every level-up that teaches nothing, from now on.")
+        extra_head += "\tkeeping tickets"
+        extras.append(evaluate([v[0] for v in sug.values()], coupon=planned, tickets=0))
+    print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%" + extra_head + "\tsource")
     for B in range(1, a.optimize + 1):
-        plan, src, rc = H.suggested_plan(res, B, 0.01, a.level)
+        plan, src, rc = sug[B]
         best = res[H.tied_plans(res, B, "full", 0)[0]]["full"][B]
         note = (f"rule (best {100 * best:.1f}%)" if src == "rule"
                 else f"best (rule: {'not checked' if rc is None else f'{100 * rc:.1f}%'})")
         tl = res[plan]["tails"][B]
         w5 = H.worst5(tl)
+        ex = "".join(f"\t{100 * e[plan]['full'][B]:.1f}%" for e in extras)
         print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
-              f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{note}")
+              f"{w5 if w5 is not None else f'{H.TAILS}+'}{ex}\t{note}")
     return 0
 
 if __name__ == "__main__":
