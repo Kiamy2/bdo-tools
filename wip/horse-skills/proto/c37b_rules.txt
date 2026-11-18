@@ -1,0 +1,85 @@
+# C37: loss (percentage points of the full-set chance) of one plan per budget for everyone.
+# Cross-validated: chosen on half of the reliable cases, measured on the other half (5 random splits x 2).
+# Cells: worst loss / average loss on the held-out cases.
+
+rule family	16 coupons	17 coupons	18 coupons	19 coupons	20 coupons	21 coupons	22 coupons	23 coupons	24 coupons
+any plan	0.6 / -0.4	2.2 / -0.2	1.9 / -0.2	2.0 / -0.2	1.3 / -0.2	0.8 / -0.2	1.5 / -0.2	1.0 / -0.2	0.8 / -0.2
+V0	26.6 / 9.9	25.2 / 8.5	22.5 / 7.3	20.9 / 6.1	17.7 / 5.1	15.5 / 4.3	13.7 / 3.4	12.4 / 2.7	10.5 / 2.1
+V2	0.6 / -0.4	1.1 / -0.3	2.8 / -0.1	3.7 / 0.3	4.5 / 0.4	5.1 / 0.5	5.1 / 0.5	5.9 / 0.5	6.3 / 0.7
+V0 until 9 held	2.3 / -0.2	1.7 / -0.2	2.5 / -0.1	1.4 / -0.1	2.0 / -0.1	2.1 / -0.0	2.2 / -0.1	2.0 / 0.1	2.3 / 0.1
+V0 until 10 held	2.4 / -0.1	2.2 / -0.2	1.3 / -0.2	1.7 / -0.1	1.4 / -0.1	2.1 / -0.1	2.4 / -0.1	2.1 / 0.0	2.4 / 0.0
+V0 until 11 held	3.1 / 0.1	2.2 / -0.0	2.0 / -0.1	1.6 / -0.1	1.2 / -0.2	1.5 / -0.1	1.7 / -0.2	1.3 / -0.1	1.5 / -0.1
+V0 until 12 held	3.6 / 0.3	4.2 / 0.1	2.9 / -0.0	2.4 / -0.1	1.3 / -0.2	1.3 / -0.2	0.8 / -0.2	0.8 / -0.2	0.9 / -0.1
+V0 until 13 held	6.2 / 1.0	5.4 / 0.6	4.5 / 0.3	3.1 / 0.2	2.3 / 0.0	2.5 / -0.1	1.5 / -0.2	1.0 / -0.2	0.5 / -0.2
+V0 until 14 held	8.2 / 1.7	7.1 / 1.3	5.8 / 0.9	4.9 / 0.6	3.9 / 0.4	3.2 / 0.3	3.7 / 0.1	1.5 / -0.0	0.9 / -0.1
+V0 until 15 held	10.8 / 3.2	10.5 / 2.7	8.6 / 1.9	7.2 / 1.5	6.0 / 1.1	4.7 / 0.8	3.0 / 0.5	3.6 / 0.3	2.2 / 0.1
+V0 until 16 held	16.9 / 5.7	15.4 / 4.6	12.4 / 3.7	10.9 / 3.1	9.6 / 2.5	8.4 / 1.9	7.4 / 1.5	5.9 / 1.1	4.6 / 0.8
+V0 until T held (any T)	2.4 / -0.2	2.2 / -0.2	1.9 / -0.2	2.0 / -0.2	1.3 / -0.2	0.8 / -0.2	1.5 / -0.2	1.0 / -0.2	0.8 / -0.2
+C29 rule (V2 from 29 - 1.5 x coupons)	0.3 / -0.4	1.0 / -0.4	2.7 / -0.2	3.6 / 0.0	4.3 / 0.2	5.0 / 0.3	4.9 / 0.4	5.7 / 0.5	6.1 / 0.6
+
+# Rules chosen on all reliable cases, rechecked with 4000 fresh horses per case (worst / average loss;
+# 'Arduanatt' = worst loss on the Arduanatt cases, left out of the fitting: its no-skill weight is unchecked).
+budget	rule family	plan	worst	average	Arduanatt worst	worst case
+16	any plan	V2, start 5, keep 1	0.8	-0.1	0.1	T8 example | Skilled 1 | none | level 8, 4 skills
+16	V2	V2, start 5, keep 1	0.8	-0.1	0.1	T8 example | Skilled 1 | none | level 8, 4 skills
+16	V0 until T held (any T)	V0 until 9 held, then V2, start 10, keep 0	1.9	0.3	0.9	Doom | Beginner 1 | none
+16	V0 until 11 held	V0 until 11 held, then V2, start 14, keep 0	3.6	0.6	1.0	Doom | Beginner 1 | none
+16	V0 until 12 held	V0 until 12 held, then V2, start 13, keep 3	5.3	0.9	1.7	Doom | Beginner 1 | none
+16	V0 until 13 held	V0 until 13 held, then V2, start 13, keep 2	7.8	1.5	2.5	Doom | Beginner 1 | none
+16	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 5, keep 0	0.8	-0.1	0.1	T8 example | Skilled 1 | none | level 8, 4 skills
+17	any plan	V2, start 4, keep 2	1.4	0.0	0.4	T8 example | Skilled 1 | none | level 8, 4 skills
+17	V2	V2, start 4, keep 2	1.4	0.0	0.4	T8 example | Skilled 1 | none | level 8, 4 skills
+17	V0 until T held (any T)	V0 until 9 held, then V2, start 10, keep 5	1.8	0.2	0.6	Doom | Beginner 1 | none
+17	V0 until 11 held	V0 until 11 held, then V2, start 11, keep 1	3.1	0.3	0.5	Doom | Beginner 1 | none
+17	V0 until 12 held	V0 until 12 held, then V2, start 13, keep 4	4.4	0.6	1.0	Doom | Beginner 1 | none
+17	V0 until 13 held	V0 until 13 held, then V2, start 13, keep 3	6.4	1.0	1.5	Doom | Beginner 1 | none
+17	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 4, keep 0	1.4	0.0	0.4	T8 example | Skilled 1 | none | level 8, 4 skills
+18	any plan	V0 until 10 held, then V2, start 10, keep 1	1.3	0.2	0.6	Doom | Beginner 1 | none
+18	V2	V2, start 7, keep 3	2.4	0.1	0.1	T8 example | Skilled 1 | none | level 8, 4 skills
+18	V0 until T held (any T)	V0 until 10 held, then V2, start 10, keep 1	1.3	0.2	0.6	Doom | Beginner 1 | none
+18	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 2	2.4	0.3	0.9	Doom | Beginner 1 | none
+18	V0 until 12 held	V0 until 12 held, then V2, start 13, keep 3	3.6	0.4	0.5	Doom | Beginner 1 | none
+18	V0 until 13 held	V0 until 13 held, then V2, start 13, keep 4	5.2	0.8	0.9	Doom | Beginner 1 | none
+18	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	2.4	0.2	0.2	T8 example | Skilled 1 | none | level 8, 4 skills
+19	any plan	V0 until 11 held, then V2, start 10, keep 4	1.7	0.2	1.1	Doom | Beginner 1 | none
+19	V2	V2, start 7, keep 10	3.3	0.9	0.5	T8 example | Beginner 1 | none
+19	V0 until T held (any T)	V0 until 11 held, then V2, start 10, keep 4	1.7	0.2	1.1	Doom | Beginner 1 | none
+19	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 4	1.7	0.2	1.1	Doom | Beginner 1 | none
+19	V0 until 12 held	V0 until 12 held, then V2, start 13, keep 4	2.9	0.4	0.7	Doom | Beginner 1 | none
+19	V0 until 13 held	V0 until 13 held, then V2, start 12, keep 2	3.6	0.5	0.9	Doom | Beginner 1 | none
+19	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	3.2	0.4	0.6	T8 example | Skilled 1 | none | level 8, 4 skills
+20	any plan	V0 until 11 held, then V2, start 10, keep 5	1.6	0.2	1.1	T8 example | Skilled 1 | none
+20	V2	V2, start 7, keep 11	4.1	0.9	0.9	T8 example | Beginner 1 | none
+20	V0 until T held (any T)	V0 until 11 held, then V2, start 10, keep 5	1.6	0.2	1.1	T8 example | Skilled 1 | none
+20	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 5	1.6	0.2	1.1	T8 example | Skilled 1 | none
+20	V0 until 12 held	V0 until 12 held, then V2, start 10, keep 3	1.8	0.2	1.1	Doom | Beginner 1 | none
+20	V0 until 13 held	V0 until 13 held, then V2, start 10, keep 0	3.3	0.4	1.0	Doom | Beginner 1 | none
+20	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	3.9	0.5	1.0	T8 example | Skilled 1 | none | level 8, 4 skills
+21	any plan	V0 until 12 held, then V2, start 10, keep 4	1.3	0.1	1.0	Doom | Beginner 1 | none
+21	V2	V2, start 7, keep 12	5.1	0.9	1.3	T8 example | Skilled 1 | none | level 8, 4 skills
+21	V0 until T held (any T)	V0 until 12 held, then V2, start 10, keep 4	1.3	0.1	1.0	Doom | Beginner 1 | none
+21	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 1	1.5	0.2	1.1	T8 example | Skilled 1 | none
+21	V0 until 12 held	V0 until 12 held, then V2, start 10, keep 4	1.3	0.1	1.0	Doom | Beginner 1 | none
+21	V0 until 13 held	V0 until 13 held, then V2, start 10, keep 3	2.4	0.2	0.8	Doom | Beginner 1 | none
+21	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	5.1	0.6	1.4	T8 example | Skilled 1 | none | level 8, 4 skills
+22	any plan	V0 until 13 held, then V2, start 10, keep 4	1.8	0.1	0.1	Doom | Beginner 1 | none
+22	V2	V2, start 2, keep 6	5.8	0.7	1.1	T8 example | Skilled 1 | none | level 8, 4 skills
+22	V0 until T held (any T)	V0 until 13 held, then V2, start 10, keep 4	1.8	0.1	0.1	Doom | Beginner 1 | none
+22	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 5	1.5	0.1	0.4	T8 example | Skilled 1 | none
+22	V0 until 12 held	V0 until 12 held, then V2, start 13, keep 6	1.7	0.3	0.5	Doom | Beginner 1 | none
+22	V0 until 13 held	V0 until 13 held, then V2, start 10, keep 4	1.8	0.1	0.1	Doom | Beginner 1 | none
+22	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	5.8	0.7	1.1	T8 example | Skilled 1 | none | level 8, 4 skills
+23	any plan	V0 until 13 held, then V2, start 10, keep 5	1.4	0.1	0.1	Doom | Beginner 1 | none
+23	V2	V2, start 7, keep 8	5.9	0.8	1.3	T8 example | Skilled 1 | none | level 8, 4 skills
+23	V0 until T held (any T)	V0 until 13 held, then V2, start 10, keep 5	1.4	0.1	0.1	Doom | Beginner 1 | none
+23	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 11	1.6	0.3	0.4	Doom | Beginner 1 | none
+23	V0 until 12 held	V0 until 12 held, then V2, start 10, keep 9	1.2	0.2	0.3	Doom | Beginner 1 | none
+23	V0 until 13 held	V0 until 13 held, then V2, start 10, keep 5	1.4	0.1	0.1	Doom | Beginner 1 | none
+23	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	5.9	0.8	1.5	T8 example | Skilled 1 | none | level 8, 4 skills
+24	any plan	V0 until 13 held, then V2, start 4, keep 1	1.3	0.0	0.3	Doom | Beginner 1 | none
+24	V2	V2, start 7, keep 15	6.5	1.1	1.7	T8 example | Skilled 1 | none | level 8, 4 skills
+24	V0 until T held (any T)	V0 until 13 held, then V2, start 4, keep 1	1.3	0.0	0.3	Doom | Beginner 1 | none
+24	V0 until 11 held	V0 until 11 held, then V2, start 10, keep 12	1.7	0.4	0.6	T8 example | Skilled 1 | none
+24	V0 until 12 held	V0 until 12 held, then V2, start 12, keep 5	1.0	0.2	0.4	T8 example | Skilled 1 | none
+24	V0 until 13 held	V0 until 13 held, then V2, start 4, keep 1	1.3	0.0	0.3	Doom | Beginner 1 | none
+24	C29 rule (V2 from 29 - 1.5 x coupons)	V2, start 2, keep 0	6.5	0.9	1.7	T8 example | Skilled 1 | none | level 8, 4 skills
