@@ -19,15 +19,16 @@ from bdo.horses_fast import _next, _mix, _pop, _swap, _slot, _trans, _explore, P
 
 
 @nb.njit(cache=True)
-def _level30x(r, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmask, fod, cyc, rare, pb, max_level):
+def _level30x(r, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmask, fod, cyc, rare, pb, max_level,
+              start_level, points):
     a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
     b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
     state = np.uint64(a) ^ (np.uint64(b) * np.uint64(0xE7037ED1A0B428DB))
     have = lmask
     spent = 0
-    pts = 0
+    pts = points
     latched = False
-    for lvl in range(1, max_level):
+    for lvl in range(start_level, max_level):
         su = 0.0
         for i in range(n):
             if not (have >> i) & 1:
@@ -82,13 +83,14 @@ def _level30x(r, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmas
 
 
 @nb.njit(cache=True, parallel=True)
-def _many30x(runs, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmask, fod, cyc, rare, pb, max_level):
+def _many30x(runs, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmask, fod, cyc, rare, pb, max_level,
+             start_level=1, points=0):
     S = np.empty(runs, np.int64)
     base = np.empty(runs, np.int64)
     pts = np.empty(runs, np.int64)
     for r in nb.prange(runs):
         a, b, c = _level30x(r, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmask, fod, cyc, rare, pb,
-                            max_level)
+                            max_level, start_level, points)
         S[r] = a
         base[r] = b
         pts[r] = c
@@ -162,7 +164,7 @@ class TableG:
 
 
 class Evaluator:
-    def __init__(self, horse, M, C=50, table=None):
+    def __init__(self, horse, M, C=50, table=None, learned=(), start_level=1, points=0):
         pool = list(horse.weights)
         idx = {s: i for i, s in enumerate(pool)}
         w = [float(horse.weights[s]) for s in pool]
@@ -172,7 +174,9 @@ class Evaluator:
         order = sorted(range(len(pool)), key=lambda i: (w[i], i))
         wmask = sum(1 << idx[s] for s in wanted)
         self.rare = [i for i in order if wmask >> i & 1]
-        self.a = (np.array(w), len(pool), float(horse.W), float(M), np.int64(0), np.int64(wmask),
+        lmask = sum(1 << idx[s] for s in set(learned) if s in idx)
+        self.start_level, self.points = start_level, points
+        self.a = (np.array(w), len(pool), float(horse.W), float(M), np.int64(lmask), np.int64(wmask),
                   np.array([idx[s] for s in fod], np.int64), idx[cyc] if cyc else -1, np.array(self.rare, np.int64))
         self.C = C
         self.table = table or TableG(w, wmask, order, self.rare, C)
@@ -180,7 +184,7 @@ class Evaluator:
     def plan(self, st, swap_from, cap, xa=0, xb=0, runs=1000, seed=1):
         w, n, W, M, lmask, wmask, fod, cyc, rare = self.a
         S, base, pts = _many30x(runs, seed, w, n, W, M, st, swap_from, cap if st else 0, xa, xb, lmask, wmask, fod,
-                                cyc, rare, 0.25, 30)
+                                cyc, rare, 0.25, 30, self.start_level, self.points)
         keys = (S << PBITS) | pts
         self.table.ensure(keys)
         rows = _rows(keys, self.table.d)
