@@ -1,0 +1,13 @@
+# coupons needed for 90/95/99% of the full set (- = more than 50), best plan of each family
+Diné Beginner 1	All at 30: -/-/-	V0: 30/36/-	V2: 33/43/-	V0 then V2 at level L: 30/36/-	V2 then V0 at level L: 30/36/-	V0 until T skills, then V2: 30/36/-	V2, V0 from level L if under T skills: 30/36/-
+Diné Skilled 1	All at 30: 44/-/-	V0: 27/31/41	V2: 26/33/-	V0 then V2 at level L: 26/30/43	V2 then V0 at level L: 27/31/41	V0 until T skills, then V2: 25/30/41	V2, V0 from level L if under T skills: 25/30/44
+Diné Professional 10	All at 30: 34/42/-	V0: 23/27/35	V2: 21/25/38	V0 then V2 at level L: 20/25/34	V2 then V0 at level L: 22/26/35	V0 until T skills, then V2: 21/25/34	V2, V0 from level L if under T skills: 21/25/34
+Diné Artisan 7 (easy check)	All at 30: 31/38/-	V0: 22/25/32	V2: 18/23/33	V0 then V2 at level L: 18/22/31	V2 then V0 at level L: 20/24/32	V0 until T skills, then V2: 18/22/31	V2, V0 from level L if under T skills: 19/23/30
+Doom Beginner 1	All at 30: 41/-/-	V0: 29/33/43	V2: 26/32/45	V0 then V2 at level L: 26/31/42	V2 then V0 at level L: 27/33/43	V0 until T skills, then V2: 26/31/41	V2, V0 from level L if under T skills: 26/31/41
+Doom Skilled 1	All at 30: 36/43/-	V0: 26/30/38	V2: 21/26/37	V0 then V2 at level L: 21/26/35	V2 then V0 at level L: 23/27/38	V0 until T skills, then V2: 22/26/35	V2, V0 from level L if under T skills: 21/26/35
+Doom Artisan 7 (easy check)	All at 30: 30/35/47	V0: 21/24/30	V2: 12/16/24	V0 then V2 at level L: 13/16/23	V2 then V0 at level L: 14/18/26	V0 until T skills, then V2: 13/17/23	V2, V0 from level L if under T skills: 12/16/23
+T8 Beginner 1	All at 30: -/-/-	V0: 41/-/-	V2: -/-/-	V0 then V2 at level L: 42/-/-	V2 then V0 at level L: 41/-/-	V0 until T skills, then V2: 42/-/-	V2, V0 from level L if under T skills: 46/-/-
+T8 Skilled 1	All at 30: -/-/-	V0: 30/41/-	V2: 40/-/-	V0 then V2 at level L: 30/42/-	V2 then V0 at level L: 31/42/-	V0 until T skills, then V2: 30/41/-	V2, V0 from level L if under T skills: 31/43/-
+T8 Professional 10	All at 30: 42/-/-	V0: 25/30/47	V2: 28/36/-	V0 then V2 at level L: 25/30/47	V2 then V0 at level L: 25/30/-	V0 until T skills, then V2: 25/30/47	V2, V0 from level L if under T skills: 25/31/-
+Arduanatt Skilled 1 (W unchecked)	All at 30: 43/-/-	V0: 27/32/49	V2: 29/37/-	V0 then V2 at level L: 27/32/49	V2 then V0 at level L: 28/32/50	V0 until T skills, then V2: 27/32/49	V2, V0 from level L if under T skills: 27/32/50
+Voltarion Skilled 1 (W unchecked)	All at 30: 11/14/20	V0: 5/8/12	V2: 3/4/7	V0 then V2 at level L: 6/6/8	V2 then V0 at level L: 5/6/8	V0 until T skills, then V2: 5/5/7	V2, V0 from level L if under T skills: 9/9/9
