@@ -1,0 +1,14 @@
+settings: {'horse': 'Mythical Diné', 'training_bonus': 21.7, 'gear': 0, 'brand': 0, 'coupons': 15, 'checkpoints': [10, 15, 20, 25], 'point_bonus': 0.25, 'runs1': 1000, 'runs2': 4000, 'stage2_top': 6, 'stage2_margin': 0.03, 'stage2_max': 15, 'seed': 20261118}
+code: b542ccb / 412a3eedcfffab60 | level-1 plan: ['coursier', 20, 5] (simulated chance 67.3%)
+horses: 600
+full set: fixed 63.7%, re-planned 67.8%, gain +4.2 points (standard error 2.1; 95% range +0.1 to +8.2)
+  horses where re-planning got the full set and fixed didn't: 90; the reverse: 65; same outcome: 445
+travel skills: fixed 12.53, re-planned 12.57, difference +0.04 (standard error 0.03)
+coupons spent: fixed 11.83, re-planned 11.64, difference -0.19 (standard error 0.14)
+skills at 30: fixed 16.81, re-planned 17.06, difference +0.25 (standard error 0.05)
+decisions at each checkpoint (re-planned arm):
+  level 10: 600 decisions: coursier, start later 599, once, start later 1
+  level 15: 600 decisions: coursier, start later 552, once, start later 23, once, start now 15, coursier, start now 10
+  level 20: 600 decisions: coursier, start later 473, coursier, start now 108, once, start now 9, once, start later 8, at30 1, hard, start later 1
+  level 25: 591 decisions: once, start later 320, coursier, start now 132, coursier, start later 121, at30 7, once, start now 6, hard, start later 5
+time: 31 min in total, 3.1s per horse
