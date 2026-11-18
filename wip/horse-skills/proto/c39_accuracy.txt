@@ -1,0 +1,26 @@
+Largest difference from the reference, all batches, plans and budgets: chances in points | expected wanted skills
+t8s1 20 coupons, 2 values, L32: 0.000002 | 0.000001
+t8s1 20 coupons, 2 values, L16: 0.000291 | 0.000067
+t8s1 20 coupons, 2 values, P32: 0.000002 | 0.000001
+t8s1 20 coupons, 2 values, P16: 0.000292 | 0.000067
+t8s1 20 coupons, 6 values, L32: 0.000004 | 0.000001
+t8s1 20 coupons, 6 values, L16: 0.000291 | 0.000067
+t8s1 20 coupons, 6 values, P32: 0.000005 | 0.000001
+t8s1 20 coupons, 6 values, P16: 0.000292 | 0.000067
+dinea7 20 coupons, 2 values, L32: 0.000003 | 0.000001
+dinea7 20 coupons, 2 values, L16: 0.000458 | 0.000077
+dinea7 20 coupons, 2 values, P32: 0.000002 | 0.000000
+dinea7 20 coupons, 2 values, P16: 0.000458 | 0.000077
+dinea7 20 coupons, 6 values, L32: 0.000005 | 0.000001
+dinea7 20 coupons, 6 values, L16: 0.000458 | 0.000077
+dinea7 20 coupons, 6 values, P32: 0.000005 | 0.000000
+dinea7 20 coupons, 6 values, P16: 0.000458 | 0.000077
+t8s1 40 coupons, 2 values, L32: 0.000003 | 0.000001
+t8s1 40 coupons, 2 values, L16: 0.000609 | 0.000095
+t8s1 40 coupons, 2 values, P32: 0.000003 | 0.000001
+t8s1 40 coupons, 2 values, P16: 0.000535 | 0.000094
+t8s1 40 coupons, 6 values, L32: 0.000003 | 0.000001  (vs 2-value reference: full-set chance and H only)
+t8s1 40 coupons, 6 values, L16: 0.000609 | 0.000095  (vs 2-value reference: full-set chance and H only)
+t8s1 40 coupons, 6 values, P32: 0.000003 | 0.000001  (vs 2-value reference: full-set chance and H only)
+t8s1 40 coupons, 6 values, P16: 0.000535 | 0.000094  (vs 2-value reference: full-set chance and H only)
+t8s1 40 coupons, 6 values, L32 vs P32 on all values: 0.000002 | 0.000000
