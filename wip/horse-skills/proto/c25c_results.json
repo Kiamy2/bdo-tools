@@ -1,0 +1,1394 @@
+[
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.6290792609149474,
+     "best": 0.6324617495962002,
+     "best_plan": [
+      "coursier_v2",
+      18,
+      6,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.6325818466008611,
+     "best": 0.6357089403104443,
+     "best_plan": [
+      "coursier_v2",
+      18,
+      6,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.8452499896186593,
+     "best": 0.8452499896186593,
+     "best_plan": [
+      "coursier_v2",
+      8,
+      12,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.8487825785429611,
+     "best": 0.8487825785429611,
+     "best_plan": [
+      "coursier_v2",
+      8,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9342908473188353,
+     "best": 0.9355420120814034,
+     "best_plan": [
+      "coursier_switch",
+      11,
+      15,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9368164781898166,
+     "best": 0.9377719437314362,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      11
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9734299293726955,
+     "best": 0.974741433351872,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9755511135214937,
+     "best": 0.9764500749285375,
+     "best_plan": [
+      "coursier_switch",
+      8,
+      22,
+      13
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9858259116257617,
+     "best": 0.9874694286426945,
+     "best_plan": [
+      "coursier_switch",
+      3,
+      22,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9866032663295797,
+     "best": 0.988066645295356,
+     "best_plan": [
+      "coursier_switch",
+      8,
+      22,
+      13
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.7356500941846734,
+     "best": 0.7372085514878374,
+     "best_plan": [
+      "coursier_v2",
+      18,
+      6,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.7395399705136365,
+     "best": 0.7412043174302265,
+     "best_plan": [
+      "coursier_v2",
+      18,
+      6,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9102824034699872,
+     "best": 0.9112132960967597,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      8,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9133991709965906,
+     "best": 0.9142310358951361,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      8,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9673077236926271,
+     "best": 0.9694802430076493,
+     "best_plan": [
+      "coursier_switch",
+      11,
+      12,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9688385757750052,
+     "best": 0.9705932798552332,
+     "best_plan": [
+      "coursier_switch",
+      11,
+      15,
+      11
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.988082075225278,
+     "best": 0.9895351401490042,
+     "best_plan": [
+      "coursier_switch",
+      10,
+      18,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9890269782848156,
+     "best": 0.9899617797238641,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      15,
+      13
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9950659095384312,
+     "best": 0.9973115681947264,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9951425910501009,
+     "best": 0.9973096946896486,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.8940131639174828,
+     "best": 0.8957343239908431,
+     "best_plan": [
+      "coursier_v2",
+      15,
+      8,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.8970995057761243,
+     "best": 0.8996019802578464,
+     "best_plan": [
+      "coursier_v2",
+      12,
+      10,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9768377084937756,
+     "best": 0.9784324249715248,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      12,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9777236042001881,
+     "best": 0.9796089382781766,
+     "best_plan": [
+      "coursier_v2",
+      9,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9942724732385813,
+     "best": 0.9947228968641944,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9946504110501737,
+     "best": 0.9951493632530715,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      10
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9981937584264996,
+     "best": 0.9989552280267099,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9986315744597943,
+     "best": 0.9990510303424877,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      10
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9996809270850986,
+     "best": 0.9997582047819088,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      22,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9997912579589208,
+     "best": 0.9997912579589208,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      15
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Guru 20",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.9999862321201679,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      10,
+      10,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9999845911603665,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      10,
+      10,
+      9
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      15,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      15,
+      9
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      2,
+      18,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      2,
+      18,
+      9
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      9
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      15
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      15
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.6953231036575489,
+     "best": 0.7071479435466835,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      8,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.7005395818776785,
+     "best": 0.7128880313398736,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      8,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.8985816558728629,
+     "best": 0.9000629975432304,
+     "best_plan": [
+      "coursier_v2",
+      12,
+      12,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9032997716528758,
+     "best": 0.9034936827757785,
+     "best_plan": [
+      "coursier_v2",
+      12,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.955283488424409,
+     "best": 0.9657454577250236,
+     "best_plan": [
+      "coursier_v2",
+      8,
+      15,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9580906246985789,
+     "best": 0.9667523324416512,
+     "best_plan": [
+      "coursier_v2",
+      8,
+      12,
+      0
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9802188568347878,
+     "best": 0.9869818506258712,
+     "best_plan": [
+      "coursier_switch",
+      6,
+      22,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9816920258453409,
+     "best": 0.987866495432881,
+     "best_plan": [
+      "coursier_switch",
+      6,
+      22,
+      9
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.993113533282929,
+     "best": 0.9958828499600578,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      22,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9936589529919281,
+     "best": 0.9962182680289414,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      22,
+      11
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.8208578883107546,
+     "best": 0.8289431048763154,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      10,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.8260999423336691,
+     "best": 0.8335146164553278,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      10,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9529096779572199,
+     "best": 0.9535944410041245,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      12,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9554892266321778,
+     "best": 0.9556393868885152,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9829381275036303,
+     "best": 0.9866841595835824,
+     "best_plan": [
+      "coursier_v2",
+      2,
+      15,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9844715358694678,
+     "best": 0.9874656642968976,
+     "best_plan": [
+      "coursier_v2",
+      2,
+      15,
+      0
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9932646103779447,
+     "best": 0.9956799165060554,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      18,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9946604950849316,
+     "best": 0.9961026227805172,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      18,
+      10
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9978394172029694,
+     "best": 0.9988395507859672,
+     "best_plan": [
+      "coursier_switch",
+      8,
+      22,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9981683296674027,
+     "best": 0.9989259582451473,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      13
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.9599764067051129,
+     "best": 0.96426487058219,
+     "best_plan": [
+      "coursier_v2",
+      15,
+      10,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.961142176934652,
+     "best": 0.9653217838696678,
+     "best_plan": [
+      "coursier_v2",
+      15,
+      10,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9945019801148716,
+     "best": 0.9950444489694594,
+     "best_plan": [
+      "coursier_v2",
+      11,
+      12,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9949938356335162,
+     "best": 0.9953214952330403,
+     "best_plan": [
+      "coursier_v2",
+      11,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9985880656283219,
+     "best": 0.9990749628026614,
+     "best_plan": [
+      "coursier_v2",
+      2,
+      15,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9986844184759461,
+     "best": 0.9992204771330865,
+     "best_plan": [
+      "coursier_v2",
+      2,
+      15,
+      0
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9996414097017139,
+     "best": 0.9997585517230565,
+     "best_plan": [
+      "coursier_switch",
+      6,
+      22,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9997740075735508,
+     "best": 0.9998245965515616,
+     "best_plan": [
+      "coursier_switch",
+      6,
+      22,
+      12
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9998964610677502,
+     "best": 0.999946773925813,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      30,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9999210562851748,
+     "best": 0.9999693760717057,
+     "best_plan": [
+      "coursier_switch",
+      6,
+      22,
+      12
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Guru 20",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      12,
+      8,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      12,
+      8,
+      11
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      14,
+      15,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      14,
+      15,
+      11
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      10,
+      15,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      10,
+      15,
+      11
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      18,
+      9
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier",
+      4,
+      30,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 1.0,
+     "best": 1.0,
+     "best_plan": [
+      "coursier",
+      2,
+      26,
+      0
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.5568365707041053,
+     "best": 0.5598049703539963,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      3,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.5599321107925216,
+     "best": 0.5621900280747013,
+     "best_plan": [
+      "coursier_v2",
+      16,
+      3,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.7693216072102556,
+     "best": 0.790622630212103,
+     "best_plan": [
+      "coursier_switch",
+      8,
+      8,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.770340197205097,
+     "best": 0.795050699441784,
+     "best_plan": [
+      "coursier_switch",
+      8,
+      8,
+      10
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.887869520667927,
+     "best": 0.8945960693287363,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      10,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.8895941205199166,
+     "best": 0.8980121374524603,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      10,
+      12
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9195102546909304,
+     "best": 0.9231816744498106,
+     "best_plan": [
+      "coursier_switch",
+      3,
+      15,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9203913137738141,
+     "best": 0.9246283231069232,
+     "best_plan": [
+      "coursier_switch",
+      3,
+      15,
+      12
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9259105380384993,
+     "best": 0.928752830465947,
+     "best_plan": [
+      "coursier_switch",
+      3,
+      15,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9260316871506872,
+     "best": 0.929640804668231,
+     "best_plan": [
+      "coursier_switch",
+      3,
+      15,
+      12
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.6562635966709254,
+     "best": 0.6626208951193706,
+     "best_plan": [
+      "coursier_v2",
+      15,
+      4,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.6600180605078622,
+     "best": 0.6670450794445165,
+     "best_plan": [
+      "coursier_v2",
+      15,
+      4,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.8567867569083907,
+     "best": 0.8597302651059097,
+     "best_plan": [
+      "coursier_switch",
+      14,
+      10,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.8587317915549434,
+     "best": 0.863875637649223,
+     "best_plan": [
+      "coursier_switch",
+      14,
+      10,
+      10
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9414061253338039,
+     "best": 0.9425540971933276,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      10,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9434505128691183,
+     "best": 0.9447916690645236,
+     "best_plan": [
+      "coursier_switch",
+      2,
+      10,
+      13
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9633801838265384,
+     "best": 0.9646542247572755,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      18,
+      12
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9650474257953078,
+     "best": 0.9650474257953078,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      14
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9682408382335715,
+     "best": 0.9684174530958267,
+     "best_plan": [
+      "coursier_switch",
+      7,
+      18,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9687331321805129,
+     "best": 0.9687331321805129,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      22,
+      15
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.8206465638751791,
+     "best": 0.8206465638751791,
+     "best_plan": [
+      "coursier_v2",
+      17,
+      10,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.822902748764715,
+     "best": 0.822902748764715,
+     "best_plan": [
+      "coursier_v2",
+      17,
+      10,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9462216670364373,
+     "best": 0.9465172201167389,
+     "best_plan": [
+      "coursier_v2",
+      3,
+      10,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9466081162332862,
+     "best": 0.9477070326277708,
+     "best_plan": [
+      "coursier_v2",
+      3,
+      12,
+      0
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9862978787811516,
+     "best": 0.9865713721047522,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      11
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9872394976831081,
+     "best": 0.9876903539914692,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      11
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9946629950699533,
+     "best": 0.9953165752490035,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.994962080431994,
+     "best": 0.995206109966591,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9962338973280397,
+     "best": 0.9967708486503526,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9962656387546607,
+     "best": 0.9965269126851665,
+     "best_plan": [
+      "coursier_switch",
+      4,
+      15,
+      13
+     ]
+    }
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Guru 20",
+  "budgets": {
+   "10": {
+    "today": {
+     "rule": 0.9988916316384397,
+     "best": 0.9992550270083203,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      8,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9989058428075971,
+     "best": 0.9993565571341606,
+     "best_plan": [
+      "coursier_v2",
+      10,
+      8,
+      0
+     ]
+    }
+   },
+   "15": {
+    "today": {
+     "rule": 0.9999509586299088,
+     "best": 0.9999878174616819,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.999952383269152,
+     "best": 0.9999884673964355,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      9
+     ]
+    }
+   },
+   "20": {
+    "today": {
+     "rule": 0.9999963901226749,
+     "best": 0.9999997274418729,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      15,
+      10
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.999996361844359,
+     "best": 0.9999998197651816,
+     "best_plan": [
+      "coursier_switch",
+      5,
+      15,
+      10
+     ]
+    }
+   },
+   "25": {
+    "today": {
+     "rule": 0.9999999752497262,
+     "best": 0.999999992812324,
+     "best_plan": [
+      "coursier_switch",
+      9,
+      12,
+      9
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9999999913209558,
+     "best": 1.0,
+     "best_plan": [
+      "coursier",
+      12,
+      22,
+      0
+     ]
+    }
+   },
+   "30": {
+    "today": {
+     "rule": 0.9999999454953753,
+     "best": 1.0,
+     "best_plan": [
+      "coursier",
+      3,
+      30,
+      0
+     ]
+    },
+    "keep_rarest": {
+     "rule": 0.9999999454953765,
+     "best": 1.0,
+     "best_plan": [
+      "coursier",
+      2,
+      26,
+      0
+     ]
+    }
+   }
+  }
+ }
+]

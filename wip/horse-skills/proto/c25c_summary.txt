@@ -1,0 +1,75 @@
+Mythical Din Beginner 1 26s
+Mythical Din Skilled 1  22s
+Mythical Din Artisan 7  15s
+Mythical Din Guru 20    12s
+Doom (T9)    Beginner 1 25s
+Doom (T9)    Skilled 1  19s
+Doom (T9)    Artisan 7  15s
+Doom (T9)    Guru 20    12s
+T8 example ( Beginner 1 29s
+T8 example ( Skilled 1  27s
+T8 example ( Artisan 7  19s
+T8 example ( Guru 20    12s
+
+full set with the Selection Coupon at the end (adapted cleanup); leveling swaps targeting today vs keeping the rarest
+case | budget | rule's plan: today / keep_rarest (diff) | best plan: today / keep_rarest (diff) | best plan with keep_rarest
+Mythical D Beginner 1 | 10 | 62.9 / 63.3 (+0.4) | 63.2 / 63.6 (+0.3) | from lvl 18, V2 until lvl 30, keep 4
+Mythical D Beginner 1 | 15 | 84.5 / 84.9 (+0.4) | 84.5 / 84.9 (+0.4) | from lvl 8, V2 until lvl 30, keep 3
+Mythical D Beginner 1 | 20 | 93.4 / 93.7 (+0.3) | 93.6 / 93.8 (+0.2) | from lvl 9, V0 until 11 learned skills, then V2, keep 8
+Mythical D Beginner 1 | 25 | 97.3 / 97.6 (+0.2) | 97.5 / 97.6 (+0.2) | from lvl 8, V0 until 13 learned skills, then V2, keep 3
+Mythical D Beginner 1 | 30 | 98.6 / 98.7 (+0.1) | 98.7 / 98.8 (+0.1) | from lvl 8, V0 until 13 learned skills, then V2, keep 8
+Mythical D Skilled 1  | 10 | 73.6 / 74.0 (+0.4) | 73.7 / 74.1 (+0.4) | from lvl 18, V2 until lvl 30, keep 4
+Mythical D Skilled 1  | 15 | 91.0 / 91.3 (+0.3) | 91.1 / 91.4 (+0.3) | from lvl 10, V2 until lvl 30, keep 7
+Mythical D Skilled 1  | 20 | 96.7 / 96.9 (+0.2) | 96.9 / 97.1 (+0.1) | from lvl 11, V0 until 11 learned skills, then V2, keep 5
+Mythical D Skilled 1  | 25 | 98.8 / 98.9 (+0.1) | 99.0 / 99.0 (+0.0) | from lvl 7, V0 until 13 learned skills, then V2, keep 10
+Mythical D Skilled 1  | 30 | 99.5 / 99.5 (+0.0) | 99.7 / 99.7 (-0.0) | from lvl 4, V0 until 13 learned skills, then V2, keep 15
+Mythical D Artisan 7  | 10 | 89.4 / 89.7 (+0.3) | 89.6 / 90.0 (+0.4) | from lvl 12, V2 until lvl 30, keep 0
+Mythical D Artisan 7  | 15 | 97.7 / 97.8 (+0.1) | 97.8 / 98.0 (+0.1) | from lvl 9, V2 until lvl 30, keep 3
+Mythical D Artisan 7  | 20 | 99.4 / 99.5 (+0.0) | 99.5 / 99.5 (+0.0) | from lvl 5, V0 until 10 learned skills, then V2, keep 2
+Mythical D Artisan 7  | 25 | 99.8 / 99.9 (+0.0) | 99.9 / 99.9 (+0.0) | from lvl 5, V0 until 10 learned skills, then V2, keep 7
+Mythical D Artisan 7  | 30 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 9, V0 until 15 learned skills, then V2, keep 8
+Mythical D Guru 20    | 10 | 100.0 / 100.0 (-0.0) | 100.0 / 100.0 (+0.0) | from lvl 10, V0 until 9 learned skills, then V2, keep 0
+Mythical D Guru 20    | 15 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 9, V0 until 9 learned skills, then V2, keep 0
+Mythical D Guru 20    | 20 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 2, V0 until 9 learned skills, then V2, keep 2
+Mythical D Guru 20    | 25 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 4, V0 until 9 learned skills, then V2, keep 10
+Mythical D Guru 20    | 30 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 9, V0 until 15 learned skills, then V2, keep 8
+Doom Beginner 1 | 10 | 69.5 / 70.1 (+0.5) | 70.7 / 71.3 (+0.6) | from lvl 16, V2 until lvl 30, keep 2
+Doom Beginner 1 | 15 | 89.9 / 90.3 (+0.5) | 90.0 / 90.3 (+0.3) | from lvl 12, V2 until lvl 30, keep 3
+Doom Beginner 1 | 20 | 95.5 / 95.8 (+0.3) | 96.6 / 96.7 (+0.1) | from lvl 8, V2 until lvl 30, keep 8
+Doom Beginner 1 | 25 | 98.0 / 98.2 (+0.1) | 98.7 / 98.8 (+0.1) | from lvl 6, V0 until 9 learned skills, then V2, keep 3
+Doom Beginner 1 | 30 | 99.3 / 99.4 (+0.1) | 99.6 / 99.6 (+0.0) | from lvl 7, V0 until 11 learned skills, then V2, keep 8
+Doom Skilled 1  | 10 | 82.1 / 82.6 (+0.5) | 82.9 / 83.4 (+0.5) | from lvl 16, V2 until lvl 30, keep 0
+Doom Skilled 1  | 15 | 95.3 / 95.5 (+0.3) | 95.4 / 95.6 (+0.2) | from lvl 10, V2 until lvl 30, keep 3
+Doom Skilled 1  | 20 | 98.3 / 98.4 (+0.2) | 98.7 / 98.7 (+0.1) | from lvl 2, V2 until lvl 30, keep 5
+Doom Skilled 1  | 25 | 99.3 / 99.5 (+0.1) | 99.6 / 99.6 (+0.0) | from lvl 9, V0 until 10 learned skills, then V2, keep 7
+Doom Skilled 1  | 30 | 99.8 / 99.8 (+0.0) | 99.9 / 99.9 (+0.0) | from lvl 9, V0 until 13 learned skills, then V2, keep 8
+Doom Artisan 7  | 10 | 96.0 / 96.1 (+0.1) | 96.4 / 96.5 (+0.1) | from lvl 15, V2 until lvl 30, keep 0
+Doom Artisan 7  | 15 | 99.5 / 99.5 (+0.0) | 99.5 / 99.5 (+0.0) | from lvl 11, V2 until lvl 30, keep 3
+Doom Artisan 7  | 20 | 99.9 / 99.9 (+0.0) | 99.9 / 99.9 (+0.0) | from lvl 2, V2 until lvl 30, keep 5
+Doom Artisan 7  | 25 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 6, V0 until 12 learned skills, then V2, keep 3
+Doom Artisan 7  | 30 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 6, V0 until 12 learned skills, then V2, keep 8
+Doom Guru 20    | 10 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 12, V0 until 11 learned skills, then V2, keep 2
+Doom Guru 20    | 15 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 14, V0 until 11 learned skills, then V2, keep 0
+Doom Guru 20    | 20 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 10, V0 until 11 learned skills, then V2, keep 5
+Doom Guru 20    | 25 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 5, V0 until 9 learned skills, then V2, keep 7
+Doom Guru 20    | 30 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 2, V0 until lvl 30, keep 4
+T8 example Beginner 1 | 10 | 55.7 / 56.0 (+0.3) | 56.0 / 56.2 (+0.2) | from lvl 16, V2 until lvl 30, keep 7
+T8 example Beginner 1 | 15 | 76.9 / 77.0 (+0.1) | 79.1 / 79.5 (+0.4) | from lvl 8, V0 until 10 learned skills, then V2, keep 7
+T8 example Beginner 1 | 20 | 88.8 / 89.0 (+0.2) | 89.5 / 89.8 (+0.3) | from lvl 4, V0 until 12 learned skills, then V2, keep 10
+T8 example Beginner 1 | 25 | 92.0 / 92.0 (+0.1) | 92.3 / 92.5 (+0.1) | from lvl 3, V0 until 12 learned skills, then V2, keep 10
+T8 example Beginner 1 | 30 | 92.6 / 92.6 (+0.0) | 92.9 / 93.0 (+0.1) | from lvl 3, V0 until 12 learned skills, then V2, keep 15
+T8 example Skilled 1  | 10 | 65.6 / 66.0 (+0.4) | 66.3 / 66.7 (+0.4) | from lvl 15, V2 until lvl 30, keep 6
+T8 example Skilled 1  | 15 | 85.7 / 85.9 (+0.2) | 86.0 / 86.4 (+0.4) | from lvl 14, V0 until 10 learned skills, then V2, keep 5
+T8 example Skilled 1  | 20 | 94.1 / 94.3 (+0.2) | 94.3 / 94.5 (+0.2) | from lvl 2, V0 until 13 learned skills, then V2, keep 10
+T8 example Skilled 1  | 25 | 96.3 / 96.5 (+0.2) | 96.5 / 96.5 (+0.0) | from lvl 9, V0 until 14 learned skills, then V2, keep 3
+T8 example Skilled 1  | 30 | 96.8 / 96.9 (+0.0) | 96.8 / 96.9 (+0.0) | from lvl 9, V0 until 15 learned skills, then V2, keep 8
+T8 example Artisan 7  | 10 | 82.1 / 82.3 (+0.2) | 82.1 / 82.3 (+0.2) | from lvl 17, V2 until lvl 30, keep 0
+T8 example Artisan 7  | 15 | 94.6 / 94.7 (+0.0) | 94.7 / 94.8 (+0.1) | from lvl 3, V2 until lvl 30, keep 3
+T8 example Artisan 7  | 20 | 98.6 / 98.7 (+0.1) | 98.7 / 98.8 (+0.1) | from lvl 9, V0 until 11 learned skills, then V2, keep 8
+T8 example Artisan 7  | 25 | 99.5 / 99.5 (+0.0) | 99.5 / 99.5 (-0.0) | from lvl 4, V0 until 13 learned skills, then V2, keep 10
+T8 example Artisan 7  | 30 | 99.6 / 99.6 (+0.0) | 99.7 / 99.7 (-0.0) | from lvl 4, V0 until 13 learned skills, then V2, keep 15
+T8 example Guru 20    | 10 | 99.9 / 99.9 (+0.0) | 99.9 / 99.9 (+0.0) | from lvl 10, V2 until lvl 30, keep 2
+T8 example Guru 20    | 15 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 9, V0 until 9 learned skills, then V2, keep 3
+T8 example Guru 20    | 20 | 100.0 / 100.0 (-0.0) | 100.0 / 100.0 (+0.0) | from lvl 5, V0 until 10 learned skills, then V2, keep 5
+T8 example Guru 20    | 25 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 12, V0 until lvl 30, keep 3
+T8 example Guru 20    | 30 | 100.0 / 100.0 (+0.0) | 100.0 / 100.0 (+0.0) | from lvl 2, V0 until lvl 30, keep 4
