@@ -68,6 +68,9 @@ def main():
     ap.add_argument("--engine", default="auto", choices=["auto", "python", "numba"],
                     help="--optimize engine: numba (fast, exact cleanup; needs numba), python, or auto (default: "
                     "numba if installed)")
+    ap.add_argument("--low-memory", action="store_true",
+                    help="--optimize, fast engine: keep the level-30 values as 16-bit numbers (less memory, results "
+                    "within about 0.001 points; speed about the same)")
     ap.add_argument("--lang", default="en", choices=["en", "fr"], help="skill names in output")
     a = ap.parse_args()
 
@@ -207,7 +210,7 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     progress = lambda lab, i, n: (i % 500 == 0 or i == n) and print(f"# {lab}: {i}/{n} plans", file=sys.stderr)
     t0 = time.time()
     if engine == "numba":
-        res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
+        res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, low_memory=a.low_memory, **kw)
         searched = ("every plan: at30, and coursier / coursier_v2 with every start level and spending cap; "
                     f"coursier_switch with every start level and threshold {H.SWITCH_TS[0]}-{H.SWITCH_TS[-1]}, on a "
                     "grid of spending caps refined around the best; level-30 cleanup computed exactly (fast engine)")

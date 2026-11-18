@@ -15,7 +15,42 @@ from numba import types
 from numba.typed import Dict
 
 from bdo import horses as H
-from bdo.horses_fast import _next, _mix, _pop, _swap, _slot, _trans, _explore, PBITS
+from bdo.horses_fast import _next, _mix, _pop, _swap, _slot, _trans, PBITS
+
+
+# copied from bdo/horses_fast.py before its table was replaced by the points sweep (C39)
+@nb.njit(cache=True)
+def _explore(starts, d, n_rows, pmax, w, n, wmask, order, rare, pb):
+    new = []
+    stack = [np.int64(0)] * 0
+    for k in starts:
+        stack.append(k)
+    nxt = np.empty(n, np.int64)
+    prb = np.empty(n, np.float64)
+    row = n_rows
+    while len(stack):
+        k = stack.pop()
+        if k in d:
+            continue
+        d[k] = row
+        row += 1
+        new.append(k)
+        S = k >> PBITS
+        p = k & ((1 << PBITS) - 1)
+        if (S & wmask) == wmask or p >= pmax:
+            continue
+        out = _slot(S, wmask, order)
+        if out < 0:
+            continue
+        m = _trans(S, p, out, w, n, rare, pb, nxt, prb)
+        for j in range(m):
+            k2 = (nxt[j] << PBITS) | (p + 1)
+            if k2 not in d:
+                stack.append(k2)
+    res = np.empty(len(new), np.int64)
+    for i in range(len(new)):
+        res[i] = new[i]
+    return res
 
 
 @nb.njit(cache=True)

@@ -2,11 +2,11 @@
 
 Same model and plan rules as bdo.horses.simulate_plan, with two differences:
 - the leveling is compiled with numba (about 30x faster per core, all cores used);
-- the level-30 cleanup is not simulated but computed exactly: a table gives, for every held-skill set and number
-  of Skill Change Points, the chance of ending with every wanted skill (and the expected number of wanted skills)
-  with c coupons left, under the same cleanup rule (swap the rarest unwanted skill held, desired = rarest missing
-  wanted skill). Same averages as simulating it, with much less noise.
-The table depends only on the horse's weights, the wanted set and the point bonus, so one table serves every plan.
+- the level-30 cleanup is not simulated but computed exactly: for every held-skill set and number of Skill Change
+  Points reached, the chance of ending with every wanted skill (and the expected number of wanted skills) with
+  c coupons left, under the same cleanup rule (swap the rarest unwanted skill held, desired = rarest missing
+  wanted skill). Same averages as simulating it, with much less noise. Plans are evaluated in batches: the batch
+  is simulated first, then one sweep over the reachable states, level by level of points, answers all of it.
 
 Random numbers differ from bdo.horses (each simulated horse has its own generator, so results don't depend on the
 number of cores): results agree statistically, not number for number.
@@ -15,8 +15,6 @@ import numpy as np
 
 try:
     import numba as nb
-    from numba import types
-    from numba.typed import Dict
 except ImportError:                                                       # pragma: no cover
     nb = None
 
@@ -28,7 +26,7 @@ def available():
 
 
 if nb is not None:
-    PBITS = 7                                    # Skill Change Points stored in the low 7 bits of a table key
+    PBITS = 7                                    # Skill Change Points stored in the low 7 bits of a state key
 
     @nb.njit(cache=True, inline="always")
     def _next(state):
@@ -189,7 +187,14 @@ if nb is not None:
             pts[r] = c
         return S, base, pts
 
-    # --- exact level-30 cleanup table ----------------------------------------------------------------------------
+    # --- exact level-30 cleanup, swept by Skill Change Points ----------------------------------------------------
+    # For an end-of-leveling state (held skills S, points p) and c coupons left, the cleanup rule (swap the rarest
+    # unwanted skill held, desired = rarest missing wanted skill) gives exact values: P(missing <= t wanted skills)
+    # for t < J (t = 0: the full set), then the expected wanted skills. A coupon always moves p to p + 1, so the
+    # states are grouped by points level and computed from the highest level down, two levels in memory at a time.
+    # Only points + coupons left <= bound is needed (bound = starting points + largest budget): every value a horse
+    # asks for satisfies it, also if the game reset the points (that only lowers them). Values aren't kept between
+    # batches: Evaluator.plans simulates a batch of plans first, then one sweep answers all of it.
 
     @nb.njit(cache=True)
     def _slot(S, wmask, order):
@@ -223,123 +228,129 @@ if nb is not None:
         return m
 
     @nb.njit(cache=True)
-    def _explore(starts, d, n_rows, pmax, w, n, wmask, order, rare, pb):
-        new = []
-        stack = [np.int64(0)] * 0
-        for k in starts:
-            stack.append(k)
-        nxt = np.empty(n, np.int64)
-        prb = np.empty(n, np.float64)
-        row = n_rows
-        while len(stack):
-            k = stack.pop()
-            if k in d:
-                continue
-            d[k] = row
-            row += 1
-            new.append(k)
-            S = k >> PBITS
-            p = k & ((1 << PBITS) - 1)
-            if (S & wmask) == wmask or p >= pmax:
-                continue
-            out = _slot(S, wmask, order)
-            if out < 0:
-                continue
-            m = _trans(S, p, out, w, n, rare, pb, nxt, prb)
-            for j in range(m):
-                k2 = (nxt[j] << PBITS) | (p + 1)
-                if k2 not in d:
-                    stack.append(k2)
-        res = np.empty(len(new), np.int64)
-        for i in range(len(new)):
-            res[i] = new[i]
-        return res
-
-    @nb.njit(cache=True)
-    def _fill(keys, d, G, Hh, C, w, n, wmask, order, rare, pb):
-        nW = _pop(wmask)
+    def _succ(keys, bound, w, n, wmask, order, rare, pb):
+        """Successor keys (points p + 1) of the states that can still use a coupon (p < bound)."""
+        out = np.empty(len(keys) * n, np.int64)
+        m_tot = 0
         nxt = np.empty(n, np.int64)
         prb = np.empty(n, np.float64)
         for k in keys:
-            r = d[k]
             S = k >> PBITS
             p = k & ((1 << PBITS) - 1)
-            hw = _pop(S & wmask)
-            if hw == nW:
-                for c in range(C + 1):
-                    G[r, c] = 1.0
-                    Hh[r, c] = nW
+            if (S & wmask) == wmask or p >= bound:
                 continue
-            G[r, 0] = 0.0
-            Hh[r, 0] = hw
-            out = _slot(S, wmask, order)
-            m = 0
-            if out >= 0:
-                m = _trans(S, p, out, w, n, rare, pb, nxt, prb)
-            for c in range(1, C + 1):
-                g = 0.0
-                h = 0.0
-                if m == 0:
-                    h = hw
-                for j in range(m):
-                    k2 = (nxt[j] << PBITS) | (p + 1)
-                    if k2 in d:
-                        r2 = d[k2]
-                        g += prb[j] * G[r2, c - 1]
-                        h += prb[j] * Hh[r2, c - 1]
-                    else:                      # beyond pmax: only reached when no coupon is left anyway
-                        h += prb[j] * _pop(nxt[j] & wmask)
-                G[r, c] = g
-                Hh[r, c] = h
+            o = _slot(S, wmask, order)
+            if o < 0:
+                continue
+            m = _trans(S, p, o, w, n, rare, pb, nxt, prb)
+            for i in range(m):
+                out[m_tot] = (nxt[i] << PBITS) | (p + 1)
+                m_tot += 1
+        return out[:m_tot]
+
+    def _levels(start, bound, w, n, wmask, order, rare, pb, chunk=200_000):
+        """Sorted keys of every state reachable from the start keys, per points level."""
+        start = np.unique(start)
+        ps = start & ((1 << PBITS) - 1)
+        levels, nxt = {}, np.empty(0, np.int64)
+        for p in range(int(ps.min()), bound + 1):
+            cur = np.union1d(nxt, start[ps == p])
+            levels[p] = cur
+            parts = [np.unique(_succ(cur[i:i + chunk], bound, w, n, wmask, order, rare, pb))
+                     for i in range(0, len(cur), chunk)]
+            nxt = np.unique(np.concatenate(parts)) if parts else np.empty(0, np.int64)
+        return levels
+
+    @nb.njit(cache=True, parallel=True)
+    def _sweep_level(K, Kn, Vn, V, cmax, J, enc, dec, q, w, n, wmask, order, rare, pb):
+        """Values V[row, c, t] of the states K at one points level (c = 0..cmax), from those of the next level
+        (keys Kn, values Vn). q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t]."""
+        nW = _pop(wmask)
+        for b in nb.prange((len(K) + 4095) // 4096):
+            nxt = np.empty(n, np.int64)
+            prb = np.empty(n, np.float64)
+            rows2 = np.empty(n, np.int64)
+            acc = np.empty(J + 1, np.float64)
+            for r in range(b * 4096, min(len(K), (b + 1) * 4096)):
+                k = K[r]
+                S = k >> PBITS
+                p = k & ((1 << PBITS) - 1)
+                hw = _pop(S & wmask)
+                miss = nW - hw
+                m = 0
+                if miss > 0 and cmax > 0:
+                    o = _slot(S, wmask, order)
+                    if o >= 0:
+                        m = _trans(S, p, o, w, n, rare, pb, nxt, prb)
+                for i in range(m):
+                    rows2[i] = np.searchsorted(Kn, (nxt[i] << PBITS) | (p + 1))
+                for c in range(cmax + 1):
+                    if c == 0 or m == 0:
+                        for t in range(J):
+                            acc[t] = 1.0 if miss <= t else 0.0
+                        acc[J] = hw
+                    else:
+                        for t in range(J + 1):
+                            acc[t] = 0.0
+                        for i in range(m):
+                            for t in range(J + 1):
+                                acc[t] += prb[i] * (Vn[rows2[i], c - 1, t] * dec[t])
+                    for t in range(J + 1):
+                        x = acc[t] * enc[t]
+                        if q:
+                            x = np.floor(x + 0.5)
+                        V[r, c, t] = x
 
     @nb.njit(cache=True)
-    def _rows(keys, d):
-        out = np.empty(len(keys), np.int64)
-        for i in range(len(keys)):
-            out[i] = d[keys[i]]
+    def _accumulate(hkeys, base, plan, cap, idx, K, V, dec, C, acc):
+        """Adds each horse's values to acc[plan, budget] for every budget from its plan's cap to C."""
+        for i in idx:
+            r = np.searchsorted(K, hkeys[i])
+            for B in range(max(cap[i], base[i]), C + 1):
+                for t in range(acc.shape[2]):
+                    acc[plan[i], B, t] += V[r, B - base[i], t] * dec[t]
+
+    def cleanup_values(hkeys, base, plan, cap, nplans, C, bound, J, low_memory, w, n, wmask, order, rare, pb):
+        """Sums over the horses of each plan of the exact cleanup values, per budget: acc[plan, B, t] (see above).
+        hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling."""
+        nv = J + 1
+        if low_memory:
+            enc = np.full(nv, 65535.0)
+            enc[J] = 65535.0 / max(1, _pop(wmask))
+            dec, dt = 1.0 / enc, np.uint16
+        else:
+            enc = dec = np.ones(nv)
+            dt = np.float32
+        acc = np.zeros((nplans, C + 1, nv))
+        levels = _levels(hkeys, bound, w, n, wmask, order, rare, pb)
+        hl = hkeys & ((1 << PBITS) - 1)
+        Kn, Vn = np.empty(0, np.int64), np.zeros((0, 1, nv), dt)
+        for p in sorted(levels, reverse=True):
+            K = levels.pop(p)
+            V = np.empty((len(K), bound - p + 1, nv), dt)
+            _sweep_level(K, Kn, Vn, V, bound - p, J, enc, dec, low_memory, w, n, wmask, order, rare, pb)
+            idx = np.nonzero(hl == p)[0]
+            if len(idx):
+                _accumulate(hkeys, base, plan, cap, idx, K, V, dec, C, acc)
+            Kn, Vn = K, V
+        return acc
+
+    @nb.njit(cache=True)
+    def _popcounts(S):
+        out = np.empty(len(S), np.int64)
+        for i in range(len(S)):
+            out[i] = _pop(S[i])
         return out
-
-    class Table:
-        """Exact cleanup table, grown on demand. G[row, c]: chance of the full set with c coupons left;
-        H[row, c]: expected wanted skills."""
-
-        def __init__(self, w, wmask, order, rare, C, pmax, point_bonus):
-            self.w = np.array(w, np.float64)
-            self.n, self.wmask, self.C, self.pmax, self.pb = len(w), int(wmask), C, pmax, point_bonus
-            self.order = np.array(order, np.int64)
-            self.rare = np.array(rare, np.int64)
-            self.d = Dict.empty(key_type=types.int64, value_type=types.int64)
-            self.rows = 0
-            self.G = np.zeros((1 << 14, C + 1), np.float32)
-            self.H = np.zeros((1 << 14, C + 1), np.float32)
-
-        def ensure(self, keys):
-            new = _explore(np.unique(np.asarray(keys, np.int64)), self.d, self.rows, self.pmax, self.w, self.n,
-                           self.wmask, self.order, self.rare, self.pb)
-            if not len(new):
-                return
-            need = self.rows + len(new)
-            if need > len(self.G):
-                cap = max(need, 2 * len(self.G))
-                for name in ("G", "H"):
-                    a = np.zeros((cap, self.C + 1), np.float32)
-                    a[:self.rows] = getattr(self, name)[:self.rows]
-                    setattr(self, name, a)
-            self.rows = need
-            new = new[np.argsort(-(new & ((1 << PBITS) - 1)), kind="stable")]
-            _fill(new, self.d, self.G, self.H, self.C, self.w, self.n, self.wmask, self.order, self.rare, self.pb)
-
-        def rows_of(self, keys):
-            return _rows(np.asarray(keys, np.int64), self.d)
 
     CODES = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v2": 6, "coursier_switch": 7}
 
     class Evaluator:
-        """Plans for one horse state (Training, boosts, level, learned skills, points, tickets); the cleanup
-        table can be shared between evaluators of the same horse, wanted set and point bonus."""
+        """Plans for one horse state (Training, boosts, level, learned skills, points, tickets). plans() simulates a
+        batch of plans and computes their level-30 cleanup exactly, in one sweep. low_memory: keep the sweep's values
+        as 16-bit numbers (less memory, results within about 0.001 points)."""
 
         def __init__(self, horse, M, max_budget=40, tickets=0, start_level=1, learned=(), wanted=None,
-                     fodder=None, point_bonus=0.25, points=0, max_level=30, table=None):
+                     fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False):
             pool = list(horse.weights)
             idx = {s: i for i, s in enumerate(pool)}
             w = [float(horse.weights[s]) for s in pool]
@@ -355,42 +366,50 @@ if nb is not None:
                           idx[cyc] if cyc else -1, np.array(order, np.int64), np.array(self.rare, np.int64))
             self.C, self.tickets, self.start_level, self.points = max_budget, tickets, start_level, points
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
-            self.table = table or Table(w, wmask, order, self.rare, C=max_budget, pmax=points + max_budget,
-                                        point_bonus=point_bonus)
+            self.low_memory = low_memory
 
-        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0):
-            """Same output as bdo.horses.simulate_plan: full[B], wanted[B] for B = 0..max_budget (None below
-            spend_cap), skills (average skills at 30). switch_at: coursier_switch's threshold."""
-            st = CODES[strategy]
-            if st == 0:
-                spend_cap = 0
+        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans"):
+            """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
+            seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
+            B = 0..max_budget (None below spend_cap), skills (average skills at 30)."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
-            S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets, self.start_level,
-                                   lmask, wmask, fod, cyc, order, rare, self.pb, self.points, self.max_level,
-                                   switch_at)
-            counts = np.array([bin(int(x)).count("1") for x in S])
-            nbud = self.C + 1
-            res = {"skills": float(counts.mean()), "wanted_total": self.n_wanted}
-            if st == 4:
-                hw = np.array([bin(int(x) & int(wmask)).count("1") for x in S])
-                res["full"] = [float((hw == self.n_wanted).mean())] * nbud
-                res["wanted"] = [float(hw.mean())] * nbud
-                return res
-            keys = (S << PBITS) | pts
-            self.table.ensure(keys)
-            rows = self.table.rows_of(keys)
-            full, wanted = [], []
-            for B in range(nbud):
-                if B < spend_cap:
-                    full.append(None)
-                    wanted.append(None)
-                    continue
-                j = np.minimum(B - base, self.table.C)
-                full.append(float(self.table.G[rows, j].mean()))
-                wanted.append(float(self.table.H[rows, j].mean()))
-            res["full"], res["wanted"] = full, wanted
-            return res
+            C, out, batch = self.C, {}, []
+            hk, hb, hp, hc = [], [], [], []
+            for i, p in enumerate(plans):
+                strategy, swap_from, spend_cap, switch_at = p
+                st = CODES[strategy]
+                if st == 0:
+                    spend_cap = 0
+                S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets,
+                                       self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
+                                       self.max_level, switch_at)
+                res = {"skills": float(_popcounts(S).mean()), "wanted_total": self.n_wanted}
+                out[p] = res
+                if st == 4:                                              # natural: no cleanup
+                    full = float((_popcounts(S & wmask) == self.n_wanted).mean())
+                    res["full"], res["wanted"] = [full] * (C + 1), [float(_popcounts(S & wmask).mean())] * (C + 1)
+                else:
+                    hk.append((S << PBITS) | pts)
+                    hb.append(base)
+                    hp.append(np.full(runs, len(batch), np.int64))
+                    hc.append(np.full(runs, spend_cap, np.int64))
+                    batch.append((p, spend_cap))
+                if progress:
+                    progress(label, i + 1, len(plans))
+            if batch:
+                acc = cleanup_values(np.concatenate(hk), np.concatenate(hb), np.concatenate(hp), np.concatenate(hc),
+                                     len(batch), C, self.points + C, 1, self.low_memory, w, n, wmask, order, rare,
+                                     self.pb)
+                for j, (p, cap) in enumerate(batch):
+                    out[p]["full"] = [float(acc[j, B, 0] / runs) if B >= cap else None for B in range(C + 1)]
+                    out[p]["wanted"] = [float(acc[j, B, 1] / runs) if B >= cap else None for B in range(C + 1)]
+            return out
+
+        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0):
+            """One plan (see plans())."""
+            p = (strategy, swap_from, spend_cap, switch_at)
+            return self.plans([p], runs, seed)[p]
 
 
 def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "coursier_switch"), runs=(1000, 4000),
@@ -414,11 +433,7 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     s1 = {}
 
     def run(todo, label):
-        todo = [p for p in todo if p not in s1]
-        for i, p in enumerate(todo):
-            s1[p] = ev.plan(p[0], p[1], p[2], runs=runs[0], seed=seed, switch_at=p[3])
-            if progress:
-                progress(label, i + 1, len(todo))
+        s1.update(ev.plans([p for p in todo if p not in s1], runs[0], seed, progress, label))
 
     def promising():
         keep = {("at30", 1, 0, 0)}
@@ -434,4 +449,4 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     near = {(st, lv, c2, T) for st, lv, cap, T in promising() if st == "coursier_switch"
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
-    return {p: ev.plan(p[0], p[1], p[2], runs=runs[1], seed=seed + 1000, switch_at=p[3]) for p in sorted(promising())}
+    return ev.plans(sorted(promising()), runs[1], seed + 1000, progress, "recheck")

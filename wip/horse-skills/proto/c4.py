@@ -27,7 +27,8 @@ import numba as nb                                                       # noqa:
 from numba import types                                                  # noqa: E402
 from numba.typed import Dict                                             # noqa: E402
 from bdo import horses as H                                              # noqa: E402
-from bdo.horses_fast import _pop, _slot, _trans, _explore, PBITS         # noqa: E402
+from bdo.horses_fast import _pop, _slot, _trans, PBITS                   # noqa: E402
+from c36_fast import _explore                                             # noqa: E402
 import c36_fast as X                                                     # noqa: E402
 
 C = 30

@@ -63,7 +63,7 @@ coupons  full set: chance  tied plans                              most wanted: 
 20       71.2%             coursier_switch: from lvl 7-11, V0 until 10-13 learned skills, then V2, keep 0-10   ...
 ```
 
-- **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 30 seconds for 20 coupons. It keeps a table of level-30 states in memory: a few hundred MB for 20 coupons, up to about 2 GB for 40 (1.8 GB measured for the T8 example).
+- **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 15 seconds and 0.5 GB of memory for 20 coupons, 30 seconds and 0.7 GB for 40 (measured on the T8 example, 2 cores). `--low-memory` keeps the level-30 values as 16-bit numbers: about 0.1 GB less at 40 coupons, same speed, chances within 0.001 points (a plan right at the edge of a tied range can move in or out of it).
 - **Plain Python** (`--engine python`, or when numba isn't installed): a grid of plans refined around the best ones (`coursier_switch` thresholds 9, 11, 13, 15, then their neighbors), simulated. Several minutes and noisier, same model.
 
 ## Your own horse (`--horse-file`)

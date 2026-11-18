@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-18
+- `bdo/horses_fast.py`: the exact level-30 cleanup is now computed per batch of plans, sweeping the reachable states by Skill Change Points (two levels in memory; only points + coupons left <= starting points + largest budget). Same results; `--optimize` on the T8 example: 13 s / 0.5 GB instead of 30 s / 1.0 GB at 20 coupons, 26 s / 0.7 GB instead of 90 s / 2.9 GB at 40. New `--low-memory` (16-bit values). `Evaluator.plans()` evaluates a batch; the persistent `Table` is gone.
 - `horse_skills.py`: new strategy `coursier_switch`: `coursier` swaps until the horse has `--switch-at` learned skills (default 12; innate ones don't count), then `coursier_v2` swaps. Building skills first, then stopping the loop, beats both with many coupons. `--optimize` searches its threshold (9-16); plans are now (strategy, start level, spending cap, threshold) in `bdo/horses.py` and `bdo/horses_fast.py`, and tied plans read "from lvl 7-11, V0 until 10-13 learned skills, then V2, keep 0-10".
 - `horse_skills.py`: new strategy `coursier_v2`: swap only Hind Kick (the heavier fodder skill) and keep Fore Chop. Plain `coursier` loses many coupons to a Hind Kick <-> Fore Chop loop; `coursier_v2` needs far fewer coupons for the same chance in most cases (see the report).
 - Level-30 cleanup rule changed to "swap the rarest unwanted skill held" (was: keep re-swapping the same slot). Slightly better, and as good as the best possible cleanup for the full set. Simulated numbers move by about +1 point.

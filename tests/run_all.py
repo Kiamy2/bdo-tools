@@ -165,6 +165,10 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
           and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
+    code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba", "--low-memory")
+    m2 = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out2, re.M))
+    check("horse_skills --optimize --low-memory: same best chances (16-bit values)", code2 == 0 and len(m2) == 11
+          and all(abs(float(m2[b]) - float(m.get(b, -9))) <= 0.11 for b in m2), out2)
     check("horse_skills --optimize --engine numba (coursier_v2 best at 10 coupons, about 62%)",
           code == 0 and "fast engine" in out and 55 <= float(m.get("10", 0)) <= 70
           and re.search(r"^10\t[\d.]+%\tcoursier_v2", out, re.M), out)
