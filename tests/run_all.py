@@ -91,6 +91,12 @@ code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--tr
 check("horse_skills --check T8", code == 0 and "MISMATCH" not in out, out)
 code, out = run("horse_skills.py", "Doom (T9)", "--training", "Artisan 7", "--check", "none=2.8289", "Deux places=3.7851", "Galop funeste=2.7253")
 check("horse_skills --check T9 Doom", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", "Doom (T9)", "--training", "Artisan 8", "--check", "none=2.27", "Ruade=20.4222",
+                "S : Pas latéraux=0.1936", "S : Charge=6.8524", "Galop funeste=2.741")
+check("horse_skills --check T9 Doom, Artisan 8 reading (refined weights)", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Artisan 8", "--check", "none=23.8715",
+                "Ruade=11.0353", "S : Pas latéraux=0.2656", "Deux places=1.0622", "Prudence=4.06")
+check("horse_skills --check T8 'Choky', Artisan 8 reading (refined weights)", code == 0 and "MISMATCH" not in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--check", "Ruade=16")
 check("horse_skills --check mismatch exits 1", code == 1 and "MISMATCH" in out, out)
 code, out = run("horse_skills.py", "--horse-file", "tests/data/sim_mythical_dine_artisan7.csv", "--training", "Professional 10",

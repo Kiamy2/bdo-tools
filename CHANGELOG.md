@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-19
+- `data/horse_skills.json`: T9 Doom and T8 example weights refined to 4 decimals from in-game simulator readings at Artisan 8 (`tests/data/sim_doom_t9_artisan8.csv`, `sim_t8_choky_artisan8.csv`); all within bdolytics' 0.01 rounding. They reproduce the earlier independent readings (Doom at Artisan 7, T8 at Professional 10) to 0.0001 points.
+
 ## 2026-11-18
 - `--optimize` ends with the average learned skills per level for the suggested plans (`Evaluator.learned_by_level`, `bdo.horses.learned_by_level`).
 - `--optimize --selection-coupon planned|fallback`: a Mount Skill Selection Coupon used at the very end on the last missing skill (needs an unwanted skill to change). `planned`: every Change Coupon aims at the second rarest missing skill, keeping the rarest for it, and the plan search includes it; `fallback`: plans as without it, plus the chance if you decide at level 30 to use it. With `--tickets`, the suggested plans also show the chance if you keep the tickets. `simulate_plan(coupon=...)`, `Evaluator.plans(coupon=...)`.
