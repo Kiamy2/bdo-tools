@@ -417,7 +417,8 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     """Like bdo.horses.optimize, but tries every plan: at30, and each strategy with every start level (from the
     next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
     (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
-    and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses.
+    and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses, and the
+    general rule's plan for every budget (H.rule_plan).
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
@@ -449,4 +450,5 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     near = {(st, lv, c2, T) for st, lv, cap, T in promising() if st == "coursier_switch"
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
-    return ev.plans(sorted(promising()), runs[1], seed + 1000, progress, "recheck")
+    final = promising() | {H.rule_plan(B, start_level) for B in range(max_budget + 1)}
+    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck")

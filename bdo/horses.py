@@ -448,13 +448,46 @@ PLAN_LEVELS = [1, 4, 7, 10, 13, 16, 18, 20, 22, 24, 26, 28]
 PLAN_CAPS = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 22, 26, 30]
 
 
+# The general rule: one plan per budget, chosen to lose the least in the worst case over 72 situations (3 horses x
+# 6 Training levels x 3 boosts, and horses partway through leveling), cross-validated (research for the report).
+# Fitted budgets: (strategy, start level, spending cap, threshold); see rule_plan() for the others.
+RULE_FITTED = {
+    5: ("coursier_v2", 23, 4, 0), 8: ("coursier_v2", 18, 8, 0), 10: ("coursier_v2", 17, 10, 0),
+    12: ("coursier_v2", 11, 12, 0), 15: ("coursier_v2", 8, 15, 0), 16: ("coursier_v2", 5, 15, 0),
+    17: ("coursier_v2", 4, 15, 0), 18: ("coursier_switch", 10, 17, 10), 19: ("coursier_switch", 10, 15, 11),
+    20: ("coursier_switch", 10, 15, 11), 21: ("coursier_switch", 10, 17, 12), 22: ("coursier_switch", 10, 18, 13),
+    23: ("coursier_switch", 10, 18, 13), 24: ("coursier_switch", 4, 23, 13), 25: ("coursier_switch", 9, 22, 14),
+    30: ("coursier_switch", 9, 22, 15), 35: ("coursier_switch", 4, 22, 15), 40: ("coursier_switch", 4, 22, 15),
+}
+
+
+def rule_plan(budget, start_level=1):
+    """The general rule's plan for a coupon budget: the fitted plan (RULE_FITTED); up to 17 coupons otherwise
+    coursier_v2 from level 29 - 1.5 x budget, spending everything; above 17, the nearest fitted budget below
+    (same spending cap). A horse already past the start level starts at its next level."""
+    if budget <= 0:
+        return ("at30", 1, 0, 0)
+    if budget in RULE_FITTED:
+        st, lv, cap, T = RULE_FITTED[budget]
+    elif budget < 17:
+        st, lv, cap, T = "coursier_v2", min(29, max(2, round(29 - 1.5 * budget))), budget, 0
+    else:
+        st, lv, cap, T = RULE_FITTED[max(b for b in RULE_FITTED if b <= budget)]
+    return (st, max(lv, start_level + 1), cap, T)
+
+
 def plan_name(plan, budget=None):
+    """A plan in words: 'from lvl 10, V0 until 11 learned skills, then V2, keep 5' (V0 = coursier swaps, V2 =
+    coursier_v2 swaps; keep = coupons kept for the level-30 cleanup, shown when the budget is given)."""
     st, lv, cap, T = plan
-    if st in ("at30", "natural"):
-        return st
-    keep = f", keep {budget - cap}" if budget is not None else ""
-    how = f"V0 until {T} learned skills, then V2" if st == "coursier_switch" else st
-    return f"from lvl {lv}, {how}, spend <= {cap}{keep}"
+    if st == "natural":
+        return "no coupons"
+    if st == "at30":
+        return "no swaps while leveling, every coupon at level 30"
+    keep = f", keep {budget - cap}" if budget is not None else f", spend <= {cap} while leveling"
+    how = {"coursier": "V0 until lvl 30", "coursier_v2": "V2 until lvl 30",
+           "coursier_switch": f"V0 until {T} learned skills, then V2"}.get(st, f"{st} until lvl 30")
+    return f"from lvl {lv}, {how}{keep}"
 
 
 def _neighbors(value, grid, lo, hi):
@@ -475,6 +508,7 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "co
     neighbors (step 1), and for coursier_switch the thresholds next to theirs (within SWITCH_TS), also with runs[0].
     Stage 2: for each budget and goal, the top plans so far and every plan close to the best (up to max_close),
     again with runs[1] and a fresh seed (to avoid picking a lucky winner, and to know which plans are tied).
+    Stage 2 also includes the general rule's plan for every budget (rule_plan), for suggested_plan().
     Returns {plan: simulate_plan result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     levels = PLAN_LEVELS if levels is None else levels
     caps = PLAN_CAPS if caps is None else caps
@@ -512,9 +546,21 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "co
                 near.update((st, l2, c2, t2) for l2 in _neighbors(lv, levels, 1, max_level - 1)
                             for c2 in _neighbors(cap, caps, 1, max_budget) for t2 in t2s)
         run_all(sorted(near), "refine")
+    final = promising() | {rule_plan(B, kw.get("start_level", 1)) for B in range(max_budget + 1)}
     return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000,
                              switch_at=p[3], **kw)
-            for p in sorted(promising())}
+            for p in sorted(final)}
+
+
+def suggested_plan(res, B, margin=0.01, start_level=1):
+    """One plan to follow for budget B (full-set goal): the general rule's plan if it's within margin of the best
+    plan in res, else the best. Returns (plan, 'rule' or 'best', the rule plan's chance or None)."""
+    best = tied_plans(res, B, "full", 0)[0]
+    rp = rule_plan(B, start_level)
+    rc = res[rp]["full"][B] if rp in res and res[rp]["full"][B] is not None else None
+    if rc is not None and rc >= res[best]["full"][B] - margin:
+        return rp, "rule", rc
+    return best, "best", rc
 
 
 def tied_plans(res, B, goal, margin):

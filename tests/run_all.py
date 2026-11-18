@@ -103,6 +103,11 @@ if ok:
     first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
+code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; "
+                "print(H.rule_plan(20), H.rule_plan(9), H.rule_plan(27), H.rule_plan(20, start_level=15))")
+check("rule_plan: fitted, formula, nearest fitted below, partway horse", code == 0 and out.strip() ==
+      "('coursier_switch', 10, 15, 11) ('coursier_v2', 16, 9, 0) ('coursier_switch', 9, 22, 14) "
+      "('coursier_switch', 16, 15, 11)", out)
 # coursier_switch with a threshold never reached is coursier, with 0 it's coursier_v2 (same random numbers)
 code, out = run("-c", """
 import sys
@@ -163,6 +168,9 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 71%)",
           code == 0 and 66 <= float(m.get("20", 0)) <= 76
           and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
+    sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t(rule|best)", out, re.M)
+    check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best)",
+          sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0, out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba", "--low-memory")

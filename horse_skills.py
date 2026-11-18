@@ -242,6 +242,17 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         b30 = next((B for B, x in enumerate(at30["full"]) if x >= t), None)
         print(f"# coupons for a {t:.0%} chance of the full set: {b if b is not None else '> max'} with the best plan, "
               f"{b30 if b30 is not None else '> max'} with at30")
+    print()
+    print("# Suggested plan per budget (full set): the general rule's plan when it's within 1 point of the best plan")
+    print("# found, else the best. V0 = coursier swaps (Hind Kick and Fore Chop), V2 = coursier_v2 swaps (Hind Kick")
+    print("# only); learned skills don't count innate ones; keep = coupons kept for the level-30 cleanup.")
+    print("coupons\tsuggested plan\tfull set\tsource")
+    for B in range(1, a.optimize + 1):
+        plan, src, rc = H.suggested_plan(res, B, 0.01, a.level)
+        best = res[H.tied_plans(res, B, "full", 0)[0]]["full"][B]
+        note = (f"rule (best {100 * best:.1f}%)" if src == "rule"
+                else f"best (rule: {'not checked' if rc is None else f'{100 * rc:.1f}%'})")
+        print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{note}")
     return 0
 
 if __name__ == "__main__":
