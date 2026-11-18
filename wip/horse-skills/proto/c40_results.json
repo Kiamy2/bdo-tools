@@ -1,0 +1,6023 @@
+[
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.2634795526657139,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.3646516946152138,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.3646468027040648,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.36455925920310495,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.36534039826761844,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.3711233650140789,
+      "used": 1.99975
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.37022364007755215,
+      "used": 1.9833
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.32890665857426865,
+      "used": 1.4193
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.3080696899922236,
+      "used": 1.1084
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.2916178096522326,
+      "used": 0.86855
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.2710337089268366,
+      "used": 0.4076
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.5196872873223581,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.5197759893029191,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.522762160525863,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.5314779618630622,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.5390282658198892,
+      "used": 4.99435
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.52690106822284,
+      "used": 4.7504
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.3864024057863249,
+      "used": 2.6879
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.3399033238426804,
+      "used": 1.95315
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.3098620851991718,
+      "used": 1.4939
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.27517507355472287,
+      "used": 0.6471
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.7288290852851597,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7312114782092524,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.7445861135243742,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7682085163283293,
+      "used": 9.9989
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.7747156582308222,
+      "used": 9.89855
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7109042344909858,
+      "used": 8.25395
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.4245408840629723,
+      "used": 3.5004
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.35573313783261673,
+      "used": 2.3852
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.31827443575029,
+      "used": 1.7959
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.2763529185147967,
+      "used": 0.73445
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.6966469261481892,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.7863391148071794,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7859752719323209,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.78575741820322,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7857547035366209,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.7861994050272421,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7858735069893213,
+      "used": 1.9864
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.7760693927734683,
+      "used": 1.3721
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.767655098700396,
+      "used": 1.1259
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7522306521681253,
+      "used": 0.8169
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7235729952275113,
+      "used": 0.3711
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8803241023255512,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8807601464847102,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8820283723932284,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8825429068948258,
+      "used": 4.99995
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8823259384927951,
+      "used": 4.99435
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8801375403931161,
+      "used": 4.80555
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8474585802388378,
+      "used": 2.5346
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8284344560506172,
+      "used": 1.999
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7910491101591498,
+      "used": 1.35835
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7380191278457758,
+      "used": 0.57415
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9616645787680521,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.962521630314592,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9636876016959548,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9632347308677621,
+      "used": 9.9986
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9627110191262327,
+      "used": 9.926
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9536320124920458,
+      "used": 8.5905
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8896139123681933,
+      "used": 3.18725
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8608897117991,
+      "used": 2.44455
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8075671092173318,
+      "used": 1.58025
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7423656949944795,
+      "used": 0.63115
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9066898256417364,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9455694871190935,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9459587864462287,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9465259978819639,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9461197866119444,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9460693440139294,
+      "used": 1.99975
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9465279323797673,
+      "used": 1.983
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9463698073033243,
+      "used": 1.40225
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9443300082145258,
+      "used": 1.06635
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9429252340497449,
+      "used": 0.84615
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9317877688150853,
+      "used": 0.4012
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9765946585584432,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9776762685429304,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9778694569721817,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9777254428386688,
+      "used": 4.99985
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9779883199878037,
+      "used": 4.9935
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9764083510462195,
+      "used": 4.7836
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9763759917251765,
+      "used": 2.61605
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9707709587965161,
+      "used": 1.8368
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9672344020295888,
+      "used": 1.4128
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9464321053341032,
+      "used": 0.61935
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9947757123604417,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9948909183397889,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9952341695621609,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9951019282981753,
+      "used": 9.9979
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9951551969029009,
+      "used": 9.91585
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9931903848975897,
+      "used": 8.5635
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9914752143740654,
+      "used": 3.3173
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9820992002084852,
+      "used": 2.18405
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9775442444372923,
+      "used": 1.65475
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9508583811067045,
+      "used": 0.67925
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.3715587026889239,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.48783773306314043,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.48777679919492595,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.4880344714104119,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.4908997984475077,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.49717693433995347,
+      "used": 1.99975
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.4961404597817779,
+      "used": 1.9821
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.46060285928428146,
+      "used": 1.43375
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.4351615141795233,
+      "used": 1.10625
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.41484503328234135,
+      "used": 0.8666
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.3850524272573907,
+      "used": 0.40505
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.643279511044019,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.6436808487268473,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.6460104341001325,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.6592987607006022,
+      "used": 4.99985
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.6693727209702013,
+      "used": 4.9955
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.6598216157543497,
+      "used": 4.75715
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.5422986949285215,
+      "used": 2.69655
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.48185530683300337,
+      "used": 1.9469
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.4426575518207744,
+      "used": 1.484
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.3913313139345987,
+      "used": 0.63625
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8245343973111049,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8271223927154824,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8397830695908902,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8616034214212417,
+      "used": 9.99895
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8686242101724769,
+      "used": 9.9228
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8242248060121529,
+      "used": 8.38235
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.5962201801292711,
+      "used": 3.48385
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.5060442672862234,
+      "used": 2.37825
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.4550592918523191,
+      "used": 1.76545
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.39293805274438054,
+      "used": 0.711
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.7964791587999556,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8675633680159168,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8672550315067113,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.867969160261529,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8683706190308556,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8677844174525642,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8675557173119625,
+      "used": 1.9877
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8646304128972231,
+      "used": 1.39265
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8597766535244904,
+      "used": 1.13095
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8477966313445496,
+      "used": 0.8292
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8243269940930535,
+      "used": 0.3664
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9341607339870185,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9350330051964149,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9365590710137505,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9363037749811243,
+      "used": 4.99995
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9352610510470928,
+      "used": 4.99655
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9343850685623823,
+      "used": 4.82815
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9235639199696482,
+      "used": 2.5619
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9131505540551618,
+      "used": 2.0169
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.884348933617957,
+      "used": 1.3718
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8385467550207861,
+      "used": 0.55295
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.982758803047426,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9834119516739622,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9846005360364914,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9847615171747283,
+      "used": 9.99915
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9836702225454151,
+      "used": 9.95055
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9798865040076896,
+      "used": 8.82065
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9575253285260871,
+      "used": 3.21215
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9431014833809808,
+      "used": 2.4781
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9000163047112525,
+      "used": 1.5833
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8429292151103728,
+      "used": 0.6046
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9513705096527935,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9750270182840526,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9748238190248608,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9747353453055024,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9747324636004865,
+      "used": 1.99995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9750784914277494,
+      "used": 1.99975
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9750724299162626,
+      "used": 1.9864
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9748166026100517,
+      "used": 1.40405
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9743728355001658,
+      "used": 1.059
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9739691454302519,
+      "used": 0.83335
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9691093851037323,
+      "used": 0.3739
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9903412792097777,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9905670272972434,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9912301422990859,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9912601309373975,
+      "used": 4.99975
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9909999403178692,
+      "used": 4.99535
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9903632751267404,
+      "used": 4.82545
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9907027116641403,
+      "used": 2.61345
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9895530739419163,
+      "used": 1.82525
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9886452330030501,
+      "used": 1.40225
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9791372877798975,
+      "used": 0.57065
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9980883956596255,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9981314515471459,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9984812142908573,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9983427691236139,
+      "used": 9.99885
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9983940257996321,
+      "used": 9.94345
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9977760518580675,
+      "used": 8.89085
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9981014041498304,
+      "used": 3.3363
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9956341326475143,
+      "used": 2.175
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9944222951471806,
+      "used": 1.64475
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9818863770201802,
+      "used": 0.62075
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "Mythical Din\u00e9",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.6165601702863948,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.727414407758494,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7274606467381912,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.727747402986032,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7313275072876981,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.7404569055398293,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7398839322802909,
+      "used": 1.98365
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.7278028228156711,
+      "used": 1.3874
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7052629638160934,
+      "used": 1.08085
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.6837919929473798,
+      "used": 0.79985
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.6406355616314053,
+      "used": 0.34535
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8423555123494924,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.842703362919575,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8451057750370339,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8577117756169725,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8705031058991987,
+      "used": 4.9975
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8666325229181635,
+      "used": 4.81415
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.830958193840865,
+      "used": 2.54425
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.773041017183951,
+      "used": 1.8457
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7314913278760771,
+      "used": 1.32475
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.6521613782924713,
+      "used": 0.523
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9411565720418236,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9426629368023715,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9494993843448581,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9633553878339007,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9687657692501933,
+      "used": 9.9729
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9551699504018208,
+      "used": 8.90165
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8975344840716338,
+      "used": 3.2005
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8083482692013029,
+      "used": 2.1899
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7522685678986177,
+      "used": 1.5426
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.6552086792963179,
+      "used": 0.5742
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.9278254944966641,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9613874840030446,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.961340835554339,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.961378943606792,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9613596387257799,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9611117974479683,
+      "used": 1.99995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9610775890765246,
+      "used": 1.99195
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9609568437138573,
+      "used": 1.2802
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9604910688960925,
+      "used": 1.03525
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9563261363595724,
+      "used": 0.6751
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9450679670820012,
+      "used": 0.26065
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9857640680182725,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9859950496204197,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9863818692190572,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9864274907642976,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9862331195689737,
+      "used": 4.9992
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9860429897639901,
+      "used": 4.9019
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9854173035681247,
+      "used": 2.2415
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9842755426673219,
+      "used": 1.7533
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9744691883888096,
+      "used": 1.06455
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9531509290903807,
+      "used": 0.37345
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9977162415161729,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9979072963267565,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9982162333726883,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9978767443418503,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9976721749603749,
+      "used": 9.993
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9973583314493298,
+      "used": 9.42715
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9959788704775274,
+      "used": 2.6987
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9945177159421146,
+      "used": 2.0696
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9804875116303563,
+      "used": 1.1916
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9551014589693397,
+      "used": 0.39795
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9896407583929598,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9954369891107082,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9954957574114204,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9955867927648127,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.99560251025334,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9955436734586954,
+      "used": 1.99995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9954720317482948,
+      "used": 1.99305
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9954294290464372,
+      "used": 1.3139
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9955637099340559,
+      "used": 1.0237
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9954358889900148,
+      "used": 0.7253
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9946767938956619,
+      "used": 0.28815
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9986564408596605,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9986164607193321,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.998672686444968,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9986623617440462,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9986221491605043,
+      "used": 4.9991
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9987058688685297,
+      "used": 4.9225
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9987467993766069,
+      "used": 2.34855
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9988160792708397,
+      "used": 1.72005
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9986457522720098,
+      "used": 1.16135
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9971336965795606,
+      "used": 0.41545
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9998294327467679,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9998359957784414,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9998724145442247,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9998869494199752,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9998658156335354,
+      "used": 9.9929
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9997758062332869,
+      "used": 9.58195
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9998355188637972,
+      "used": 2.88925
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9998238946527243,
+      "used": 2.01765
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9997596344351769,
+      "used": 1.3277
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9978155192226171,
+      "used": 0.44795
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.37600095972477765,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.5214494539432366,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.521442801132067,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.5214820242165144,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.5243538171610739,
+      "used": 1.99995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.5332451225691848,
+      "used": 1.9981
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.5292952844726405,
+      "used": 1.9433
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.47673778780348214,
+      "used": 1.32185
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.44754084033019725,
+      "used": 1.0337
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.41894320923897566,
+      "used": 0.7674
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.386876757166052,
+      "used": 0.3479
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.70401173847987,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7043619377015964,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.7091504446762575,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7262884507158349,
+      "used": 4.99945
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.7342776480606615,
+      "used": 4.9646
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7060720955327712,
+      "used": 4.433
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.55749535274965,
+      "used": 2.3504
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.4921986926473458,
+      "used": 1.719
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.4416401679622573,
+      "used": 1.23815
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.39144786976924123,
+      "used": 0.519
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8855769719699158,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8892181140899418,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9023413600037827,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9200673305015548,
+      "used": 9.99425
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9128968578321597,
+      "used": 9.66095
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8240685368205058,
+      "used": 7.23755
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.5979898186279295,
+      "used": 2.84655
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.5092676743328948,
+      "used": 1.9822
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.44914418654391847,
+      "used": 1.40115
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.3923403784145945,
+      "used": 0.56185
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.7801234320348817,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8696571732687031,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8696980721580063,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8688113873104659,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8686901016169275,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8682968465725728,
+      "used": 1.99895
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8677679759353331,
+      "used": 1.96335
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8677830717748497,
+      "used": 1.3404
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.857732559601753,
+      "used": 1.06995
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8485644820949856,
+      "used": 0.81325
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8149687424763037,
+      "used": 0.3896
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9460194331938401,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.946783956781216,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9470294823333752,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9459874060070153,
+      "used": 4.9993
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.944776602695604,
+      "used": 4.982
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9407329610900731,
+      "used": 4.61405
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9422136198155582,
+      "used": 2.4114
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9169609645151068,
+      "used": 1.8091
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8956274863405386,
+      "used": 1.3327
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.832486891938002,
+      "used": 0.58055
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9906994308868423,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9911778960107825,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9906067255366594,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9882742305606603,
+      "used": 9.9943
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9866913851749152,
+      "used": 9.8421
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9762850765519775,
+      "used": 8.06365
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9793209373969585,
+      "used": 2.93325
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.941494736655755,
+      "used": 2.10205
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9136666588922031,
+      "used": 1.51635
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8370233840467408,
+      "used": 0.6299
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9414349109837785,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9709063072906109,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9712103326362791,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9707242912106216,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9708112621504813,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9708659607399255,
+      "used": 1.99905
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9703131105571985,
+      "used": 1.96345
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9712388466364937,
+      "used": 1.26755
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9703073256019968,
+      "used": 0.99375
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9685597661630251,
+      "used": 0.72445
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9594990288887173,
+      "used": 0.31615
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9905618389680981,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9900709272690117,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9906093016230502,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9908321372739971,
+      "used": 4.9992
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.991060887374729,
+      "used": 4.98155
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9897131642870605,
+      "used": 4.63825
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9904100361004472,
+      "used": 2.1989
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9875945139102638,
+      "used": 1.61815
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9847657476764172,
+      "used": 1.1406
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9683852636910975,
+      "used": 0.45525
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9987745049655438,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.998820491963625,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9991621926009655,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9991010355055332,
+      "used": 9.99495
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9989481197893619,
+      "used": 9.8289
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9967530092135072,
+      "used": 8.2357
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9985064931601286,
+      "used": 2.6078
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9937311746627092,
+      "used": 1.82745
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9902451930463314,
+      "used": 1.26955
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9702715835481882,
+      "used": 0.4846
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.532630886608058,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.6797781757111867,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.6798142144165208,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.6802264887965024,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.6834677953277363,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.6943895090921621,
+      "used": 1.9986
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.6911148561989744,
+      "used": 1.9475
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.6683316425680929,
+      "used": 1.33865
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.6375731157454102,
+      "used": 1.0311
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.6055744246941976,
+      "used": 0.7812
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.5542805298262653,
+      "used": 0.3518
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8295696715751157,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8302213648227469,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8341726795708583,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8488734163581381,
+      "used": 4.9995
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8583533021095725,
+      "used": 4.97405
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8385038615371102,
+      "used": 4.4938
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.7805997016440561,
+      "used": 2.3616
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7065879256409823,
+      "used": 1.70125
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.6465783519195178,
+      "used": 1.24295
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.5624368524387564,
+      "used": 0.5125
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9483399343945915,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9501532549754614,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9575158168583774,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9699166357816897,
+      "used": 9.99755
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9664661845015516,
+      "used": 9.7855
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.917423524789837,
+      "used": 7.74175
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8411623478564215,
+      "used": 2.83195
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7350144324956418,
+      "used": 1.95325
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.6601121350924741,
+      "used": 1.3935
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.5641486629107745,
+      "used": 0.5474
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.8798107265089926,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9386872388368472,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.939258299475722,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9394106215232517,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9379174239085522,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9373525877996203,
+      "used": 1.9994
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9372018692974466,
+      "used": 1.97165
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.938566039721982,
+      "used": 1.27355
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9373316985161393,
+      "used": 1.0252
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9290398756807438,
+      "used": 0.71715
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9083732152988901,
+      "used": 0.30245
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9801244992870838,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9804848102923482,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9811804081812501,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9795694779430166,
+      "used": 4.9999
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9781786053897115,
+      "used": 4.9911
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9769472840141971,
+      "used": 4.717
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9794708097409457,
+      "used": 2.1844
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9761981769580395,
+      "used": 1.6687
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9591910299135372,
+      "used": 1.10825
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9210094064201577,
+      "used": 0.4258
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9979970013543964,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9980384731709957,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9971813971884549,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9954433965763078,
+      "used": 9.9986
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9943144014595542,
+      "used": 9.93255
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9914737115506083,
+      "used": 8.69305
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9939796353228391,
+      "used": 2.54115
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9891681310776621,
+      "used": 1.89
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9674976724099368,
+      "used": 1.2177
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9235260900501162,
+      "used": 0.44925
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9744244388557971,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9892673714809119,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9894693564325571,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9893279437331483,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9889130168888718,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9890736117176712,
+      "used": 1.9995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9890016787219793,
+      "used": 1.97385
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9894406852424145,
+      "used": 1.2727
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9891510312162339,
+      "used": 0.98295
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9892254874588922,
+      "used": 0.7226
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9866350320015103,
+      "used": 0.3111
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9971751378618181,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9971296606607735,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9975488090910017,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9974945967555046,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9972960983768105,
+      "used": 4.9901
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9966119471505285,
+      "used": 4.75525
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9973477971449495,
+      "used": 2.1852
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9970559503439814,
+      "used": 1.5824
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.996763300242275,
+      "used": 1.1278
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9922049007862807,
+      "used": 0.44405
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9997264691472053,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9996975474327803,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9998188703536988,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9998279104858637,
+      "used": 9.9992
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9996695180818439,
+      "used": 9.92985
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9990139453947544,
+      "used": 8.92745
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9997212939143181,
+      "used": 2.563
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9994472602397203,
+      "used": 1.78205
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9992412836074829,
+      "used": 1.25645
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9936876635357738,
+      "used": 0.4728
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "Doom (T9)",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.8260877387920232,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.907085114419459,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9071304317921387,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9072503110587584,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9105960512400579,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.919761966578001,
+      "used": 1.9991
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9189397251531852,
+      "used": 1.97085
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9139546489102753,
+      "used": 1.2256
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9151050103908712,
+      "used": 0.95545
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9013860786550003,
+      "used": 0.6538
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8593835028160473,
+      "used": 0.24995
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9649409736612411,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9650734965839954,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9660580055829668,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9716615883496248,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9784360134417928,
+      "used": 4.9928
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9750528846643263,
+      "used": 4.75975
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9750843985603722,
+      "used": 2.03855
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9766359023483303,
+      "used": 1.51895
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9444709821527038,
+      "used": 0.9682
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8725794172065362,
+      "used": 0.33925
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9938021081803367,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.993872096814774,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9951311968563125,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9976401331357658,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.997498919093702,
+      "used": 9.9621
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9916985445062222,
+      "used": 9.1208
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9983781290858984,
+      "used": 2.32415
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9986355411052704,
+      "used": 1.6946
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.955398031864129,
+      "used": 1.04115
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8745006890637916,
+      "used": 0.3511
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.978771300448291,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9927769649423659,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9927597073689103,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9929057357728481,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9919037034697831,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9915240147978067,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9915127596050501,
+      "used": 1.99015
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9928937836613506,
+      "used": 1.1702
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9924836857113987,
+      "used": 0.8723
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9922911079887301,
+      "used": 0.60765
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9903281351298093,
+      "used": 0.23365
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9986503345243632,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9986372328095138,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9987044217906892,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9978306057751178,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9974299872096628,
+      "used": 4.9999
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9974112943377346,
+      "used": 4.927
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9987621231481433,
+      "used": 1.90475
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9986428728532046,
+      "used": 1.34105
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.998239298208803,
+      "used": 0.8977
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9950713123850524,
+      "used": 0.3199
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9999485127836466,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9999658116042613,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9998521860912443,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9992553965836763,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9989753445092588,
+      "used": 9.9987
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9988890787232667,
+      "used": 9.72495
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9998422394692897,
+      "used": 2.16445
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9997531879540533,
+      "used": 1.4727
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.999477271874249,
+      "used": 0.9733
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9961922679372132,
+      "used": 0.3382
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9975059607818723,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9992208133921027,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9992161521032452,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9993332524567843,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9992293079629541,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9992759585693478,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9991911489695311,
+      "used": 1.9947
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9992336919344962,
+      "used": 1.09825
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9993412207752467,
+      "used": 0.8063
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9992034040033817,
+      "used": 0.54355
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9991010738477111,
+      "used": 0.193
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9999114485532046,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9999106659948825,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9999091817855835,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9998662750393152,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9998234434425831,
+      "used": 4.99995
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9997049824118615,
+      "used": 4.9602
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9998811085373164,
+      "used": 1.75545
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9998374499976636,
+      "used": 1.2058
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9998308114439249,
+      "used": 0.78965
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9996692447990179,
+      "used": 0.2565
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9999997537642717,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9999997570842505,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9999996267318726,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9999766183942557,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9999146465092897,
+      "used": 9.9994
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9998262063324451,
+      "used": 9.8546
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9999818250060082,
+      "used": 1.95265
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9999715506404638,
+      "used": 1.29405
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9999348870486021,
+      "used": 0.8413
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9997805770903826,
+      "used": 0.26825
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Beginner 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.19063324407397522,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.2564013779652596,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.2564013779652596,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.2564411338464648,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.2563405280908468,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.25769607338554923,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.25748889929879226,
+      "used": 1.99505
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.23236548094583778,
+      "used": 1.461
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.22249219989283592,
+      "used": 1.24435
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.21016418128512013,
+      "used": 0.89755
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.19753517013030578,
+      "used": 0.426
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.36240926410063257,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.36245152554317467,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.36316003386819357,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.3663662571316119,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.36875954531334426,
+      "used": 4.99925
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.3649832627277108,
+      "used": 4.9092
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.2712899453854443,
+      "used": 2.84405
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.2499524006249805,
+      "used": 2.3475
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.22535596127695318,
+      "used": 1.59905
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.20131586473871502,
+      "used": 0.7022
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.5422827676517569,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.5427829779436492,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.5479222663098393,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.5606948820259823,
+      "used": 9.99985
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.562677654070859,
+      "used": 9.9765
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.5338672834770798,
+      "used": 9.1386
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.2982760358649815,
+      "used": 3.8254
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.26736403873819947,
+      "used": 3.0835
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.23246228313870598,
+      "used": 1.9831
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.20280713592673347,
+      "used": 0.8188
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.6090711463201325,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.690557391381776,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.6903889101346489,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.6906459278868046,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.6911539958574809,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.6905338225902989,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.6907326262627729,
+      "used": 1.99485
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.6816247004470323,
+      "used": 1.46235
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.6722240920337382,
+      "used": 1.1937
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.6604113883302082,
+      "used": 0.9001
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.637567803100124,
+      "used": 0.44155
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.784562034603674,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7858793272124603,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.7895969775795005,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7898704857497476,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.7895298330256016,
+      "used": 4.99885
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7887903235411271,
+      "used": 4.91055
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.7518070167902857,
+      "used": 2.8652
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7272005690666847,
+      "used": 2.2047
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7020055353770033,
+      "used": 1.6088
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.657165902922023,
+      "used": 0.7251
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.89068570559863,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8930073191387579,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8962435543674976,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8964659728530794,
+      "used": 9.99995
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8963110813034698,
+      "used": 9.9754
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8884643694095313,
+      "used": 9.1861
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.802830514774844,
+      "used": 3.86635
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7610600287587382,
+      "used": 2.8139
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7256964142926038,
+      "used": 1.9955
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.6658339818657376,
+      "used": 0.8407
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.8266081641811878,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8853915380448103,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8856450914427638,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8866904914349317,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8861711258217693,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8859326714858413,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8857614997051656,
+      "used": 1.99265
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8833769504204393,
+      "used": 1.43195
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8823508803874254,
+      "used": 1.18885
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8771970065906644,
+      "used": 0.9011
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8663968305565417,
+      "used": 0.45755
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9387328980058431,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9396955842807889,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9417584906131029,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9410898877188564,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9401590736374259,
+      "used": 4.99905
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9403081399440766,
+      "used": 4.88765
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9334588166743517,
+      "used": 2.76425
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9295542691141367,
+      "used": 2.2008
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.917458701031655,
+      "used": 1.6099
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8953462183691562,
+      "used": 0.76185
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9790574997484685,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9800790934026241,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9810970464482903,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.981031653316319,
+      "used": 9.9999
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9811366023629904,
+      "used": 9.97015
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9785272046342492,
+      "used": 9.0271
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9637802621781826,
+      "used": 3.67165
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9563425671577453,
+      "used": 2.81205
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9388836165621877,
+      "used": 1.98565
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9090090935982764,
+      "used": 0.8886
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Skilled 1",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.26021606956794274,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.3384912215018434,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.3385024045372171,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.3384434818535832,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.33806870138620654,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.340566589183388,
+      "used": 1.99995
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.3402672880028651,
+      "used": 1.9944
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.31320747715680264,
+      "used": 1.4528
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.3025345836496126,
+      "used": 1.232
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.28659243608707546,
+      "used": 0.89005
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.26909678686871047,
+      "used": 0.424
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.4578924793084545,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.45792320438822937,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.458065294945908,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.4617491709655449,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.46745132831423764,
+      "used": 4.9992
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.46389996565796243,
+      "used": 4.90575
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.3632896078240592,
+      "used": 2.84375
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.3384999668327655,
+      "used": 2.33435
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.3062447616852012,
+      "used": 1.5965
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.27450402121581136,
+      "used": 0.6983
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.6369534128063271,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.6377605360024521,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.6437768852062203,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.6591388905804663,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.6640540938519,
+      "used": 9.9774
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.6393885604847456,
+      "used": 9.13275
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.4030608848413976,
+      "used": 3.87375
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.3628741476558964,
+      "used": 3.09715
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.31729130778525794,
+      "used": 1.99535
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.2765894580627835,
+      "used": 0.8159
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.6984068921652564,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.7685819349043537,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7685267784253228,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.7699955252103973,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.7720266716656276,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.771286477547884,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.7711245299403555,
+      "used": 1.99455
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.7638206570181064,
+      "used": 1.46865
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.7550490197951906,
+      "used": 1.17225
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7471952927157283,
+      "used": 0.9189
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7261372120903805,
+      "used": 0.4409
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8505683714165352,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8512196846469305,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8536228649137542,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8552165218375624,
+      "used": 4.9999
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8551357499426231,
+      "used": 4.9988
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8540407482046634,
+      "used": 4.91245
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8314906932634302,
+      "used": 2.91035
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8056610861015506,
+      "used": 2.14775
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.7903672823182307,
+      "used": 1.6593
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7456713319735602,
+      "used": 0.7268
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9306873009167611,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9325358650479466,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9350929885592312,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9358562805594877,
+      "used": 9.99945
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9356244116039947,
+      "used": 9.97705
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9303787179104984,
+      "used": 9.2305
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.8808303784113377,
+      "used": 3.9991
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8356870745351073,
+      "used": 2.72875
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8143599770395086,
+      "used": 2.07255
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.7537852061022073,
+      "used": 0.84645
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.8948967687010765,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9344018351972103,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9345745690464974,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9357937536373735,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9358178638726473,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9353268757268787,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.935233097794652,
+      "used": 1.9935
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9345298635527491,
+      "used": 1.41225
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9323698774784803,
+      "used": 1.1513
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9307453067943454,
+      "used": 0.88135
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9231852164745331,
+      "used": 0.43835
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.966858924408257,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9672830551117658,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9690046546459198,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9688284771397709,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9683173654437065,
+      "used": 4.9986
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9680718588963151,
+      "used": 4.8921
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9660555702880025,
+      "used": 2.7083
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9605308731049299,
+      "used": 2.07825
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9563547386467457,
+      "used": 1.55675
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9414283891141415,
+      "used": 0.71995
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9901750793084502,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9903267982959747,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9910066337436437,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9910405532538891,
+      "used": 9.9994
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9908021648362278,
+      "used": 9.97275
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9894214084506034,
+      "used": 9.0865
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9839301738202572,
+      "used": 3.56035
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9748665492385625,
+      "used": 2.5853
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9690853327155113,
+      "used": 1.90075
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9491653798058629,
+      "used": 0.8299
+     }
+    ]
+   }
+  }
+ },
+ {
+  "horse": "T8 example (bdolytics icon horse_71)",
+  "training": "Artisan 7",
+  "budgets": {
+   "10": {
+    "plan": [
+     "coursier_v2",
+     17,
+     10,
+     0
+    ],
+    "none": 0.417965939843603,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.5142994749264792,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.5142972412543372,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.5142020186977461,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.5153719563312407,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.5184130437874075,
+      "used": 1.9999
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.5182764501803394,
+      "used": 1.99385
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.4927020551796537,
+      "used": 1.4289
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.47907956039686395,
+      "used": 1.2015
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.4583722735132411,
+      "used": 0.8466
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.4318452351888176,
+      "used": 0.3713
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.6370465797837315,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.6370970046583054,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.638349437755761,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.6475630755159815,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.6532958826830305,
+      "used": 4.9991
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.6508731609231603,
+      "used": 4.90445
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.5615534957008392,
+      "used": 2.74515
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.5305083232728081,
+      "used": 2.2234
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.48748608764833334,
+      "used": 1.4673
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.4393100864502179,
+      "used": 0.59
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.7926819564710721,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.7935555545996292,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8000758190936292,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8186154419106694,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8253277702232655,
+      "used": 9.9815
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.811233710966813,
+      "used": 9.18095
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.611332922049088,
+      "used": 3.64835
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.5635472536412213,
+      "used": 2.87825
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.5009163221830735,
+      "used": 1.77795
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.4416898199139658,
+      "used": 0.66965
+     }
+    ]
+   },
+   "20": {
+    "plan": [
+     "coursier_switch",
+     10,
+     15,
+     11
+    ],
+    "none": 0.8355790975511074,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.8843608040634543,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.8848504001628608,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.8857898194525391,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.8841479852812365,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.8846540675138124,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.8844016579959542,
+      "used": 1.9948
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.882990959290415,
+      "used": 1.45785
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.8781134004112333,
+      "used": 1.1521
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.8733680851735175,
+      "used": 0.8774
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8570294617980718,
+      "used": 0.39175
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9325072041284292,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9335446339156479,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9356267124116421,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9358103504304774,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9354698041548021,
+      "used": 4.99955
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9351670572314411,
+      "used": 4.928
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9288315609719604,
+      "used": 2.8407
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9146519285149872,
+      "used": 2.0919
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.903801180069521,
+      "used": 1.54025
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8705031406795606,
+      "used": 0.62
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9749361715450883,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9761479941755533,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9774882714569568,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9772827387280763,
+      "used": 9.9999
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.977361816008389,
+      "used": 9.9889
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9761158245258034,
+      "used": 9.38535
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9619311097696424,
+      "used": 3.83965
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9366310307539999,
+      "used": 2.6402
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9206565126366913,
+      "used": 1.88775
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.8761853397399187,
+      "used": 0.7042
+     }
+    ]
+   },
+   "30": {
+    "plan": [
+     "coursier_switch",
+     9,
+     22,
+     15
+    ],
+    "none": 0.9649423666581511,
+    "policies": [
+     {
+      "tickets": 2,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9801526344522834,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9800795204907655,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.980323468400538,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9803029352068902,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9802394028678536,
+      "used": 2.0
+     },
+     {
+      "tickets": 2,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9803226065561176,
+      "used": 1.99345
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9804421864524484,
+      "used": 1.37815
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9799780663952231,
+      "used": 1.1536
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9785675148069859,
+      "used": 0.7865
+     },
+     {
+      "tickets": 2,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9756296802997589,
+      "used": 0.36375
+     },
+     {
+      "tickets": 5,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9913036523371935,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.99138501778543,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.991596412780881,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9914982136324048,
+      "used": 5.0
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9915346941202879,
+      "used": 4.99905
+     },
+     {
+      "tickets": 5,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9913237979978323,
+      "used": 4.91505
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9913593697026372,
+      "used": 2.57535
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9909087058484555,
+      "used": 2.1007
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9879621490314603,
+      "used": 1.32275
+     },
+     {
+      "tickets": 5,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9817090276807546,
+      "used": 0.55905
+     },
+     {
+      "tickets": 10,
+      "policy": "always",
+      "param": 0,
+      "chance": 0.9978634213984012,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 5,
+      "chance": 0.9977800481379032,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 10,
+      "chance": 0.9980114090919494,
+      "used": 10.0
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 15,
+      "chance": 0.9981060493260622,
+      "used": 9.99985
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 20,
+      "chance": 0.9979455878019333,
+      "used": 9.98515
+     },
+     {
+      "tickets": 10,
+      "policy": "from",
+      "param": 25,
+      "chance": 0.9976122771412134,
+      "used": 9.3343
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0,
+      "chance": 0.9972425391584635,
+      "used": 3.31635
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 0.5,
+      "chance": 0.9968547649204731,
+      "used": 2.6685
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 1,
+      "chance": 0.9919430522352457,
+      "used": 1.55115
+     },
+     {
+      "tickets": 10,
+      "policy": "behind",
+      "param": 2,
+      "chance": 0.9836959666937589,
+      "used": 0.6189
+     }
+    ]
+   }
+  }
+ }
+]
