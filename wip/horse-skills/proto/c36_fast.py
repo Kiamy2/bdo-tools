@@ -5,6 +5,8 @@ Same engine as bdo/horses_fast.py (imported), with extra leveling strategies, ea
   10 V0 until level xa, then V2         11 V2 until level xa, then V0
   12 V0 until the horse holds >= xb skills (then V2 for good)
   13 V2, but V0 on levels >= xa while the horse holds < xb skills (falling behind)
+  14 V0 until at most xb travel skills are missing, then V2 (C38)
+  15 V0 until at most xb travel skills are missing and the horse holds >= xa skills, then V2 (C38)
 The exact cleanup table stores only the full-set chance (G), to fit budgets up to 50 in memory.
 """
 import numpy as np
@@ -57,6 +59,13 @@ def _level30x(r, seed, w, n, W, M, st, swap_from, spend_cap, xa, xb, lmask, wmas
             v0 = not latched
         elif st == 13:
             v0 = reached >= xa and held < xb
+        elif st == 14 or st == 15:
+            # 14: V0 until at most xb travel skills are missing (then V2 for good);
+            # 15: same, but only once the horse also holds >= xa skills
+            missing = _pop(wmask) - _pop(have & wmask)
+            if missing <= xb and (st == 14 or held >= xa):
+                latched = True
+            v0 = not latched
         if v0:
             for s in fod:
                 if (have >> s) & 1 and spent < spend_cap:
@@ -130,10 +139,16 @@ class TableG:
         self.d = Dict.empty(key_type=types.int64, value_type=types.int64)
         self.rows = 0
         self.G = np.zeros((1 << 14, C + 1), np.float32)
+        self.known = set()
 
     def ensure(self, keys):
-        new = _explore(np.unique(keys), self.d, self.rows, self.pmax, self.w, self.n, self.wmask, self.order,
+        # skip keys already in the table with a Python-side set (asking the numba dict costs ~30 ms per call)
+        todo = [k for k in np.unique(keys).tolist() if k not in self.known]
+        if not todo:
+            return
+        new = _explore(np.array(todo, np.int64), self.d, self.rows, self.pmax, self.w, self.n, self.wmask, self.order,
                        self.rare, self.pb)
+        self.known.update(new.tolist())
         if not len(new):
             return
         need = self.rows + len(new)

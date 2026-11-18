@@ -1,0 +1,12 @@
+# coupons needed for 90/95/99% of the full set (- = more than 50), best plan of each family
+Diné Beginner 1	All at 30: -/-/-	V0: 30/36/-	V2: 33/43/-	V0 until T skills held, then V2: 30/36/-	V0 until X travel skills missing, then V2: 30/36/-	V0 until X missing and T held, then V2: 30/36/-
+Diné Skilled 1	All at 30: 44/-/-	V0: 27/31/41	V2: 26/33/-	V0 until T skills held, then V2: 25/30/41	V0 until X travel skills missing, then V2: 25/30/42	V0 until X missing and T held, then V2: 25/30/41
+Diné Professional 10	All at 30: 34/42/-	V0: 23/27/35	V2: 21/25/38	V0 until T skills held, then V2: 21/25/34	V0 until X travel skills missing, then V2: 21/25/34	V0 until X missing and T held, then V2: 21/24/34
+Diné Artisan 7 (easy check)	All at 30: 31/38/-	V0: 22/25/32	V2: 18/23/33	V0 until T skills held, then V2: 18/22/31	V0 until X travel skills missing, then V2: 19/23/31	V0 until X missing and T held, then V2: 19/23/31
+Doom Beginner 1	All at 30: 41/-/-	V0: 29/33/43	V2: 26/32/45	V0 until T skills held, then V2: 26/31/41	V0 until X travel skills missing, then V2: 26/31/42	V0 until X missing and T held, then V2: 26/31/41
+Doom Skilled 1	All at 30: 36/43/-	V0: 26/30/38	V2: 21/26/37	V0 until T skills held, then V2: 22/26/35	V0 until X travel skills missing, then V2: 21/26/35	V0 until X missing and T held, then V2: 22/26/35
+Doom Artisan 7 (easy check)	All at 30: 30/35/47	V0: 21/24/30	V2: 12/16/24	V0 until T skills held, then V2: 14/16/24	V0 until X travel skills missing, then V2: 13/17/23	V0 until X missing and T held, then V2: 14/17/24
+T8 Beginner 1	All at 30: -/-/-	V0: 41/-/-	V2: -/-/-	V0 until T skills held, then V2: 42/-/-	V0 until X travel skills missing, then V2: 45/-/-	V0 until X missing and T held, then V2: 42/-/-
+T8 Skilled 1	All at 30: -/-/-	V0: 30/41/-	V2: 40/-/-	V0 until T skills held, then V2: 30/41/-	V0 until X travel skills missing, then V2: 30/41/-	V0 until X missing and T held, then V2: 30/41/-
+T8 Professional 10	All at 30: 42/-/-	V0: 25/30/47	V2: 28/36/-	V0 until T skills held, then V2: 25/30/47	V0 until X travel skills missing, then V2: 25/30/47	V0 until X missing and T held, then V2: 25/30/47
+Arduanatt Skilled 1 (W unchecked)	All at 30: 43/-/-	V0: 27/32/49	V2: 29/37/-	V0 until T skills held, then V2: 27/32/49	V0 until X travel skills missing, then V2: 27/32/-	V0 until X missing and T held, then V2: 27/32/49
