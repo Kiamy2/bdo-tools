@@ -48,13 +48,17 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               "Wings of Freedom", "Earth of Protection", "Dark Sprint", "Lightning Charge",
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
 CLASSIC_FODDER = ["Hind Kick", "Fore Chop"]
-STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "once", "hard", "ideal"]
+STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard", "ideal"]
+SWITCH_TS = list(range(9, 17))                  # thresholds the optimizer tries for coursier_switch
+DEFAULT_SWITCH_AT = 12
 STRATEGY_HELP = {
     "natural": "no coupons used",
     "at30": "level naturally, spend all coupons at level 30 on unwanted skills",
     "coursier": "swap Hind Kick/Fore Chop each time they're learned (keeping a reserve), rest at 30",
     "coursier_v2": "swap only Hind Kick (the heavier of the two) each time it's learned and keep Fore Chop: no "
-                   "Hind Kick <-> Fore Chop loop (keeping a reserve), rest at 30. Best in most cases",
+                   "Hind Kick <-> Fore Chop loop (keeping a reserve), rest at 30. Best with few coupons",
+    "coursier_switch": "coursier until the horse has --switch-at learned skills (default 12; innate skills don't "
+                       "count), then coursier_v2 (keeping a reserve), rest at 30. Best with many coupons",
     "once": "swap every unwanted skill once when it's learned (keeping a reserve), rest at 30",
     "hard": "swap every unwanted skill until a wanted one comes (keeping a reserve), rest at 30",
     "ideal": "unlimited coupons: always hold the rarest skills, for the most skills at 30",
@@ -201,11 +205,14 @@ def _draw(rng, items, weights):
 
 
 def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(), wanted=None, fodder=None,
-             point_bonus=0.25, points=0, runs=5000, seed=1, max_level=30, reserve=0, swap_from=1):
+             point_bonus=0.25, points=0, runs=5000, seed=1, max_level=30, reserve=0, swap_from=1,
+             switch_at=DEFAULT_SWITCH_AT):
     """Monte Carlo of leveling start_level -> max_level. Returns averages over runs.
 
     reserve: coupons the coursier/once/hard strategies keep for the level-30 cleanup (no swaps while leveling below it).
     swap_from: horse level from which coursier/once/hard start swapping while leveling (before it, they wait).
+    switch_at: coursier_switch swaps like coursier until the horse holds this many learned skills (checked from
+    swap_from on), then like coursier_v2 for good.
     """
     rng = random.Random(seed)
     pool = list(horse.weights)
@@ -220,6 +227,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
         have = set(s for s in learned if s in wt)
         c = 0 if strategy == "natural" else coupons
         t, pts = tickets, points
+        latched = False                              # coursier_switch: switched to the V2 swaps
 
         def swap(out):
             nonlocal c, pts
@@ -251,15 +259,17 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                 t -= 1                               # Mount Level Down Ticket: redo this level
             if got:
                 have.add(got)
+            if strategy == "coursier_switch" and _lvl + 1 >= swap_from and len(have) >= switch_at:
+                latched = True                       # from now on, V2 swaps only
             if strategy == "ideal":
                 have = set(rare[:len(have)])
             elif _lvl + 1 < swap_from:                 # level just reached is below swap_from: no swaps yet
                 pass
-            elif strategy == "coursier":
+            elif strategy == "coursier" or (strategy == "coursier_switch" and not latched):
                 for s in fodder:
                     if s in have and c > reserve:
                         swap(s)
-            elif strategy == "coursier_v2":
+            elif strategy in ("coursier_v2", "coursier_switch"):
                 if cyc in have and c > reserve:
                     swap(cyc)
             elif strategy == "once":
@@ -276,7 +286,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                             slot = swap(slot)
                             if slot is None:
                                 break
-        if strategy in ("at30", "coursier", "coursier_v2", "once", "hard"):
+        if strategy in ("at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard"):
             while c > 0 and not wanted <= have:      # level-30 cleanup (see _rarest_unwanted)
                 out = _rarest_unwanted(have, wanted, rank)
                 if out is None or swap(out) is None:
@@ -318,14 +328,16 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
 
 
 # --- plans and optimizer ---------------------------------------------------------------------------------------
-# A plan = (strategy, swap_from, spend_cap): swap while leveling from level swap_from on, spending at most spend_cap
-# coupons, then do the level-30 cleanup with whatever is left. For a budget B >= spend_cap this is the same as
+# A plan = (strategy, swap_from, spend_cap, switch_at): swap while leveling from level swap_from on, spending at most
+# spend_cap coupons, then do the level-30 cleanup with whatever is left. switch_at is coursier_switch's threshold
+# (learned skills); 0 for the other strategies. For a budget B >= spend_cap this is the same as
 # "keep B - spend_cap coupons for level 30". One simulation of a plan gives its result for every budget at once:
 # the cleanup is run with as many coupons as it takes, and a budget B simply stops it after B coupons in total.
 
 def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
-                  wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30):
-    """Monte Carlo of one plan for every budget 0..max_budget.
+                  wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30,
+                  switch_at=DEFAULT_SWITCH_AT):
+    """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate().
 
     Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
     for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
@@ -346,6 +358,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     for _ in range(runs):
         have = set(s for s in learned if s in wt)
         spent, t, pts = 0, tickets, points
+        latched = False
 
         def swap(out):
             nonlocal spent, pts
@@ -379,11 +392,13 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 have.add(got)
             if _lvl + 1 < swap_from or spent >= spend_cap:
                 continue
-            if strategy == "coursier":
+            if strategy == "coursier_switch" and len(have) >= switch_at:
+                latched = True                       # from now on, V2 swaps only
+            if strategy == "coursier" or (strategy == "coursier_switch" and not latched):
                 for s in fodder:
                     if s in have and spent < spend_cap:
                         swap(s)
-            elif strategy == "coursier_v2":
+            elif strategy in ("coursier_v2", "coursier_switch"):
                 if cyc in have and spent < spend_cap:
                     swap(cyc)
             elif strategy == "once":
@@ -434,11 +449,12 @@ PLAN_CAPS = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 22, 26, 30]
 
 
 def plan_name(plan, budget=None):
-    st, lv, cap = plan
+    st, lv, cap, T = plan
     if st in ("at30", "natural"):
         return st
     keep = f", keep {budget - cap}" if budget is not None else ""
-    return f"{st} from lvl {lv}, spend <= {cap}{keep}"
+    how = f"V0 until {T} learned skills, then V2" if st == "coursier_switch" else st
+    return f"from lvl {lv}, {how}, spend <= {cap}{keep}"
 
 
 def _neighbors(value, grid, lo, hi):
@@ -448,30 +464,34 @@ def _neighbors(value, grid, lo, hi):
     return range(max(lo, below + 1), min(hi, above - 1) + 1)
 
 
-def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "once", "hard"), levels=None, caps=None,
-             runs=(1000, 4000), top=6, max_close=15, refine=True, seed=1, progress=None, **kw):
+def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "coursier_switch", "once", "hard"),
+             levels=None, caps=None, switch_ts=None, runs=(1000, 4000), top=6, max_close=15, refine=True, seed=1,
+             progress=None, **kw):
     """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
     'wanted' (average wanted skills).
-    Stage 1: every plan of the grid with runs[0].
+    Stage 1: every plan of the grid with runs[0] (coursier_switch: thresholds switch_ts, default every other value of
+    SWITCH_TS).
     Refine: around the best and close plans of stage 1, every start level and spending cap between their grid
-    neighbors (step 1), also with runs[0].
+    neighbors (step 1), and for coursier_switch the thresholds next to theirs (within SWITCH_TS), also with runs[0].
     Stage 2: for each budget and goal, the top plans so far and every plan close to the best (up to max_close),
     again with runs[1] and a fresh seed (to avoid picking a lucky winner, and to know which plans are tied).
-    Returns {plan: simulate_plan result} for the stage-2 plans."""
+    Returns {plan: simulate_plan result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     levels = PLAN_LEVELS if levels is None else levels
     caps = PLAN_CAPS if caps is None else caps
+    switch_ts = SWITCH_TS[::2] if switch_ts is None else switch_ts
     max_level = kw.get("max_level", 30)
     found = {}
 
     def run_all(plans, label):
         todo = [p for p in plans if p not in found]
         for i, p in enumerate(todo):
-            found[p] = simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[0], seed=seed, **kw)
+            found[p] = simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[0], seed=seed,
+                                     switch_at=p[3], **kw)
             if progress:
                 progress(label, i + 1, len(todo))
 
     def promising():
-        keep = {("at30", 1, 0)}
+        keep = {("at30", 1, 0, 0)}
         for B in range(max_budget + 1):
             for goal, margin in (("full", 0.03), ("wanted", 0.1)):     # ~2 standard errors at 1000 runs
                 ok = [p for p in found if found[p][goal][B] is not None]
@@ -481,16 +501,19 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "on
                 keep.update(close[:max_close])
         return keep
 
-    run_all([("at30", 1, 0)] + [(st, lv, cap) for st in strategies for lv in levels for cap in caps
-                                if cap <= max_budget], "grid")
+    ts = lambda st: switch_ts if st == "coursier_switch" else [0]
+    run_all([("at30", 1, 0, 0)] + [(st, lv, cap, T) for st in strategies for lv in levels for cap in caps
+                                   for T in ts(st) if cap <= max_budget], "grid")
     if refine:
         near = set()
-        for st, lv, cap in promising():
+        for st, lv, cap, T in promising():
             if st in strategies:
-                near.update((st, l2, c2) for l2 in _neighbors(lv, levels, 1, max_level - 1)
-                            for c2 in _neighbors(cap, caps, 1, max_budget))
+                t2s = [t for t in (T - 1, T, T + 1) if t in SWITCH_TS] if st == "coursier_switch" else [0]
+                near.update((st, l2, c2, t2) for l2 in _neighbors(lv, levels, 1, max_level - 1)
+                            for c2 in _neighbors(cap, caps, 1, max_budget) for t2 in t2s)
         run_all(sorted(near), "refine")
-    return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000, **kw)
+    return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000,
+                             switch_at=p[3], **kw)
             for p in sorted(promising())}
 
 
@@ -502,7 +525,8 @@ def tied_plans(res, B, goal, margin):
 
 
 def describe_plans(plans, budget):
-    """Short text for a set of tied plans: per strategy, the span of start levels and of coupons kept."""
+    """Short text for a set of tied plans: per strategy, the span of start levels, of coupons kept, and for
+    coursier_switch of the threshold."""
     parts, seen = [], []
     for p in plans:
         if p[0] not in seen:
@@ -515,5 +539,9 @@ def describe_plans(plans, budget):
         lv = sorted({p[1] for p in ps})
         kp = sorted({budget - p[2] for p in ps})
         span = lambda v: f"{v[0]}" if v[0] == v[-1] else f"{v[0]}-{v[-1]}"
-        parts.append(f"{st} from lvl {span(lv)}, keep {span(kp)}")
+        if st == "coursier_switch":
+            Ts = sorted({p[3] for p in ps})
+            parts.append(f"{st}: from lvl {span(lv)}, V0 until {span(Ts)} learned skills, then V2, keep {span(kp)}")
+        else:
+            parts.append(f"{st}: from lvl {span(lv)}, keep {span(kp)}")
     return " | ".join(parts)

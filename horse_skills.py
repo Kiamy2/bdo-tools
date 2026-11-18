@@ -54,9 +54,12 @@ def main():
     ap.add_argument("--strategy", help="comma-separated subset (default all): "
                     + "; ".join(f"{k} = {v}" for k, v in H.STRATEGY_HELP.items()))
     ap.add_argument("--wanted", help="wanted skills, comma-separated (default: the travel set, see docs)")
-    ap.add_argument("--reserve", type=int, default=5, help="coupons coursier/once/hard keep for level 30 (default 5)")
+    ap.add_argument("--reserve", type=int, default=5, help="coupons the swapping strategies keep for level 30 (default 5)")
     ap.add_argument("--swap-from", type=int, default=1, metavar="LEVEL",
-                    help="coursier/once/hard only start swapping once the horse reaches this level (default 1)")
+                    help="the swapping strategies only start once the horse reaches this level (default 1)")
+    ap.add_argument("--switch-at", type=int, default=H.DEFAULT_SWITCH_AT, metavar="T",
+                    help="coursier_switch: learned skills (innate ones don't count) at which it goes from coursier to "
+                    f"coursier_v2 swaps (default {H.DEFAULT_SWITCH_AT})")
     ap.add_argument("--fodder", help="skills the 'coursier' strategy swaps out (default: Hind Kick,Fore Chop)")
     ap.add_argument("--points", type=int, default=0, help="Skill Change Points the horse already has (default 0)")
     ap.add_argument("--point-bonus", type=float, default=0.25, help="desired-skill weight bonus per point (default 0.25)")
@@ -147,7 +150,8 @@ def main():
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(map(show, learned)) or '-'} | tickets {a.tickets} | "
-          f"{a.runs} runs | reserve {a.reserve} | swaps from level {a.swap_from} | wanted: {len(W)} skills, learnable: {len(horse.weights)}")
+          f"{a.runs} runs | reserve {a.reserve} | swaps from level {a.swap_from} | switch at {a.switch_at} learned skills | "
+          f"wanted: {len(W)} skills, learnable: {len(horse.weights)}")
     print("# cells a/b/c = no boost / gear set or brand stone / both")
     if targets:
         print("# coupons needed to end with every wanted skill in the given share of runs (+/-1 coupon; >150 = not reached)")
@@ -163,7 +167,8 @@ def main():
                     n = H.coupons_needed(horse, horse.M(bonus, gear, brand), strat, t / 100, cache=caches[i],
                                          tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted,
                                          fodder=fodder, point_bonus=a.point_bonus, points=a.points, runs=a.runs,
-                                         seed=a.seed, reserve=a.reserve, swap_from=a.swap_from)
+                                         seed=a.seed, reserve=a.reserve, swap_from=a.swap_from,
+                                         switch_at=a.switch_at)
                     vals.append(">150" if n is None else str(n))
                 cols.append("/".join(vals))
             print(f"{strat}\t" + "\t".join(cols))
@@ -175,7 +180,7 @@ def main():
             for gear, brand in [(0, 0), (1, 0), (1, 1)]:
                 res.append(H.simulate(horse, horse.M(bonus, gear, brand), strat, budget, a.tickets, a.level, learned,
                                       wanted, fodder, a.point_bonus, a.points, a.runs, a.seed,
-                                      reserve=a.reserve, swap_from=a.swap_from))
+                                      reserve=a.reserve, swap_from=a.swap_from, switch_at=a.switch_at))
             cell = lambda k, f: "/".join(f.format(r[k]) for r in res)
             cp = "-" if strat == "natural" else ("unlimited" if strat == "ideal" else str(budget))
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")
@@ -204,21 +209,23 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     if engine == "numba":
         res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
         searched = ("every plan: at30, and coursier / coursier_v2 with every start level and spending cap; "
-                    "level-30 cleanup computed exactly (fast engine)")
+                    f"coursier_switch with every start level and threshold {H.SWITCH_TS[0]}-{H.SWITCH_TS[-1]}, on a "
+                    "grid of spending caps refined around the best; level-30 cleanup computed exactly (fast engine)")
     else:
         res = H.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
-        searched = ("a grid of plans (coursier, coursier_v2, once, hard), then every start level and spending cap "
-                    "around the best ones (plain-Python engine)")
+        searched = ("a grid of plans (coursier, coursier_v2, coursier_switch, once, hard), then every start level, "
+                    "spending cap and threshold around the best ones (plain-Python engine)")
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
           f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
     print(f"# Searched: {searched}.")
     print("# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the")
-    print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup.")
+    print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup;")
+    print("# coursier_switch: V0 = coursier swaps, V2 = coursier_v2 swaps, learned skills don't count innate ones.")
     print("# The spans cover the tied plans; not every combination inside a span is tied.")
     print("coupons\tfull set: chance\ttied plans\tmost wanted: avg\ttied plans\tat30: chance, avg")
-    at30 = res[("at30", 1, 0)]
+    at30 = res[("at30", 1, 0, 0)]
     best_full = []
     for B in range(a.optimize + 1):
         tf = H.tied_plans(res, B, "full", 0.01)

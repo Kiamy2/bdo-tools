@@ -4,7 +4,7 @@
     python3 -I tests/run_all.py
 
 Prints one line per check and 'ALL OK' at the end; exit code 1 if anything failed.
-Expect ~10-60 s (Arsha retries can make it slower).
+Expect ~1-2 min (Arsha retries can make it slower; the horse optimizer checks take ~45 s with numba).
 """
 import os
 import re
@@ -98,11 +98,21 @@ code, out = run("horse_skills.py", "--horse-file", "tests/data/sim_mythical_dine
 check("horse_skills --horse-file (simulator reading)", code == 0 and "MISMATCH" not in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "300", "--coupons", "20")
 rows = {l.split("\t")[0]: l.split("\t") for l in out.splitlines() if not l.startswith("#")}
-ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "coursier_v2", "hard", "ideal"}
+ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "coursier_v2", "coursier_switch", "hard", "ideal"}
 if ok:
     first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
+# coursier_switch with a threshold never reached is coursier, with 0 it's coursier_v2 (same random numbers)
+code, out = run("-c", """
+import sys
+sys.path.insert(0, ".")
+from bdo import horses as H
+h = H.get_horse(H.load_data(), "Doom (T9)"); M = h.M(0, 0, 0)
+f = lambda st, T: H.simulate_plan(h, M, st, 10, 15, 20, runs=300, seed=5, switch_at=T)["full"]
+print(f("coursier_switch", 0) == f("coursier_v2", 0), f("coursier_switch", 99) == f("coursier", 0))
+""")
+check("coursier_switch limits: T=0 is coursier_v2, T never reached is coursier", code == 0 and out.strip() == "True True", out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "200", "--target", "50",
                "--strategy", "at30,coursier")
 m = re.search(r"^coursier\t(\d+)/(\d+)/(\d+)$", out, re.M)
@@ -127,14 +137,32 @@ import math, sys
 sys.path.insert(0, ".")
 from bdo import horses as H, horses_fast as F
 h = H.get_horse(H.load_data(), "Mythical Diné"); M = h.M(21.7, 0, 0)
-for st, L, cap in (("coursier_v2", 15, 9), ("coursier", 20, 5), ("at30", 1, 0)):
-    a = F.Evaluator(h, M, max_budget=20).plan(st, L, cap, runs=8000, seed=3)["full"]
-    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3)["full"]
-    z = max(abs(a[B] - b[B]) / math.sqrt(b[B] * (1 - b[B]) / 4000 + a[B] * (1 - a[B]) / 8000) for B in (10, 15, 20))
+for st, L, cap, T in (("coursier_v2", 15, 9, 0), ("coursier", 20, 5, 0), ("at30", 1, 0, 0), ("coursier_switch", 8, 15, 11)):
+    a = F.Evaluator(h, M, max_budget=20).plan(st, L, cap, runs=8000, seed=3, switch_at=T)["full"]
+    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3, switch_at=T)["full"]
+    z = max(abs(a[B] - b[B]) / math.sqrt(b[B] * (1 - b[B]) / 4000 + a[B] * (1 - a[B]) / 8000) for B in (15, 20))
     print(st, round(z, 2), "OK" if z < 4 else "DIFF")
 """)
     check("horses_fast agrees with bdo.horses (same plans, within noise)", code == 0 and "DIFF" not in out
-          and out.count("OK") == 3, out)
+          and out.count("OK") == 4, out)
+    code, out = run("-c", """
+import sys
+import numpy as np
+sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "Doom (T9)"); ev = F.Evaluator(h, h.M(0, 0, 0), max_budget=20)
+w, n, W, M = ev.args; lmask, wmask, fod, cyc, order, rare = ev.masks
+g = lambda st, T: F._many30(3000, 7, w, n, W, M, st, 10, 15, 0, 1, lmask, wmask, fod, cyc, order, rare, 0.25, 0, 30, T)
+same = lambda x, y: all(np.array_equal(p, q) for p, q in zip(x, y))
+print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
+""")
+    check("horses_fast coursier_switch limits: T=0 is coursier_v2, T never reached is coursier",
+          code == 0 and out.strip() == "True True", out)
+    code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20")
+    m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
+    check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 71%)",
+          code == 0 and 66 <= float(m.get("20", 0)) <= 76
+          and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     check("horse_skills --optimize --engine numba (coursier_v2 best at 10 coupons, about 62%)",

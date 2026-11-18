@@ -85,9 +85,11 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                 rare, pb, points, max_level):
+                 rare, pb, points, max_level, switch_at):
         """One horse from start_level to max_level, without the level-30 cleanup.
-        st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc').
+        st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
+        (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
+        coursier_v2 for good).
         Returns (held skills, coupons spent while leveling, Skill Change Points)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
@@ -96,6 +98,7 @@ if nb is not None:
         spent = 0
         t = tickets
         pts = points
+        latched = False
         for lvl in range(start_level, max_level):
             got = -1
             while True:
@@ -121,14 +124,16 @@ if nb is not None:
                 have |= np.int64(1) << got
             if lvl + 1 < swap_from or spent >= spend_cap:
                 continue
-            if st == 1:
+            if st == 7 and _pop(have) >= switch_at:
+                latched = True
+            if st == 1 or (st == 7 and not latched):
                 for s in fod:
                     if (have >> s) & 1 and spent < spend_cap:
                         nw, have, state = _swap(s, have, pts, state, w, n, rare, pb)
                         if nw >= 0:
                             spent += 1
                             pts += 1
-            elif st == 6:
+            elif st == 6 or st == 7:
                 if cyc >= 0 and (have >> cyc) & 1 and spent < spend_cap:
                     nw, have, state = _swap(cyc, have, pts, state, w, n, rare, pb)
                     if nw >= 0:
@@ -172,13 +177,13 @@ if nb is not None:
 
     @nb.njit(cache=True, parallel=True)
     def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
-                order, rare, pb, points, max_level):
+                order, rare, pb, points, max_level, switch_at=0):
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
         for r in nb.prange(runs):
             a, b, c = _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
-                               fod, cyc, order, rare, pb, points, max_level)
+                               fod, cyc, order, rare, pb, points, max_level, switch_at)
             S[r] = a
             base[r] = b
             pts[r] = c
@@ -327,7 +332,7 @@ if nb is not None:
         def rows_of(self, keys):
             return _rows(np.asarray(keys, np.int64), self.d)
 
-    CODES = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v2": 6}
+    CODES = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v2": 6, "coursier_switch": 7}
 
     class Evaluator:
         """Plans for one horse state (Training, boosts, level, learned skills, points, tickets); the cleanup
@@ -353,16 +358,17 @@ if nb is not None:
             self.table = table or Table(w, wmask, order, self.rare, C=max_budget, pmax=points + max_budget,
                                         point_bonus=point_bonus)
 
-        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1):
+        def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0):
             """Same output as bdo.horses.simulate_plan: full[B], wanted[B] for B = 0..max_budget (None below
-            spend_cap), skills (average skills at 30)."""
+            spend_cap), skills (average skills at 30). switch_at: coursier_switch's threshold."""
             st = CODES[strategy]
             if st == 0:
                 spend_cap = 0
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets, self.start_level,
-                                   lmask, wmask, fod, cyc, order, rare, self.pb, self.points, self.max_level)
+                                   lmask, wmask, fod, cyc, order, rare, self.pb, self.points, self.max_level,
+                                   switch_at)
             counts = np.array([bin(int(x)).count("1") for x in S])
             nbud = self.C + 1
             res = {"skills": float(counts.mean()), "wanted_total": self.n_wanted}
@@ -387,26 +393,45 @@ if nb is not None:
             return res
 
 
-def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2"), runs=(1000, 4000), top=6,
-             max_close=25, seed=1, progress=None, start_level=1, **kw):
+def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "coursier_switch"), runs=(1000, 4000),
+             top=6, max_close=25, seed=1, progress=None, start_level=1, **kw):
     """Like bdo.horses.optimize, but tries every plan: at30, and each strategy with every start level (from the
-    next level to 29) and every spending cap (1 to max_budget). Stage 2 reruns the top and close plans of each
-    budget and goal with fresh horses. Returns {plan: result} for the stage-2 plans."""
+    next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
+    (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
+    and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses.
+    Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
     ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **kw)
-    plans = [("at30", 1, 0)] + [(st, lv, cap) for st in strategies for lv in range(start_level + 1, 30)
-                                for cap in range(1, max_budget + 1)]
+    levels = range(start_level + 1, 30)
+    plans = [("at30", 1, 0, 0)]
+    for st in strategies:
+        if st == "coursier_switch":
+            plans += [(st, lv, cap, T) for lv in levels for cap in H.PLAN_CAPS if cap <= max_budget
+                      for T in H.SWITCH_TS]
+        else:
+            plans += [(st, lv, cap, 0) for lv in levels for cap in range(1, max_budget + 1)]
     s1 = {}
-    for i, p in enumerate(plans):
-        s1[p] = ev.plan(*p, runs=runs[0], seed=seed)
-        if progress:
-            progress("search", i + 1, len(plans))
-    keep = {("at30", 1, 0)}
-    for B in range(max_budget + 1):
-        for goal, margin in (("full", 0.025), ("wanted", 0.08)):
-            ok = [p for p in plans if s1[p][goal][B] is not None]
-            ranked = sorted(ok, key=lambda p: -s1[p][goal][B])
-            keep.update(ranked[:top])
-            keep.update([p for p in ranked if s1[p][goal][B] >= s1[ranked[0]][goal][B] - margin][:max_close])
-    return {p: ev.plan(*p, runs=runs[1], seed=seed + 1000) for p in sorted(keep)}
+
+    def run(todo, label):
+        todo = [p for p in todo if p not in s1]
+        for i, p in enumerate(todo):
+            s1[p] = ev.plan(p[0], p[1], p[2], runs=runs[0], seed=seed, switch_at=p[3])
+            if progress:
+                progress(label, i + 1, len(todo))
+
+    def promising():
+        keep = {("at30", 1, 0, 0)}
+        for B in range(max_budget + 1):
+            for goal, margin in (("full", 0.025), ("wanted", 0.08)):
+                ok = [p for p in s1 if s1[p][goal][B] is not None]
+                ranked = sorted(ok, key=lambda p: -s1[p][goal][B])
+                keep.update(ranked[:top])
+                keep.update([p for p in ranked if s1[p][goal][B] >= s1[ranked[0]][goal][B] - margin][:max_close])
+        return keep
+
+    run(plans, "search")
+    near = {(st, lv, c2, T) for st, lv, cap, T in promising() if st == "coursier_switch"
+            for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
+    run(sorted(near), "refine")
+    return {p: ev.plan(p[0], p[1], p[2], runs=runs[1], seed=seed + 1000, switch_at=p[3]) for p in sorted(promising())}
