@@ -1,44 +1,48 @@
 # Horse skills: how they're learned, and how to get the ones you want
 
-Report of 2026-11-17. It explains how a horse picks a skill when it levels up, checks that against the game, and simulates the usual ways of leveling a horse, so you can skip straight to the conclusions.
+Report of 2026-11-18. It explains how a horse picks a skill when it levels up, checks that against the game, and compares ways of using Mount Skill Change Coupons, so you can skip straight to the conclusions.
 
-Everything here can be reproduced with [horse_skills.py](horse_skills.md), a command-line tool in this repo (commands at the end). The tool can also run the same simulations for your own horse and Training level. The horse data it uses (each skill's weight, explained below) is in [data/horse_skills.json](../data/horse_skills.json).
+Everything here can be reproduced with [horse_skills.py](horse_skills.md), a command-line tool in this repo (commands at the end). It also finds the best plan for your own horse, Training level and coupons. The horse data it uses (each skill's weight, explained below) is in [data/horse_skills.json](../data/horse_skills.json).
 
 ## Terms used
 
-- **Learn-chance boosts:** the two items that raise a horse's chance of learning a skill. Each adds +10%:
+- **Learn-chance boosts:** the two items that raise a horse's chance of learning a skill, +10% each:
   - the **horse gear set:** any 4 Pearl Shop horse gear pieces worn together, from any set;
   - the **Mount Brand Spell Stone**, applied to the horse.
-- **a/b/c:** most results are given as three numbers: **a** = no boost, **b** = one boost (the gear set *or* the brand stone, they're equal), **c** = both boosts.
-- **Coupon:** a Mount Skill Change Coupon. It replaces a learned skill with a random unlearned one, and you can mark one skill as **desired** to make it more likely.
+- **a/b/c:** some results are given as three numbers: **a** = no boost, **b** = one boost (the gear set *or* the brand stone, they're equal), **c** = both boosts.
+- **Coupon:** a Mount Skill Change Coupon. It replaces one learned skill with a random unlearned one. You mark one skill as **desired** to make it more likely.
   - Each coupon used gives the horse a **Skill Change Point**, and points make the desired skill more likely still.
   - Innate skills (the ones the horse is born with) can't be swapped.
 - **Ticket:** a Mount Level Down Ticket. It undoes a level-up so it can be redone.
-- **Travel set:** the skills this report counts as wanted, mainly for getting around (full list and reasons in [The travel set](#the-travel-set)). **Full set:** ending at level 30 with every skill of the travel set.
-- **Leveling strategies** compared (details in [Strategies](#strategies)):
-  - **Natural:** level 1 to 30 without coupons.
-  - **All at 30:** level naturally, then at level 30 swap every skill outside the travel set until a travel-set skill comes out, while coupons last. That last step is called the **level-30 cleanup**.
-  - **Coursier:** the classic "coursier method": each time the horse learns Hind Kick or Fore Chop, swap it right away, but keep 5 coupons (the **reserve**) for the level-30 cleanup.
-  - **Hard:** swap every unwanted skill as soon as it's learned, and keep swapping until a travel-set skill comes out (same reserve).
+- **Travel set:** the skills this report counts as wanted, mainly for getting around (list and reasons in [The travel set](#the-travel-set)). **Full set:** ending at level 30 with every skill of the travel set.
+- **Level-30 cleanup:** at level 30, using the coupons left to replace skills outside the travel set, until the travel set is complete or coupons run out.
+- **Leveling strategies** (details in [Strategies](#strategies)):
+  - **All at 30:** level without coupons, keep them all for the level-30 cleanup.
+  - **Coursier:** the classic "coursier method": each time the horse learns Hind Kick or Fore Chop (the two most common skills), swap it right away.
+  - **Coursier V2:** the same, but **only swap Hind Kick, never Fore Chop**.
+- **Plan:** a strategy plus the level at which you start swapping, and how many coupons you keep for the level-30 cleanup.
 
 ## Conclusions
 
-1. **Use the coursier method, keeping 5 coupons for level 30.**
-   - With 10 coupons or fewer, it's about as good as keeping them all for level 30, within a few percentage points either way.
-   - From 15–20 coupons, it's much better. For example, a Mythical Diné at Training Artisan 7 with 30 coupons ends with the full set 90% of the time, against 62% with All at 30.
-2. **Don't use the Hard strategy.** It's the worst of the coupon strategies at every Training level. Most swaps land on common skills, so the coupons run out halfway through leveling.
-3. **Each learn-chance boost adds about half a skill** at Training Professional–Artisan, a third of a skill at Master 20, and almost nothing at Guru 20.
-   - With coupons, a boost raises the chance of the full set by a few percentage points.
-   - Compared with simply having more coupons (Mythical Diné, Artisan 7, Coursier): with 20 coupons, one boost helps about as much as 1–2 extra coupons; with 30 coupons, as much as about 6 extra. At 30 coupons, though, both only add a few points, since you're already near 90%.
-4. **Training level matters more than the boosts:** going from Professional 10 to Guru 20 adds about 2 skills by level 30. Tickets help too: 4 tickets add about 0.7 skill.
-5. **How many skills to expect at level 30 without coupons** (Artisan 7, no boost): about 16 of the 20 learnable skills for a Mythical Diné, 17 of 21 for a T9 Doom, and 14 of 19 for the T8 that was checked.
+1. **Use Coursier V2: each time the horse learns Hind Kick, swap it; never swap Fore Chop.**
+   - It needs far fewer coupons than the classic Coursier or keeping them all for level 30. For a fresh Mythical Diné at Training Artisan 7, a 90% chance of the full set takes 18 coupons, against 22 with the classic Coursier and 31 with All at 30.
+   - Why: in the classic Coursier, swapping Fore Chop often draws Hind Kick straight back, and the other way round, so many coupons go round in circles. Keeping Fore Chop learned stops that.
+2. **Start swapping at about level 29 − 1.5 × your coupons:** level 22 with 5 coupons, level 14 with 10, level 7 with 15. With about 18–20 coupons, start right away (level 2–5).
+   - Across the five horses and Training levels tested, this single rule loses at most 0.6 percentage points of chance against each case's own best plan, up to 18 coupons.
+   - From about 25 coupons, the classic Coursier is as good, and slightly better on the T8 example.
+3. **At level 30, swap your rarest unwanted skill first, and mark your rarest missing skill as desired.** Common skills such as Hind Kick stay learned until last, so they don't come back in the next coupon draws. Trying every other choice gains nothing measurable.
+4. **Training level and boosts save coupons.** For a 90% chance of the full set on a Mythical Diné:
+   - Artisan 7: 18 coupons with no boost, 14 with one boost, 11 with both.
+   - Guru 20: 4 coupons.
+5. **Re-deciding the plan as you level doesn't help with Coursier V2.** Choosing the best plan again at levels 10, 15, 20 and 25, from what the horse actually learned, changed the chance by −0.1 points (±0.7). With the classic Coursier it gained +3.7 points, mostly by limiting its coupon losses. So pick the plan at the start; re-running the tool later only matters if something changes, such as getting more coupons.
+6. **How many skills to expect at level 30 without coupons** (Artisan 7, no boost): about 16 of the 20 learnable skills for a Mythical Diné, 17 of 21 for a T9 Doom, and 14 of 19 for the T8 that was checked. With unlimited coupons, a horse can end with nearly all of them.
 
 ## How a level-up picks a skill
 
 **In short:** each level-up is a single draw with one outcome: one skill, or nothing. It's not a separate roll for each skill; the game's own numbers rule that out ([How this was checked](#how-this-was-checked)).
 - Every skill has a fixed **weight** for each horse type. Common skills like Hind Kick have big weights; rare ones like S: Sideways have tiny ones.
 - **The chance of learning anything at all depends on how much weight the unlearned skills still add up to.** A fresh horse learns something on most level-ups. Once the common skills are learned, only small weights are left, and most level-ups teach nothing.
-- That's why the Coursier method works. Swapping Hind Kick away puts its big weight back into the draw, so later level-ups keep teaching something. And each time the horse relearns Hind Kick, that's one more coupon draw, which can't give Hind Kick back and favors the skill you want.
+- That's why the Coursier methods work. Swapping Hind Kick away puts its big weight back into the draw, so later level-ups keep teaching something. And each time the horse relearns Hind Kick, that's one more coupon draw, which can't give Hind Kick back and favors the skill you want.
 - Your Training level and the boosts raise every skill's chance in the same proportion.
 - The horse's own level doesn't matter: a level-up at 25 has the same odds as one at 5, for the same learned skills.
 
@@ -47,52 +51,52 @@ Everything here can be reproduced with [horse_skills.py](horse_skills.md), a com
     chance of skill i = M × wᵢ / (Σ w of the unlearned skills + W)
     chance of nothing = 1 − (sum of the chances above)
 
-- **wᵢ** is the skill's weight for that horse. Databases such as the [bdolytics horse skills page](https://bdolytics.com/en/training/horse-skills) list it as "learn chance". Skills listed at 100% are innate.
+- **wᵢ** is the skill's weight for that horse. Databases such as the [bdolytics horse skills page](https://bdolytics.com/en/training/horse-skills) list it as "learn chance", rounded to 0.01. Skills listed at 100% are innate.
 - **W** is the horse's "no skill" weight.
   - For the Mythical Diné and the T9 Doom, W = 100 − (sum of all the horse's weights).
   - For the T8 checked, W is 39.2 instead of the 33.0 that rule gives. So W has to be read from the in-game simulator (next section) for each horse.
 - **M = 1 + Training bonus + 0.10 per learn-chance boost.** It's the same for every tier.
   - The Training bonus by level comes from a [community sheet](https://docs.google.com/spreadsheets/d/1erIfp07xnYWG6N0HYPjWiBRCuncOa0x0si_-3XiZHyI), for example Professional 10 = 16.8%, Artisan 7 = 21.7%, Master 10 = 31.4%, Master 20 = 44.1%, Guru 20 and up = 100%.
   - Example: Artisan 7 with both boosts gives M = 1 + 0.217 + 0.2 = 1.417.
-- **Cap:** if the skill chances would add up to more than 100%, they're scaled down to exactly 100%, and "nothing" becomes 0%.
-  - A fresh Mythical Diné reaches the cap once the Training bonus plus boosts reach 36.4%, for example at Master 14, or at Artisan 7 with both boosts.
-  - The cap is why boosts matter less at high Training levels: early level-ups already can't fail.
+- **Cap:** if the skill chances would add up to more than 100%, they're scaled down to exactly 100%, and "nothing" becomes 0%. A fresh Mythical Diné reaches the cap once the Training bonus plus boosts reach 36.4%, for example at Master 14, or at Artisan 7 with both boosts.
 - **Sprint** was innate on every horse checked, although bdolytics lists a weight for it.
 
-**Coupons:** the new skill is drawn among the unlearned skills, minus the one removed, using the same weights. The desired skill's weight is multiplied by (1 + 0.25 × Skill Change Points).
-- The ×1.25 at 1 point was read in the game's coupon window.
-- Two things are **assumptions**, and they have a large effect (see [Limits](#limits)): that the bonus grows by +0.25 for each further point, and that points only reset when a horse is awakened into a Mythical.
+**Coupons:** the new skill is drawn among the unlearned skills, minus the one removed, using the same weights. The desired skill's weight is multiplied by (1 + 0.25 × Skill Change Points): ×1.25 at 1 point and ×1.5 at 2 points, both read in the game's coupon window. Further points are assumed to keep adding 0.25 each, and points are assumed to reset only when a horse is awakened into a Mythical (see [Limits](#limits)).
 
 ### How this was checked
 
-The game has a **growth simulator** (Horse info → Growth simulator). For any horse, Training level and boosts, it shows the chance of each skill and of "nothing" on the next level-up. You can also toggle skills as learned.
+The game has a **growth simulator** (Horse info → Growth simulator). For any horse, Training level and boosts, it shows the chance of each skill and of "nothing" on the next level-up. You can also toggle skills as learned. The **coupon window** shows the chance of each skill for the next coupon.
 
-The formula was compared with what the simulator shows on 2026-11-17:
-- **Weights:** taken from bdolytics and stored in `data/horse_skills.json`.
+The formula was compared with what the game showed on 2026-11-17 and 18:
+- **Weights:** taken from bdolytics and stored in `data/horse_skills.json`. For the Mythical Diné, they were refined to 4 decimals from an in-game reading; every refined value is within bdolytics' rounding.
 - **W:** fitted to the simulator for each horse checked.
-- **Result:** every number below matches, within the rounding of bdolytics' weights (0.01).
-- **One draw, not one roll per skill:** the simulator's chances, "nothing" included, always add up to 100%, and "nothing" drops to exactly 0% at the cap. With a separate roll per skill, the Diné at Artisan 7 would get nothing 39.5% of the time at the chances shown, not 10.8%. Even tuned to give 10.8%, separate rolls would put Hind Kick at 16.2% instead of the 15.2% shown.
+- **Result:** every number below matches, within the rounding of the weights.
 
-| Horse | Simulator settings compared | Numbers compared |
+| Horse | What was compared | Numbers compared |
 |---|---|---|
-| Mythical Diné | Artisan 7, Professional 10, Master 20, Guru 57; brand stone only; both boosts (cap); one skill toggled as learned | all 20 skills and "nothing" at Artisan 7; 2–8 numbers for each other setting |
-| T9 Doom | Artisan 7 | all 21 skills and "nothing". Its weights equal bdolytics' Mythical Doom row (bdolytics' T9 Doom row shows every skill at 100%) |
-| T8, one coat | Artisan 7, Professional 10, gear set | 7 skills and "nothing" for each |
-| Mythical Diné, coupon window | 1 Skill Change Point, desired skill Instant Accel | the 8 draw chances shown |
+| Mythical Diné | Simulator at Artisan 7, Professional 10, Master 20, Guru 57; brand stone only; both boosts (cap); one skill toggled as learned | all 20 skills and "nothing" at Artisan 7; 2–8 numbers for each other setting |
+| T9 Doom | Simulator at Artisan 7 | all 21 skills and "nothing". Its weights equal bdolytics' Mythical Doom row |
+| T8, one coat | Simulator at Artisan 7, Professional 10, gear set | 7 skills and "nothing" for each |
+| Mythical Diné | Coupon window at 1 point (desired Instant Accel) and 2 points (desired S: Sideways) | 8 chances each; at 2 points every value within 0.0001 point |
+
+- **One draw, not one roll per skill:** the simulator's chances, "nothing" included, always add up to 100%, and "nothing" drops to exactly 0% at the cap. With a separate roll per skill, the Diné at Artisan 7 would get nothing 39.5% of the time at the chances shown, not 10.8%.
 
 The Mythical Arduanatt and Voltarion in the data file use bdolytics' weights with W = 100 − (sum of weights). That hasn't been checked. Other T8 coats have different weights (bdolytics lists 11 T8 rows), so the T8 results here are only an example.
 
 ## Strategies
 
-- **Natural:** no coupons.
-- **All at 30:** level naturally. Then the level-30 cleanup: swap each skill outside the travel set, and keep swapping the same slot until a travel-set skill comes out, while coupons last.
-- **Coursier:**
-  - Each time the horse learns Hind Kick or Fore Chop (the two most common skills), swap it right away, as long as more than 5 coupons are left. Then do the level-30 cleanup with what's left.
-  - Why it works: swapping a common skill puts a big weight back into the draw, which keeps later level-ups productive. The horse also often relearns it, which gives another swap.
-- **Hard:** swap every skill outside the travel set as soon as it's learned, and keep swapping until a travel-set skill comes out, keeping the same 5-coupon reserve. Then the level-30 cleanup.
-- **Ideal:** an upper bound, not a real strategy: unlimited coupons, used so that the horse always holds the rarest skills.
+- **All at 30:** no coupons while leveling, then the level-30 cleanup.
+- **Coursier:** each time the horse learns Hind Kick or Fore Chop, swap it. Then the level-30 cleanup.
+- **Coursier V2:** each time the horse learns Hind Kick, swap it; keep Fore Chop. Then the level-30 cleanup.
+  - V2 swaps the heavier of the two attack skills (Hind Kick on every horse checked; on the T8 both weigh the same). Swapping Fore Chop instead costs 2–6 points of chance on the Diné and the Doom.
+  - Also swapping each other unwanted skill once when learned was tested and is worse (−1 to −12 points).
+- **The level-30 cleanup,** in every strategy: swap the rarest unwanted skill held, with the rarest missing travel-set skill as the desired one, until the travel set is complete or coupons run out.
+  - Swapping the rarest first matters: a swapped-away skill goes back into the draw, so swapping Hind Kick first makes the next coupons likely to land on it again.
+  - An exact calculation that tried every possible choice of skill to swap and of desired skill, at every step, found no measurable gain for the full set (at most 0.03 points).
+- **Swap once** and **Hard** (swap every unwanted skill once, or until a wanted one comes) never beat the best Coursier plan in earlier searches, at most tying it in easy cases. The tool still offers them.
+- **Ideal:** unlimited coupons, used so that the horse always holds the rarest skills. It shows the most skills a horse can reach.
 
-In every strategy, the coupon's desired skill is the rarest travel-set skill the horse is still missing. Tickets are used on level-ups that teach nothing. The results below use no tickets unless stated.
+A plan also says **when to start swapping** and **how many coupons to keep** for the cleanup. Coupons are only spent while leveling from the start level on, and never below the number kept. Tickets are used on level-ups that teach nothing.
 
 ### The travel set
 
@@ -109,83 +113,97 @@ In every strategy, the coupon's desired skill is the rarest travel-set skill the
 
 ## Results
 
-Simulated from level 1 to 30, 4,000 runs per number, random seed 1. Remember that **a/b/c** = no boost / one boost / both boosts.
+Five cases, from the hardest to the easiest:
 
-**Skills at level 30 with natural leveling** (no coupons, no tickets). "Of N" = number of skills the horse can learn; innate skills aren't counted.
-
-| Training | Mythical Diné (of 20) | T9 Doom (of 21) | T8 example (of 19) |
+| Case | Horse | Training | Boosts |
 |---|---|---|---|
-| Professional 10 | 15.6/16.1/16.5 | 16.9/17.4/17.8 | 13.7/14.2/14.7 |
-| Artisan 7 | 15.8/16.3/16.7 | 17.1/17.6/17.9 | 13.9/14.4/14.9 |
-| Master 10 | 16.3/16.6/16.9 | 17.6/17.9/18.1 | 14.4/14.9/15.3 |
-| Master 20 | 16.7/17.0/17.2 | 18.0/18.2/18.4 | 15.0/15.3/15.6 |
-| Guru 20 | 17.8/17.9/18.0 | 18.8/18.9/19.0 | 16.4/16.6/16.7 |
+| F1 | T8 example | Professional 10 | none |
+| F2 | Mythical Diné | Artisan 7 | none |
+| F3 | T9 Doom | Artisan 7 | none |
+| F5 | Mythical Diné | Artisan 7 | both |
+| F6 | Mythical Diné | Guru 20 | none |
 
-**Chance of ending with the full set**, by strategy and number of coupons.
+Numbers come from the tool's search: every plan (each strategy, every start level from 2 to 29, every number of coupons kept), 1,000 simulated horses each, then the best ones again with 4,000 fresh horses. The level-30 cleanup is computed exactly rather than simulated.
 
-Mythical Diné (travel set: 13 skills):
+**Coupons needed for a 50% / 90% chance of the full set**, with the best plan of each strategy:
 
-| Training | All at 30, 10 coupons | Coursier, 10 coupons | All at 30, 30 coupons | Coursier, 30 coupons | Hard, 30 coupons |
+| Case | All at 30 | Coursier | **Coursier V2** |
+|---|---|---|---|
+| F1 T8, Professional 10 | 16 / over 40 | 14 / **25** | **13** / 28 |
+| F2 Diné, Artisan 7 | 14 / 31 | 12 / 22 | **9 / 18** |
+| F3 Doom, Artisan 7 | 15 / 30 | 11 / 21 | **6 / 12** |
+| F5 Diné, Artisan 7, both boosts | 11 / 24 | 9 / 17 | **5 / 11** |
+| F6 Diné, Guru 20 | 6 / 16 | 2 / 9 | **2 / 4** |
+
+**Best plans for the Diné at Artisan 7 (F2).** Several plans are usually tied with the best (within 1 point), so ranges are shown:
+
+| Coupons | Chance of the full set | Tied plans | All at 30 |
+|---|---|---|---|
+| 5 | 25% | Coursier V2, start at level 22–23 | 11% |
+| 10 | 63% | Coursier V2, start at level 10–16 | 32% |
+| 15 | 84% | Coursier V2, start at level 2–12 | 54% |
+| 20 | 93% | Coursier V2, start at level 2–13 | 71% |
+| 25 | 97% | Coursier V2, start at level 2–15 | 83% |
+| 30 | 99% | Coursier V2 (start at level 2–17) or Coursier (start at level 2–13) | 90% |
+
+With Coursier V2, the number of coupons kept for level 30 hardly matters: V2 only spends when the horse holds Hind Kick, so its spending stays moderate on its own.
+
+**One rule for everyone.** For each budget, the single plan with the smallest worst-case loss across F1, F2, F3, F5 and F6. The loss is that case's best chance minus this plan's chance, in percentage points. It was then tested on a sixth case it wasn't chosen with: a Mythical Diné at Artisan 7, already level 2 with High Jump, 1 point and 4 tickets.
+
+| Coupons | Plan | Worst loss | Average loss | Loss on the sixth case | All at 30: worst / average loss |
 |---|---|---|---|---|---|
-| Professional 10 | 10%/13%/18% | 9%/13%/16% | 58%/66%/72% | 85%/93%/96% | 48%/53%/59% |
-| Artisan 7 | 11%/16%/19% | 12%/16%/20% | 62%/70%/73% | 90%/94%/97% | 52%/58%/62% |
-| Master 10 | 16%/19%/25% | 15%/19%/24% | 68%/73%/77% | 95%/97%/98% | 57%/61%/66% |
-| Master 20 | 20%/26%/29% | 22%/25%/28% | 75%/77%/80% | 98%/98%/99% | 62%/65%/69% |
-| Guru 20 | 42%/44%/49% | 38%/42%/45% | 87%/89%/89% | 100%/100%/100% | 74%/77%/78% |
+| 5 | Coursier V2 from level 22 | 0.4 | 0.0 | 0.1 | 50 / 26 |
+| 8 | Coursier V2 from level 17 | 0.5 | 0.2 | 2.2 | 50 / 32 |
+| 10 | Coursier V2 from level 14 | 0.6 | 0.2 | 1.3 | 52 / 32 |
+| 12 | Coursier V2 from level 11 | 0.3 | 0.1 | 0.4 | 50 / 30 |
+| 15 | Coursier V2 from level 7 | 0.1 | 0.0 | 0.1 | 42 / 24 |
+| 20 | Coursier V2 from level 5 | 1.4 | 0.3 | 0.1 | 27 / 16 |
+| 25 | Coursier from level 16, keep 8 | 2.7 | 1.6 | 1.1 | 16 / 11 |
+| 30 | Coursier from level 12, keep 10 | 0.8 | 0.4 | 0.2 | 12 / 7 |
 
-T9 Doom (travel set: 13 skills):
+**Skills at level 30 without coupons, and with unlimited coupons** (a/b/c = no boost / one boost / both). "Of N" = number of skills the horse can learn; innate skills aren't counted.
 
-| Training | All at 30, 10 coupons | Coursier, 10 coupons | All at 30, 30 coupons | Coursier, 30 coupons | Hard, 30 coupons |
+| Training | Diné (of 20): no coupons | Diné: unlimited | Doom (of 21): no coupons | Doom: unlimited | T8 (of 19): no coupons | T8: unlimited |
+|---|---|---|---|---|---|---|
+| Professional 10 | 15.5/16.0/16.5 | 19.6/19.9/20.0 | 16.9/17.4/17.8 | 20.9/21.0/21.0 | 13.7/14.2/14.7 | 17.2/17.9/18.4 |
+| Artisan 7 | 15.8/16.3/16.6 | 19.8/19.9/20.0 | 17.1/17.6/17.9 | 21.0/21.0/21.0 | 13.9/14.4/14.9 | 17.5/18.1/18.5 |
+| Master 10 | 16.3/16.6/16.9 | 19.9/20.0/20.0 | 17.6/17.9/18.1 | 21.0/21.0/21.0 | 14.4/14.9/15.3 | 18.1/18.5/18.8 |
+| Master 20 | 16.7/17.0/17.2 | 20.0/20.0/20.0 | 18.0/18.2/18.4 | 21.0/21.0/21.0 | 15.0/15.3/15.6 | 18.6/18.8/18.9 |
+| Guru 20 | 17.8/17.9/17.9 | 20.0/20.0/20.0 | 18.8/18.9/19.0 | 21.0/21.0/21.0 | 16.4/16.6/16.7 | 19.0/19.0/19.0 |
+
+**Re-deciding the plan during leveling.** Each simulated horse was played twice with the same random numbers: once with the best plan chosen at level 1, once choosing the best plan again at levels 10, 15, 20 and 25 from what it had actually learned. Fresh Mythical Diné, Artisan 7:
+
+| Strategies available | Coupons | Horses | Fixed plan | Re-planned | Gain |
 |---|---|---|---|---|---|
-| Professional 10 | 8%/12%/15% | 7%/10%/14% | 48%/54%/60% | 88%/93%/95% | 33%/41%/45% |
-| Artisan 7 | 9%/14%/17% | 9%/12%/16% | 52%/57%/62% | 91%/94%/95% | 37%/44%/48% |
-| Master 10 | 14%/17%/20% | 12%/17%/20% | 59%/61%/66% | 94%/95%/96% | 45%/49%/50% |
-| Master 20 | 17%/22%/26% | 18%/20%/22% | 63%/68%/69% | 95%/97%/98% | 47%/52%/54% |
-| Guru 20 | 37%/40%/42% | 35%/36%/37% | 78%/78%/80% | 99%/100%/100% | 63%/65%/67% |
-
-T8 example (travel set: 12 skills):
-
-| Training | All at 30, 10 coupons | Coursier, 10 coupons | All at 30, 30 coupons | Coursier, 30 coupons | Hard, 30 coupons |
-|---|---|---|---|---|---|
-| Professional 10 | 13%/17%/22% | 12%/17%/22% | 72%/78%/83% | 86%/91%/94% | 65%/70%/73% |
-| Artisan 7 | 15%/19%/24% | 14%/20%/25% | 75%/81%/85% | 89%/91%/95% | 69%/73%/76% |
-| Master 10 | 19%/23%/30% | 19%/25%/29% | 81%/84%/88% | 93%/95%/97% | 72%/76%/80% |
-| Master 20 | 26%/31%/35% | 27%/31%/36% | 86%/88%/90% | 96%/97%/98% | 76%/81%/83% |
-| Guru 20 | 51%/54%/57% | 50%/53%/54% | 94%/95%/96% | 100%/100%/100% | 89%/89%/90% |
-
-**How many coupons do you need?** Mythical Diné, Artisan 7, chance of the full set:
-
-| Coupons | 5 | 10 | 15 | 20 | 25 | 30 | 40 |
-|---|---|---|---|---|---|---|---|
-| All at 30 | 4%/7%/10% | 11%/16%/19% | 22%/27%/33% | 34%/43%/48% | 49%/56%/62% | 62%/70%/73% | 82%/85%/89% |
-| Coursier | 4%/7%/10% | 12%/16%/20% | 28%/35%/39% | 56%/62%/70% | 79%/86%/89% | 90%/94%/97% | 97%/99%/100% |
-
-With only 5 coupons, Coursier is the same as All at 30, because all 5 are kept in reserve.
+| All at 30, Coursier, Swap once, Hard | 15 | 1,200 | 66.2% | 69.8% | +3.7 points (±1.4) |
+| All at 30, Coursier, Coursier V2 | 10 | 1,200 | 62.5% | 62.3% | −0.1 points (±0.7) |
 
 ## Limits
 
-- **The coupon's desired-skill bonus is the biggest unknown** (see [Coupons](#how-a-level-up-picks-a-skill)).
-  - If marking a skill as desired did nothing at all, the Mythical Diné at Artisan 7 with 30 coupons and no boost would drop from 90% to 63% (Coursier), from 62% to 19% (All at 30), and from 52% to 14% (Hard).
-  - The ranking of the strategies stays the same.
-- **Tickets:** with 4 Mount Level Down Tickets, natural leveling ends with 0.7 more skills (16.5 instead of 15.8), and Coursier with 30 coupons reaches the full set 96% of the time instead of 90% (Mythical Diné, Artisan 7, no boost).
-- **Rounding:** bdolytics rounds weights to 0.01, so the tool's chances can be off by up to about 0.005 points per skill, and "nothing" by up to about 0.05.
+- **The Skill Change Point bonus beyond 2 points is assumed** to keep growing by +0.25 per point (checked at 1 and 2). It's also unknown whether points reset when you obtain the desired skill; the model assumes they don't. The bonus matters a lot: without it, the chances of the full set drop sharply.
+- **Weights are rounded:** bdolytics rounds to 0.01, which is a few percent for the rarest skills. The Diné's weights were refined from an in-game reading; the Doom's and the T8's weren't.
+- **Plans are fixed at level 1.** The tool doesn't follow your horse level by level, but you can run it again from your horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
+- **Not modelled:** the Mount Skill Selection Coupon (one guaranteed skill per horse, 3,100 Pearls). It would help most at level 30 on the last rare skill, as long as the horse holds an unwanted skill to replace.
+- **Simulation noise:** about ±1 point in the tables; differences under 1 point between plans aren't meaningful. In one re-planning run, a first batch of horses showed −1.7 points by chance; repeated on new horses, it gave −0.1 (scripts on the work branch).
 - **The game can change.** To check your horse, run `horse_skills.py` with `--check` and numbers read in the in-game simulator. If they don't match, add your horse from one simulator reading (`--horse-file`, see [the tool's doc](horse_skills.md)).
-- **Simulation noise:** about ±1–2 percentage points.
 
 ## Reproduce
 
+The fast engine needs numba (`pip install -r requirements-optional.txt`); without it, the same commands run in plain Python, more slowly.
+
 ```
-python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --runs 4000 --sweep 10,30
+python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --optimize 40
+python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --gear --brand --optimize 40
+python3 -I horse_skills.py "Mythical Diné" --training "Guru 20" --optimize 40
+python3 -I horse_skills.py "Doom (T9)" --training "Artisan 7" --optimize 40
+python3 -I horse_skills.py "T8 example (bdolytics icon horse_71)" --training "Professional 10" --optimize 40
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --runs 4000 --strategy natural,ideal
-python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --runs 4000 --sweep 5,10,15,20,25,30,40 --strategy at30,coursier
-python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --runs 4000 --point-bonus 0
-python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --runs 4000 --tickets 4
 ```
 
-Use `"Doom (T9)"` or `"T8 example (bdolytics icon horse_71)"` for the other horses, and other `--training` values for the other rows. With the default seed, these commands give exactly the numbers in the tables.
+The comparison with the classic Coursier and All at 30, the one-rule table, the cleanup check and the re-planning runs used the analysis scripts in `wip/horse-skills/` on the `horse-skills-wip` branch.
 
 ## Sources
 
 - **Skill weights:** [bdolytics horse skills](https://bdolytics.com/en/training/horse-skills), read 2026-11-17 (T8, T9 and T10 tabs). The source and date of each horse are in `data/horse_skills.json`.
 - **Training bonus by level:** [community sheet](https://docs.google.com/spreadsheets/d/1erIfp07xnYWG6N0HYPjWiBRCuncOa0x0si_-3XiZHyI). Professional 10 and Artisan 7 were confirmed in-game.
-- **Everything else:** the in-game growth simulator and the coupon window, read 2026-11-17.
+- **Everything else:** the in-game growth simulator and the coupon window, read 2026-11-17 and 18.
