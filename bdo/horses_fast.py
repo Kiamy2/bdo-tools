@@ -342,6 +342,7 @@ if nb is not None:
             out[i] = _pop(S[i])
         return out
 
+    TAILS = 5                                    # with tails=True: P(missing <= 0..4 wanted skills)
     CODES = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v2": 6, "coursier_switch": 7}
 
     class Evaluator:
@@ -368,10 +369,11 @@ if nb is not None:
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
             self.low_memory = low_memory
 
-        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans"):
+        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False):
             """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
             seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
-            B = 0..max_budget (None below spend_cap), skills (average skills at 30)."""
+            B = 0..max_budget (None below spend_cap), skills (average skills at 30); with tails=True also
+            tails[B] = [P(missing <= t wanted skills) for t = 0..TAILS - 1] (a bit slower)."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             C, out, batch = self.C, {}, []
@@ -387,8 +389,10 @@ if nb is not None:
                 res = {"skills": float(_popcounts(S).mean()), "wanted_total": self.n_wanted}
                 out[p] = res
                 if st == 4:                                              # natural: no cleanup
-                    full = float((_popcounts(S & wmask) == self.n_wanted).mean())
-                    res["full"], res["wanted"] = [full] * (C + 1), [float(_popcounts(S & wmask).mean())] * (C + 1)
+                    miss = self.n_wanted - _popcounts(S & wmask)
+                    res["full"], res["wanted"] = [float((miss == 0).mean())] * (C + 1), [float((self.n_wanted - miss).mean())] * (C + 1)
+                    if tails:
+                        res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
                 else:
                     hk.append((S << PBITS) | pts)
                     hb.append(base)
@@ -398,12 +402,16 @@ if nb is not None:
                 if progress:
                     progress(label, i + 1, len(plans))
             if batch:
+                J = TAILS if tails else 1
                 acc = cleanup_values(np.concatenate(hk), np.concatenate(hb), np.concatenate(hp), np.concatenate(hc),
-                                     len(batch), C, self.points + C, 1, self.low_memory, w, n, wmask, order, rare,
+                                     len(batch), C, self.points + C, J, self.low_memory, w, n, wmask, order, rare,
                                      self.pb)
                 for j, (p, cap) in enumerate(batch):
                     out[p]["full"] = [float(acc[j, B, 0] / runs) if B >= cap else None for B in range(C + 1)]
-                    out[p]["wanted"] = [float(acc[j, B, 1] / runs) if B >= cap else None for B in range(C + 1)]
+                    out[p]["wanted"] = [float(acc[j, B, J] / runs) if B >= cap else None for B in range(C + 1)]
+                    if tails:
+                        out[p]["tails"] = [[float(acc[j, B, t] / runs) for t in range(J)] if B >= cap else None
+                                           for B in range(C + 1)]
             return out
 
         def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0):
@@ -418,7 +426,7 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
     (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
     and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses, and the
-    general rule's plan for every budget (H.rule_plan).
+    general rule's plan for every budget (H.rule_plan), with the chances of missing at most 0..4 wanted skills.
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
@@ -451,4 +459,4 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
     final = promising() | {H.rule_plan(B, start_level) for B in range(max_budget + 1)}
-    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck")
+    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True)

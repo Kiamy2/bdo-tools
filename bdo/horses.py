@@ -49,7 +49,8 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
 CLASSIC_FODDER = ["Hind Kick", "Fore Chop"]
 STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard", "ideal"]
-SWITCH_TS = list(range(9, 17))                  # thresholds the optimizer tries for coursier_switch
+SWITCH_TS = list(range(9, 17))
+TAILS = 5                                       # bad-outcome chances: missing at most 0..4 wanted skills                  # thresholds the optimizer tries for coursier_switch
 DEFAULT_SWITCH_AT = 12
 STRATEGY_HELP = {
     "natural": "no coupons used",
@@ -223,6 +224,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
     rank = {s: (wt[s], i) for i, s in enumerate(pool)}
     cyc = _cycle_skill(fodder, wt)
     tot_sum = wanted_sum = all_count = used_sum = 0
+    misses = []
     for _ in range(runs):
         have = set(s for s in learned if s in wt)
         c = 0 if strategy == "natural" else coupons
@@ -296,8 +298,11 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
         tot_sum += n
         wanted_sum += nw
         all_count += nw == len(wanted)
+        misses.append(len(wanted) - nw)
         used_sum += 0 if strategy in ("natural", "ideal") else coupons - c
+    misses.sort()
     return {"skills": tot_sum / runs, "wanted": wanted_sum / runs, "all_wanted": all_count / runs,
+            "missing_le1": sum(m <= 1 for m in misses) / runs, "worst5_missing": percentile(misses, 0.95),
             "coupons_used": used_sum / runs, "wanted_total": len(wanted), "pool_total": len(pool)}
 
 
@@ -340,7 +345,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate().
 
     Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
-    for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
+    tails[B] (chances of missing at most 0..TAILS - 1 wanted skills), for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
     needed per run for the full set, inf when the horse has too few skills); skill_counts (sorted, per run).
     """
     rng = random.Random(seed)
@@ -354,6 +359,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
         spend_cap = 0
     nb = max_budget + 1
     full_n, wanted_sum = [0] * nb, [0] * nb
+    tail_n = [[0] * TAILS for _ in range(nb)]
     needed, counts = [], []
     for _ in range(runs):
         have = set(s for s in learned if s in wt)
@@ -429,11 +435,21 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 j = 0
             wanted_sum[B] += traj[min(j, last)]
             full_n[B] += need <= B if strategy != "natural" else traj[0] == len(wanted)
+            miss = len(wanted) - traj[min(j, last)]
+            for t in range(miss, TAILS):
+                tail_n[B][t] += 1
     needed.sort()
     counts.sort()
     return {"full": [full_n[B] / runs if B >= spend_cap else None for B in range(nb)],
             "wanted": [wanted_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
+            "tails": [[x / runs for x in tail_n[B]] if B >= spend_cap else None for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
+
+
+def worst5(tails):
+    """Wanted skills missed by the worst 5% of horses, from tails = [P(missing <= t) for t = 0, 1...]: the smallest
+    t with P(missing <= t) >= 95%, or None if it's beyond the tails given."""
+    return next((t for t, x in enumerate(tails) if x >= 0.95 - 1e-9), None)
 
 
 def percentile(sorted_values, p):

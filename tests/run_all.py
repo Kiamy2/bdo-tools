@@ -168,9 +168,11 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 71%)",
           code == 0 and 66 <= float(m.get("20", 0)) <= 76
           and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
-    sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t(rule|best)", out, re.M)
-    check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best)",
-          sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0, out)
+    sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
+                    r"([\d.]+)%\t(\d)\t(rule|best)", out, re.M)
+    check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best; "
+          "full set <= missing 1 <= missing 2)", sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0
+          and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba", "--low-memory")

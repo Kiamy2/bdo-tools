@@ -176,7 +176,8 @@ def main():
                 cols.append("/".join(vals))
             print(f"{strat}\t" + "\t".join(cols))
         return 0
-    print("strategy\tcoupons\tskills at 30\twanted at 30\tall wanted\tcoupons used")
+    print("# <=1 missing: chance of missing at most 1 wanted skill; worst 5%: wanted skills the worst 5% of runs miss")
+    print("strategy\tcoupons\tskills at 30\twanted at 30\tall wanted\tcoupons used\t<=1 missing\tworst 5%")
     for budget in budgets:
         for strat in strategies:
             res = []
@@ -188,7 +189,9 @@ def main():
             cp = "-" if strat == "natural" else ("unlimited" if strat == "ideal" else str(budget))
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")
             allw = "/".join(f"{100 * r['all_wanted']:.0f}%" for r in res)
-            print(f"{strat}\t{cp}\t{cell('skills', '{:.1f}')}\t{cell('wanted', '{:.1f}')}\t{allw}\t{used}")
+            le1 = "/".join(f"{100 * r['missing_le1']:.0f}%" for r in res)
+            print(f"{strat}\t{cp}\t{cell('skills', '{:.1f}')}\t{cell('wanted', '{:.1f}')}\t{allw}\t{used}\t{le1}\t"
+                  f"{cell('worst5_missing', '{}')}")
     return 0
 
 
@@ -246,13 +249,18 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     print("# Suggested plan per budget (full set): the general rule's plan when it's within 1 point of the best plan")
     print("# found, else the best. V0 = coursier swaps (Hind Kick and Fore Chop), V2 = coursier_v2 swaps (Hind Kick")
     print("# only); learned skills don't count innate ones; keep = coupons kept for the level-30 cleanup.")
-    print("coupons\tsuggested plan\tfull set\tsource")
+    print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
+    print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more).")
+    print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%\tsource")
     for B in range(1, a.optimize + 1):
         plan, src, rc = H.suggested_plan(res, B, 0.01, a.level)
         best = res[H.tied_plans(res, B, "full", 0)[0]]["full"][B]
         note = (f"rule (best {100 * best:.1f}%)" if src == "rule"
                 else f"best (rule: {'not checked' if rc is None else f'{100 * rc:.1f}%'})")
-        print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{note}")
+        tl = res[plan]["tails"][B]
+        w5 = H.worst5(tl)
+        print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
+              f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{note}")
     return 0
 
 if __name__ == "__main__":

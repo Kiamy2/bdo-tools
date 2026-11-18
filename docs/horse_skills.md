@@ -43,12 +43,13 @@ Every strategy except `natural` and `ideal` ends with the **level-30 cleanup**: 
 The simulation prints one row per strategy (descriptions in `--help` and the report):
 
 ```
-strategy  coupons  skills at 30   wanted at 30   all wanted   coupons used
-coursier  30       18.8/19.3/19.6 12.9/12.9/13.0 90%/94%/97%  27/25/24
+strategy  coupons  skills at 30   wanted at 30   all wanted    coupons used  <=1 missing    worst 5%
+coursier  30       18.8/19.3/19.6 13.0/13.0/13.0 97%/99%/100%  23/23/23      99%/100%/100%  0/0/0
 ```
+(Mythical Diné, Artisan 7, 30 coupons.)
 
 - Each cell is **a/b/c**: a = no learn-chance boost, b = Pearl horse gear set **or** Mount Brand Spell Stone (both are +10%), c = both.
-- `skills at 30`: learnable skills the horse has at level 30 (innate ones not counted). `wanted at 30`: how many of those are wanted. `all wanted`: chance of ending with every wanted skill. `coupons used`: average.
+- `skills at 30`: learnable skills the horse has at level 30 (innate ones not counted). `wanted at 30`: how many of those are wanted. `all wanted`: chance of ending with every wanted skill. `coupons used`: average. `<=1 missing`: chance of missing at most one wanted skill. `worst 5%`: how many wanted skills the worst 5% of runs miss (the bad cases).
 - `--odds` prints the next level-up's chances like the in-game simulator, with `--gear`/`--brand` for the learn-chance boosts.
 - `--target 50,90`: instead of a budget, the coupons needed to end with every wanted skill in 50% / 90% of runs, per strategy (fixed `--reserve` / `--swap-from`).
 - `--check` compares numbers you read in the in-game simulator with the model (`none` = "no skill"). It exits with 1 on a mismatch, which means the data is outdated or the settings differ (same Training level, boosts and learned skills as in the game?).
@@ -63,7 +64,7 @@ coupons  full set: chance  tied plans                              most wanted: 
 20       71.2%             coursier_switch: from lvl 7-11, V0 until 10-13 learned skills, then V2, keep 0-10   ...
 ```
 
-After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 10, V0 until 11 learned skills, then V2, keep 5  70.7%  rule (best 71.2%)`. It's the general rule's plan (the same for everyone, chosen to lose the least over many horses and Training levels) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. V0 = `coursier` swaps, V2 = `coursier_v2` swaps.
+After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 10, V0 until 11 learned skills, then V2, keep 5  70.7%  rule (best 71.2%)`. It's the general rule's plan (the same for everyone, chosen to lose the least over many horses and Training levels) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
 
 - **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 15 seconds and 0.5 GB of memory for 20 coupons, 30 seconds and 0.7 GB for 40 (measured on the T8 example, 2 cores). `--low-memory` keeps the level-30 values as 16-bit numbers: about 0.1 GB less at 40 coupons, same speed, chances within 0.001 points (a plan right at the edge of a tied range can move in or out of it).
 - **Plain Python** (`--engine python`, or when numba isn't installed): a grid of plans refined around the best ones (`coursier_switch` thresholds 9, 11, 13, 15, then their neighbors), simulated. Several minutes and noisier, same model.
