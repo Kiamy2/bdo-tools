@@ -1,0 +1,10 @@
+== results2_dine_a7_10.jsonl
+full set: fixed 63.0%, re-planned 61.3%, gain -1.71 points (standard error 0.71; 95% range -3.10 to -0.33)
+== results2_seed2.jsonl
+full set: fixed 62.5%, re-planned 62.3%, gain -0.12 points (standard error 0.66; 95% range -1.42 to +1.18)
+== results2_cp10.jsonl
+full set: fixed 63.0%, re-planned 61.2%, gain -1.76 points (standard error 0.66; 95% range -3.05 to -0.47)
+== results2_cp10_seed2.jsonl
+full set: fixed 63.0%, re-planned 63.4%, gain +0.36 points (standard error 0.44; 95% range -0.50 to +1.22)
+== results2_dine_a7_10_accurate.jsonl
+full set: fixed 65.5%, re-planned 63.3%, gain -2.19 points (standard error 1.64; 95% range -5.40 to +1.01)
