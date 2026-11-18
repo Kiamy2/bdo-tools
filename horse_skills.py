@@ -301,7 +301,44 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         ex = "".join(f"\t{100 * e[plan]['full'][B]:.1f}%" for e in extras)
         print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
               f"{w5 if w5 is not None else f'{H.TAILS}+'}{ex}\t{note}")
+    # average learned skills per level, one column per suggested plan (the budgets it's suggested for)
+    groups = {}
+    for B in range(1, a.optimize + 1):
+        groups.setdefault(sug[B][0], []).append(B)
+    k = {k2: v for k2, v in kw.items() if k2 != "start_level"}
+    if engine == "numba":
+        ev = HF.Evaluator(horse, M, max_budget=a.optimize, **kw)
+        curves = {p: ev.learned_by_level(p, 4000, a.seed + 1000, planned) for p in groups}
+    else:
+        curves = {p: H.learned_by_level(horse, M, p, 1000, a.seed + 1000, a.level, coupon=planned, **k) for p in groups}
+    span = lambda bs: ",".join(f"{x[0]}" if x[0] == x[-1] else f"{x[0]}-{x[-1]}" for x in _runs(bs))
+    cols = []                                     # merge plans whose averages stay within 0.2 skills at every level
+    for p, bs in groups.items():
+        c = next((c for c in cols if max(abs(curves[p][L] - curves[c[0]][L]) for L in curves[p]) < 0.2), None)
+        if c:
+            c[1].extend(bs)
+        else:
+            cols.append([p, list(bs)])
+    print()
+    print("# Average learned skills (innate ones not counted) when reaching each level, for the suggested plans (the")
+    print("# columns: coupon budgets; plans within 0.2 skills of each other share a column). Compare your horse at its")
+    print("# level: below average means leveling is going worse than usual."
+          + (" Level Down Tickets are used on every level-up that teaches nothing." if a.tickets else ""))
+    print("level\t" + "\t".join(f"{span(sorted(bs))} coupons" for _, bs in cols))
+    for L in range(a.level, 31):
+        print(f"{L}\t" + "\t".join(f"{curves[p][L]:.1f}" for p, _ in cols))
     return 0
+
+
+def _runs(values):
+    """[1, 2, 3, 5, 7, 8] -> [[1, 2, 3], [5], [7, 8]]"""
+    out = []
+    for v in values:
+        if out and v == out[-1][-1] + 1:
+            out[-1].append(v)
+        else:
+            out.append([v])
+    return out
 
 if __name__ == "__main__":
     sys.exit(main())

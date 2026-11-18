@@ -179,6 +179,11 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 71%)",
           code == 0 and 66 <= float(m.get("20", 0)) <= 76
           and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
+    lv = {int(l.split("\t")[0]): [float(x) for x in l.split("\t")[1:]] for l in out.split("# Average learned")[-1].splitlines()
+          if re.match(r"^\d+\t[\d.]+", l)}
+    check("horse_skills --optimize: average learned skills per level (levels 1-30, rising, ~13-16 at 30 on the T8 Skilled 1)",
+          sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
+          and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
     sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
                     r"([\d.]+)%\t(\d)\t(rule|best)", out, re.M)
     check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best; "

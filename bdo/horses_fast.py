@@ -456,6 +456,21 @@ if nb is not None:
                                        for B in range(C + 1)]
             return out
 
+        def learned_by_level(self, plan, runs=4000, seed=1, coupon=None):
+            """Average learned skills (innate ones not counted) when reaching each level from start_level to
+            max_level, for one plan: {level: average}. Same horses as plans() with the same seed."""
+            w, n, W, M = self.args
+            lmask, wmask, fod, cyc, order, rare = self.masks
+            strategy, swap_from, spend_cap, switch_at = plan
+            st = CODES[strategy]
+            out = {}
+            for L in range(self.start_level, self.max_level + 1):
+                S, _, _ = _many30(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
+                                  self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, L,
+                                  switch_at, coupon == "planned")
+                out[L] = float(_popcounts(S).mean())
+            return out
+
         def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0, coupon=None):
             """One plan (see plans())."""
             p = (strategy, swap_from, spend_cap, switch_at)

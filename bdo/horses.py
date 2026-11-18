@@ -463,6 +463,14 @@ def worst5(tails):
     return next((t for t, x in enumerate(tails) if x >= 0.95 - 1e-9), None)
 
 
+def learned_by_level(horse, M, plan, runs=1000, seed=1, start_level=1, max_level=30, **kw):
+    """Average learned skills (innate ones not counted) when reaching each level from start_level to max_level, for
+    one plan (strategy, swap_from, spend_cap, switch_at): {level: average}. kw: as simulate_plan."""
+    st, lv, cap, T = plan
+    return {L: simulate_plan(horse, M, st, lv, cap, 0, runs=runs, seed=seed, start_level=start_level, max_level=L,
+                             switch_at=T, **kw)["skills"] for L in range(start_level, max_level + 1)}
+
+
 def percentile(sorted_values, p):
     """Value below which a share p (0-1) of the sorted values falls (nearest rank)."""
     if not sorted_values:

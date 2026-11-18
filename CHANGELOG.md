@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-18
+- `--optimize` ends with the average learned skills per level for the suggested plans (`Evaluator.learned_by_level`, `bdo.horses.learned_by_level`).
 - `--optimize --selection-coupon planned|fallback`: a Mount Skill Selection Coupon used at the very end on the last missing skill (needs an unwanted skill to change). `planned`: every Change Coupon aims at the second rarest missing skill, keeping the rarest for it, and the plan search includes it; `fallback`: plans as without it, plus the chance if you decide at level 30 to use it. With `--tickets`, the suggested plans also show the chance if you keep the tickets. `simulate_plan(coupon=...)`, `Evaluator.plans(coupon=...)`.
 - Bad cases shown: the strategies table has `<=1 missing` and `worst 5%` columns; the `--optimize` suggested plans show the chances of missing at most 1 / 2 wanted skills and what the worst 5% of horses miss (exact in the fast engine: `Evaluator.plans(tails=True)`; `simulate_plan` returns `tails`).
 - `--optimize`: a suggested plan per budget after the table: the general rule's plan (`bdo/horses.py` `rule_plan`, fitted over 72 situations) when it's within 1 point of the best plan found, else the best. Plans are written as "from lvl 10, V0 until 11 learned skills, then V2, keep 5".
