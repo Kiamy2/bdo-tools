@@ -1,0 +1,44 @@
+# C29: safest single plan per budget = smallest worst-case loss across F1 F2 F3 F5 F6 (loss = scenario's
+# best chance minus this plan's chance, in points of the full-set chance). Chosen on stage-1 values, then
+# rechecked with 8000 fresh horses per scenario; F4 (the user's Diné) was left out of the choice.
+coupons	safest plan	worst loss	average loss	loss F1 F2 F3 F5 F6	loss on F4 (held out)	All at 30 worst / average loss
+1	All at 30	0.2	-0.2	-0.0 -0.1 -0.4 0.2 -0.7	0.1	0.0 / 0.0
+2	V2 from lvl 27, keep 1	0.6	0.2	0.0 0.4 0.2 -0.2 0.6	-0.5	23.2 / 6.7
+3	V2 from lvl 26, keep 1	0.5	-0.1	0.3 0.1 0.5 -0.9 -0.5	0.2	43.2 / 14.6
+4	V2 from lvl 24, keep 1	0.5	-0.3	0.5 -0.6 -0.5 -0.4 -0.8	-0.3	50.4 / 20.8
+5	V2 from lvl 22, keep 1	0.4	0.0	0.4 -0.0 -0.7 0.3 0.0	0.1	50.4 / 26.0
+6	V2 from lvl 20, keep 1	0.7	0.1	0.7 -0.2 0.3 -0.1 -0.1	1.0	45.9 / 29.0
+7	V2 from lvl 18, keep 1	1.4	0.6	1.1 -0.3 1.4 0.7 -0.0	1.1	45.9 / 31.4
+8	V2 from lvl 17, keep 1	0.5	0.2	0.4 -0.5 0.5 0.5 0.0	2.2	50.0 / 32.2
+9	V2 from lvl 16, keep 1	0.7	0.1	0.6 -0.1 -0.4 0.7 0.0	2.5	51.9 / 32.3
+10	V2 from lvl 14, keep 0	0.6	0.2	0.5 -0.1 0.0 0.6 0.0	1.3	52.1 / 31.7
+11	V2 from lvl 12, keep 1	0.3	-0.0	-0.4 0.3 -0.2 0.2 0.0	0.5	51.4 / 30.8
+12	V2 from lvl 11, keep 0	0.3	0.1	-0.3 0.3 0.2 0.3 0.0	0.4	49.7 / 29.5
+13	V2 from lvl 8, keep 1	0.2	0.0	-0.3 0.2 0.0 0.2 -0.0	0.1	47.2 / 27.9
+14	V2 from lvl 7, keep 2	0.1	0.0	-0.2 0.1 0.0 0.1 0.0	0.0	44.4 / 26.1
+15	V2 from lvl 7, keep 1	0.1	-0.0	-0.0 0.0 -0.1 0.1 0.0	0.1	41.5 / 24.4
+16	V2 from lvl 4, keep 1	0.3	0.1	0.1 0.3 -0.1 0.1 0.0	0.1	38.5 / 22.6
+17	V2 from lvl 4, keep 1	0.2	0.1	0.2 0.2 -0.1 0.0 0.0	0.1	35.5 / 20.9
+18	V2 from lvl 2, keep 3	0.2	0.1	0.2 0.2 -0.1 0.0 0.0	nan	32.6 / 19.2
+19	V2 from lvl 2, keep 6	0.5	0.1	0.5 0.1 0.0 0.0 0.0	nan	29.8 / 17.6
+20	V2 from lvl 5, keep 5	1.4	0.3	1.4 -0.0 -0.1 0.0 0.0	0.1	27.0 / 16.3
+21	V2 from lvl 5, keep 6	2.0	0.4	2.0 -0.0 -0.0 0.0 0.0	0.1	24.5 / 15.0
+22	V2 from lvl 5, keep 7	2.5	0.5	2.5 -0.0 -0.0 0.0 0.0	0.1	22.1 / 13.7
+23	V2 from lvl 5, keep 8	2.9	0.6	2.9 -0.0 -0.0 0.0 0.0	0.1	19.9 / 12.6
+24	V2 from lvl 5, keep 9	3.2	0.6	3.2 -0.0 -0.0 0.0 0.0	0.1	17.8 / 11.6
+25	plain Coursier from lvl 16, keep 8	2.7	1.6	1.9 2.5 2.7 0.9 0.0	1.1	16.0 / 10.6
+26	plain Coursier from lvl 16, keep 9	2.0	1.2	1.8 1.7 2.0 0.6 0.0	0.8	14.2 / 9.7
+27	plain Coursier from lvl 15, keep 10	1.7	1.0	1.7 1.2 1.7 0.4 0.0	0.5	13.3 / 8.9
+28	plain Coursier from lvl 14, keep 8	1.4	0.8	1.3 1.0 1.4 0.4 0.0	0.5	12.9 / 8.1
+29	plain Coursier from lvl 13, keep 9	1.1	0.6	1.1 0.5 1.1 0.2 0.0	0.3	12.6 / 7.4
+30	plain Coursier from lvl 12, keep 10	0.8	0.4	0.8 0.3 0.8 0.1 0.0	0.2	12.2 / 6.8
+31	plain Coursier from lvl 10, keep 10	0.7	0.3	0.7 0.2 0.7 0.1 0.0	0.1	11.8 / 6.3
+32	plain Coursier from lvl 10, keep 12	0.6	0.3	0.6 0.1 0.6 0.1 0.0	0.0	11.4 / 5.8
+33	plain Coursier from lvl 10, keep 12	0.6	0.2	0.6 0.1 0.4 0.0 0.0	0.0	11.0 / 5.3
+34	plain Coursier from lvl 7, keep 9	0.4	0.2	0.4 0.1 0.3 0.1 0.0	0.1	10.7 / 4.9
+35	plain Coursier from lvl 3, keep 10	0.4	0.2	0.4 0.1 0.3 0.0 0.0	0.0	10.4 / 4.6
+36	plain Coursier from lvl 3, keep 12	0.4	0.1	0.4 0.0 0.2 0.0 0.0	0.0	10.0 / 4.2
+37	plain Coursier from lvl 4, keep 12	0.3	0.1	0.3 0.0 0.1 0.0 0.0	0.0	9.8 / 4.0
+38	plain Coursier from lvl 4, keep 14	0.3	0.1	0.3 0.0 0.1 0.0 0.0	0.0	9.5 / 3.7
+39	plain Coursier from lvl 4, keep 15	0.3	0.1	0.3 0.0 0.1 0.0 0.0	0.0	9.3 / 3.5
+40	plain Coursier from lvl 4, keep 16	0.3	0.1	0.3 -0.0 0.1 0.0 0.0	0.0	9.1 / 3.3

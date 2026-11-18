@@ -1,0 +1,49 @@
+# C29 rerun-optimizer: F6 = Diné, Guru 20
+# plans: All at 30; plain Coursier and V2 (cycle Hind Kick, keep Fore Chop) from every start level and spending cap; exact level-30 cleanup (rarest unwanted first, rarest missing as desired)
+# 2241 plans x 1000 horses, then 259 plans x 4000 fresh horses. Ties: within 1 point (full set) / 0.05 skill (travel skills). 'from lvl' = level to start swapping, 'keep' = coupons kept for level 30.
+coupons	full set: best	tied plans	travel skills: best	tied plans	All at 30: full set, travel skills
+0	2.7%	All at 30	10.86	All at 30	2.7%, 10.86
+1	20.7%	All at 30	11.74	All at 30	20.7%, 11.74
+2	50.4%	plain Coursier from lvl 28, keep 1 | V2 from lvl 28, keep 1	12.32	plain Coursier from lvl 26-28, keep 1 | V2 from lvl 26-28, keep 0-1	27.2%, 11.93
+3	76.3%	V2 from lvl 26, keep 1	12.71	V2 from lvl 24-26, keep 0-1	33.2%, 12.07
+4	90.6%	V2 from lvl 23-24, keep 0-1	12.89	V2 from lvl 22-25, keep 0-1	40.2%, 12.20
+5	96.8%	V2 from lvl 21-23, keep 0-1	12.96	V2 from lvl 19-25, keep 0-2	46.4%, 12.31
+6	98.9%	V2 from lvl 18-22, keep 0-1	12.99	V2 from lvl 16-24, keep 0-2	53.0%, 12.42
+7	99.7%	V2 from lvl 16-21, keep 0-2	13.00	V2 from lvl 14-24, keep 0-4	58.7%, 12.50
+8	99.9%	V2 from lvl 14-21, keep 0-3	13.00	V2 from lvl 13-25, keep 0-5	64.5%, 12.58
+9	100.0%	V2 from lvl 12-22, keep 0-4	13.00	V2 from lvl 11-25, keep 0-6	69.3%, 12.64
+10	100.0%	V2 from lvl 10-22, keep 0-6	13.00	V2 from lvl 10-26, keep 0-7	74.0%, 12.70
+11	100.0%	V2 from lvl 9-23, keep 0-7	13.00	V2 from lvl 9-26, keep 0-9	77.8%, 12.75
+12	100.0%	V2 from lvl 9-23, keep 0-8	13.00	V2 from lvl 9-27, keep 0-10	81.4%, 12.79
+13	100.0%	V2 from lvl 2-24, keep 0-9	13.00	V2 from lvl 2-27, keep 0-11	84.4%, 12.83
+14	100.0%	V2 from lvl 2-25, keep 0-11	13.00	V2 from lvl 2-27, keep 0-12	87.0%, 12.86
+15	100.0%	V2 from lvl 2-25, keep 0-12	13.00	plain Coursier from lvl 26-27, keep 14 | V2 from lvl 2-28, keep 0-14	89.2%, 12.88
+16	100.0%	V2 from lvl 2-25, keep 0-13	13.00	plain Coursier from lvl 26-28, keep 15 | V2 from lvl 2-28, keep 0-15	91.1%, 12.90
+17	100.0%	V2 from lvl 2-26, keep 0-15	13.00	plain Coursier from lvl 26-29, keep 16 | V2 from lvl 2-29, keep 0-16	92.6%, 12.92
+18	100.0%	V2 from lvl 2-26, keep 0-16	13.00	plain Coursier from lvl 26-29, keep 17 | V2 from lvl 2-29, keep 0-17	94.0%, 12.93
+19	100.0%	V2 from lvl 2-27, keep 0-17	13.00	plain Coursier from lvl 26-29, keep 18 | V2 from lvl 2-29, keep 0-18	95.0%, 12.95
+20	100.0%	V2 from lvl 2-27, keep 0-18	13.00	All at 30 | plain Coursier from lvl 26-29, keep 19 | V2 from lvl 2-29, keep 0-19	95.9%, 12.96
+21	100.0%	V2 from lvl 2-28, keep 0-19	13.00	All at 30 | plain Coursier from lvl 26-29, keep 20 | V2 from lvl 2-29, keep 0-20	96.7%, 12.96
+22	100.0%	plain Coursier from lvl 26-27, keep 21 | V2 from lvl 2-28, keep 0-21	13.00	All at 30 | plain Coursier from lvl 26-29, keep 21 | V2 from lvl 2-29, keep 0-21	97.3%, 12.97
+23	100.0%	plain Coursier from lvl 26-28, keep 22 | V2 from lvl 2-28, keep 0-22	13.00	All at 30 | plain Coursier from lvl 6-29, keep 1-22 | V2 from lvl 2-29, keep 0-22	97.8%, 12.98
+24	100.0%	plain Coursier from lvl 26-29, keep 23 | V2 from lvl 2-29, keep 0-23	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-23 | V2 from lvl 2-29, keep 0-23	98.2%, 12.98
+25	100.0%	plain Coursier from lvl 6-29, keep 0-24 | V2 from lvl 2-29, keep 0-24	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-24 | V2 from lvl 2-29, keep 0-24	98.6%, 12.98
+26	100.0%	plain Coursier from lvl 2-29, keep 0-25 | V2 from lvl 2-29, keep 0-25	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-25 | V2 from lvl 2-29, keep 0-25	98.8%, 12.99
+27	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-26 | V2 from lvl 2-29, keep 0-26	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-26 | V2 from lvl 2-29, keep 0-26	99.1%, 12.99
+28	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-27 | V2 from lvl 2-29, keep 1-27	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-27 | V2 from lvl 2-29, keep 1-27	99.2%, 12.99
+29	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-28 | V2 from lvl 2-29, keep 2-28	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-28 | V2 from lvl 2-29, keep 2-28	99.4%, 12.99
+30	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-29 | V2 from lvl 2-29, keep 3-29	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-29 | V2 from lvl 2-29, keep 3-29	99.5%, 12.99
+31	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-30 | V2 from lvl 2-29, keep 4-30	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-30 | V2 from lvl 2-29, keep 4-30	99.6%, 13.00
+32	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-31 | V2 from lvl 2-29, keep 5-31	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-31 | V2 from lvl 2-29, keep 5-31	99.7%, 13.00
+33	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-32 | V2 from lvl 2-29, keep 6-32	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-32 | V2 from lvl 2-29, keep 6-32	99.7%, 13.00
+34	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-33 | V2 from lvl 2-29, keep 7-33	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-33 | V2 from lvl 2-29, keep 7-33	99.8%, 13.00
+35	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-34 | V2 from lvl 2-29, keep 8-34	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-34 | V2 from lvl 2-29, keep 8-34	99.8%, 13.00
+36	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-35 | V2 from lvl 2-29, keep 9-35	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-35 | V2 from lvl 2-29, keep 9-35	99.9%, 13.00
+37	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-36 | V2 from lvl 2-29, keep 10-36	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-36 | V2 from lvl 2-29, keep 10-36	99.9%, 13.00
+38	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-37 | V2 from lvl 2-29, keep 11-37	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-37 | V2 from lvl 2-29, keep 11-37	99.9%, 13.00
+39	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-38 | V2 from lvl 2-29, keep 12-38	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-38 | V2 from lvl 2-29, keep 12-38	99.9%, 13.00
+40	100.0%	All at 30 | plain Coursier from lvl 2-29, keep 0-39 | V2 from lvl 2-29, keep 13-39	13.00	All at 30 | plain Coursier from lvl 2-29, keep 0-39 | V2 from lvl 2-29, keep 13-39	99.9%, 13.00
+# coupons for a 50% chance of the full set: 2 with the best plan, 6 with All at 30
+# coupons for a 80% chance of the full set: 4 with the best plan, 12 with All at 30
+# coupons for a 90% chance of the full set: 4 with the best plan, 16 with All at 30
+# coupons for a 95% chance of the full set: 5 with the best plan, 19 with All at 30
