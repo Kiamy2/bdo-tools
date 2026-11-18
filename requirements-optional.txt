@@ -1,0 +1,5 @@
+# Optional: the fast engine of horse_skills.py --optimize (bdo/horses_fast.py). Everything works without it.
+# pip install -r requirements-optional.txt
+numba==0.68.1
+llvmlite==0.50.0
+numpy==2.5.3

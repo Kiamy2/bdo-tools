@@ -7,6 +7,11 @@
   python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --sweep 0,10,20,40
   python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --odds --gear      # next level-up odds
   python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --check "Ruade=15.1844" "none=10.7826"
+  python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --optimize 30         # best plan per budget
+
+--optimize uses the fast engine (bdo/horses_fast.py) when numba is installed (pip install -r
+requirements-optional.txt): every plan is tried and the level-30 cleanup is computed exactly. Without numba it
+falls back to plain Python (a grid of plans, slower and noisier).
 
 a/b/c columns: a = no learn-chance boost, b = Pearl horse gear set OR Mount Brand Spell Stone (both are +10%), c = both.
 Exit codes: 0 ok; 2 bad input (unknown horse, skill or Training level); 1 --check found a mismatch.
@@ -57,6 +62,9 @@ def main():
     ap.add_argument("--point-bonus", type=float, default=0.25, help="desired-skill weight bonus per point (default 0.25)")
     ap.add_argument("--runs", type=int, default=5000, help="simulated levelings per cell (default 5000)")
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--engine", default="auto", choices=["auto", "python", "numba"],
+                    help="--optimize engine: numba (fast, exact cleanup; needs numba), python, or auto (default: "
+                    "numba if installed)")
     ap.add_argument("--lang", default="en", choices=["en", "fr"], help="skill names in output")
     a = ap.parse_args()
 
@@ -178,18 +186,34 @@ def main():
 
 def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     import time
+    from bdo import horses_fast as HF
     M = horse.M(bonus, a.gear, a.brand)
     kw = dict(tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted, fodder=fodder,
               point_bonus=a.point_bonus, points=a.points)
+    engine = a.engine
+    if engine == "auto":
+        engine = "numba" if HF.available() else "python"
+        if engine == "python":
+            print("# numba not installed: plain-Python search (slower, noisier); "
+                  "pip install -r requirements-optional.txt for the fast engine", file=sys.stderr)
+    if engine == "numba" and not HF.available():
+        print("ERROR: --engine numba needs numba (pip install -r requirements-optional.txt)", file=sys.stderr)
+        return 2
+    progress = lambda lab, i, n: (i % 500 == 0 or i == n) and print(f"# {lab}: {i}/{n} plans", file=sys.stderr)
     t0 = time.time()
-    res = H.optimize(horse, M, a.optimize, seed=a.seed,
-                     progress=lambda lab, i, n: (i % 100 == 0 or i == n) and print(f"# {lab}: {i}/{n} plans",
-                                                                                file=sys.stderr), **kw)
+    if engine == "numba":
+        res = HF.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
+        searched = ("every plan: at30, and coursier / coursier_v2 with every start level and spending cap; "
+                    "level-30 cleanup computed exactly (fast engine)")
+    else:
+        res = H.optimize(horse, M, a.optimize, seed=a.seed, progress=progress, **kw)
+        searched = ("a grid of plans (coursier, coursier_v2, once, hard), then every start level and spending cap "
+                    "around the best ones (plain-Python engine)")
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
     print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
           f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
-    print("# Searched: a grid of plans, then every start level and spending cap around the best ones.")
+    print(f"# Searched: {searched}.")
     print("# For each budget: the plans tied with the best (within 1 point for the full set, 0.05 skill for the")
     print("# average), as spans: 'from lvl' = level to start swapping, 'keep' = coupons kept for the level-30 cleanup.")
     print("# The spans cover the tied plans; not every combination inside a span is tied.")

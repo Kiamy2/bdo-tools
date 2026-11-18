@@ -10,6 +10,8 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --level 2 --l
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --sweep 0,10,20,40 --strategy at30,coursier
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --odds --gear --lang fr   # next level-up's odds
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --check "Ruade=15.1844" "none=10.7826"
+python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --optimize 30            # best plan per budget
+python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,90 --strategy coursier_v2
 ```
 
 ## Inputs
@@ -19,9 +21,21 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --check "Ruad
 - `--learned`: skills the horse already has, besides its innate ones. Skill names in English or French, comma-separated (`"High Jump, Dérapage"`).
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
 - `--coupons` (default 30) or `--sweep 0,10,20`: Mount Skill Change Coupons available. `--tickets`: Mount Level Down Tickets (default 0).
-- `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategy swaps out (default `Hind Kick, Fore Chop`). `--reserve`: coupons kept for level 30 (default 5).
+- `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategies swap out (default `Hind Kick, Fore Chop`; `coursier_v2` cycles only the heaviest of them). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1).
 - `--points`: Skill Change Points the horse already has. `--point-bonus`: how much each point raises the desired skill (default 0.25, see the report).
 - `--runs` (default 5000) and `--seed`: simulation size and random seed. Results move by about ±1 point between seeds at 5000 runs.
+
+## Strategies
+
+`--strategy` takes a comma-separated subset (default all):
+
+- `natural`: no coupons. `at30`: all coupons kept for level 30.
+- `coursier`: swap Hind Kick and Fore Chop each time they're learned. Swapping one often draws the other back, so coupons churn.
+- `coursier_v2`: swap only Hind Kick (the heavier of the two) each time it's learned, and keep Fore Chop. No loop: best in most cases (see the report).
+- `once`, `hard`: swap every unwanted skill once / until a wanted one comes. Rarely worth it.
+- `ideal`: unlimited coupons, always holding the rarest skills (the most skills a horse can reach).
+
+Every strategy except `natural` and `ideal` ends with the **level-30 cleanup**: swap the rarest unwanted skill held, with the rarest missing wanted skill as the desired one, until every wanted skill is held or coupons run out. Swapping the rarest first keeps the common skills (Hind Kick...) held, so they don't come back in the next coupon draws. Trying every other choice of skill to swap and of desired skill gains nothing measurable for the full set.
 
 ## Output
 
@@ -35,7 +49,20 @@ coursier  30       18.8/19.3/19.6 12.9/12.9/13.0 90%/94%/97%  27/25/24
 - Each cell is **a/b/c**: a = no learn-chance boost, b = Pearl horse gear set **or** Mount Brand Spell Stone (both are +10%), c = both.
 - `skills at 30`: learnable skills the horse has at level 30 (innate ones not counted). `wanted at 30`: how many of those are wanted. `all wanted`: chance of ending with every wanted skill. `coupons used`: average.
 - `--odds` prints the next level-up's chances like the in-game simulator, with `--gear`/`--brand` for the learn-chance boosts.
+- `--target 50,90`: instead of a budget, the coupons needed to end with every wanted skill in 50% / 90% of runs, per strategy (fixed `--reserve` / `--swap-from`).
 - `--check` compares numbers you read in the in-game simulator with the model (`none` = "no skill"). It exits with 1 on a mismatch, which means the data is outdated or the settings differ (same Training level, boosts and learned skills as in the game?).
+
+## Best plan per budget (`--optimize N`)
+
+`--optimize 30` searches, for every budget from 0 to 30 coupons, the best plan: the strategy, the level to start swapping, and how many coupons to keep for level 30. It prints the plans tied with the best (within 1 point) for two goals, the full set and the most wanted skills on average, then the coupons needed for a 50 / 80 / 90 / 95% chance of the full set. Works from a horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
+
+```
+coupons  full set: chance  tied plans                              most wanted: avg  tied plans  at30: chance, avg
+10       62.6%             coursier_v2 from lvl 10-16, keep 0-3   12.46             ...         32.3%, 11.94
+```
+
+- **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap) and computes the level-30 cleanup exactly instead of simulating it. About 10 seconds for 20 coupons, under a minute for 40. It keeps a table of level-30 states in memory: a few hundred MB for 20 coupons, up to about 2 GB for 40 (1.8 GB measured for the T8 example).
+- **Plain Python** (`--engine python`, or when numba isn't installed): a grid of plans refined around the best ones, simulated. Several minutes and noisier, same model.
 
 ## Your own horse (`--horse-file`)
 

@@ -1,6 +1,6 @@
 # bdo-tools
 
-Small command-line tools for **Black Desert Online**: live Central Market prices, item lookups, and a horse skill simulator. They're designed to be run by AI agents as well as humans: compact tab-separated output, clear warnings, no dependencies beyond Python 3.8+.
+Small command-line tools for **Black Desert Online**: live Central Market prices, item lookups, and a horse skill simulator. They're designed to be run by AI agents as well as humans: compact tab-separated output, clear warnings, no dependencies beyond Python 3.8+ (optional: numba makes `horse_skills.py --optimize` much faster, `pip install -r requirements-optional.txt`).
 
 ```
 git clone --depth 1 https://github.com/Kiamy2/bdo-tools && cd bdo-tools

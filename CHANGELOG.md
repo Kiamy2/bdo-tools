@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-18
+- `horse_skills.py`: new strategy `coursier_v2`: swap only Hind Kick (the heavier fodder skill) and keep Fore Chop. Plain `coursier` loses many coupons to a Hind Kick <-> Fore Chop loop; `coursier_v2` needs far fewer coupons for the same chance in most cases (see the report).
+- Level-30 cleanup rule changed to "swap the rarest unwanted skill held" (was: keep re-swapping the same slot). Slightly better, and as good as the best possible cleanup for the full set. Simulated numbers move by about +1 point.
+- `--optimize N`: best plan per budget (strategy, start level, coupons kept), with tied ranges and coupons needed for 50/80/90/95%. `--target`: coupons needed per strategy. `--swap-from`: level to start swapping.
+- New optional fast engine `bdo/horses_fast.py` (numba, `requirements-optional.txt`): every plan tried, level-30 cleanup computed exactly. `--engine auto|python|numba`; without numba everything still works in plain Python.
+- `data/horse_skills.json`: Mythical Diné weights refined to 4 decimals from an in-game simulator reading (bdolytics rounds to 0.01); checked against a coupon-window reading at 2 Skill Change Points.
+
 ## 2026-11-17
 - New `horse_skills.py` (offline): horse skill odds per level-up and a leveling-strategy simulator (natural, coupons at 30, coursier, hard, ideal), with the gear set / brand stone as a/b/c columns, coupon budgets, Mount Level Down Tickets, a horse's current level and learned skills. `--check` compares in-game simulator readings with the model; `--horse-file` adds any horse from one reading.
 - New `bdo/horses.py` (model and simulation) and `data/horse_skills.json` (weights for Mythical Diné, Arduanatt and Doom, Doom T9, Voltarion and one T8 coat, with source and date).

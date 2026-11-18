@@ -48,11 +48,13 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               "Wings of Freedom", "Earth of Protection", "Dark Sprint", "Lightning Charge",
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
 CLASSIC_FODDER = ["Hind Kick", "Fore Chop"]
-STRATEGIES = ["natural", "at30", "coursier", "once", "hard", "ideal"]
+STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "once", "hard", "ideal"]
 STRATEGY_HELP = {
     "natural": "no coupons used",
     "at30": "level naturally, spend all coupons at level 30 on unwanted skills",
     "coursier": "swap Hind Kick/Fore Chop each time they're learned (keeping a reserve), rest at 30",
+    "coursier_v2": "swap only Hind Kick (the heavier of the two) each time it's learned and keep Fore Chop: no "
+                   "Hind Kick <-> Fore Chop loop (keeping a reserve), rest at 30. Best in most cases",
     "once": "swap every unwanted skill once when it's learned (keeping a reserve), rest at 30",
     "hard": "swap every unwanted skill until a wanted one comes (keeping a reserve), rest at 30",
     "ideal": "unlimited coupons: always hold the rarest skills, for the most skills at 30",
@@ -175,6 +177,20 @@ def horse_from_sim_file(path, resolve):
 
 # --- simulation ----------------------------------------------------------------------------------------------
 
+def _cycle_skill(fodder, wt):
+    """V2 cycles exactly one fodder skill, the heaviest (first in the list on ties), and keeps the others: a swap
+    of it can then never draw another fodder skill back, so coupons don't churn between them."""
+    return max(fodder, key=lambda s: wt[s]) if fodder else None
+
+
+def _rarest_unwanted(have, wanted, rank):
+    """Level-30 cleanup rule: swap the rarest unwanted skill held. A swapped-away skill goes back into the coupon
+    draw, so the common ones (Hind Kick...) stay held until last. Checked against the best possible cleanup
+    (any skill to swap, any desired skill): no measurable difference for the full set."""
+    junk = [s for s in have if s not in wanted]
+    return min(junk, key=lambda s: rank[s]) if junk else None
+
+
 def _draw(rng, items, weights):
     x = rng.random() * sum(weights)
     for s, w in zip(items, weights):
@@ -197,6 +213,8 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
     wanted = set(TRAVEL_SET if wanted is None else wanted) & set(pool)
     fodder = [s for s in (CLASSIC_FODDER if fodder is None else fodder) if s in wt and s not in wanted]
     rare = sorted(pool, key=lambda s: wt[s])
+    rank = {s: (wt[s], i) for i, s in enumerate(pool)}
+    cyc = _cycle_skill(fodder, wt)
     tot_sum = wanted_sum = all_count = used_sum = 0
     for _ in range(runs):
         have = set(s for s in learned if s in wt)
@@ -216,13 +234,6 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
             c -= 1
             pts += 1
             return new
-
-        def fix(slot):                               # re-swap a slot until it holds a wanted skill
-            while slot not in wanted and c > 0:
-                new = swap(slot)
-                if new is None:
-                    return
-                slot = new
 
         for _lvl in range(start_level, max_level):
             while True:
@@ -248,6 +259,9 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                 for s in fodder:
                     if s in have and c > reserve:
                         swap(s)
+            elif strategy == "coursier_v2":
+                if cyc in have and c > reserve:
+                    swap(cyc)
             elif strategy == "once":
                 # swap each unwanted skill once when it's learned; at swap_from, also those learned while waiting
                 todo = sorted(have - wanted, key=lambda s: wt[s]) if _lvl + 1 == swap_from > 1 else [got]
@@ -262,12 +276,11 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                             slot = swap(slot)
                             if slot is None:
                                 break
-        if strategy in ("at30", "coursier", "once", "hard"):
-            # level-30 cleanup, rarest unwanted skill first: a swapped-away skill goes back into the coupon draw,
-            # so common ones (Hind Kick...) are kept until last to keep their big weight out of the other swaps
-            for s in sorted(have - wanted, key=lambda s: wt[s]):
-                if s in have:
-                    fix(s)
+        if strategy in ("at30", "coursier", "coursier_v2", "once", "hard"):
+            while c > 0 and not wanted <= have:      # level-30 cleanup (see _rarest_unwanted)
+                out = _rarest_unwanted(have, wanted, rank)
+                if out is None or swap(out) is None:
+                    break
         n = len(have)
         nw = min(n, len(wanted)) if strategy == "ideal" else len(have & wanted)
         tot_sum += n
@@ -323,6 +336,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     wt = horse.weights
     wanted = set(TRAVEL_SET if wanted is None else wanted) & set(pool)
     fodder = [s for s in (CLASSIC_FODDER if fodder is None else fodder) if s in wt and s not in wanted]
+    rank = {s: (wt[s], i) for i, s in enumerate(pool)}
+    cyc = _cycle_skill(fodder, wt)
     if strategy == "at30":
         spend_cap = 0
     nb = max_budget + 1
@@ -368,6 +383,9 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 for s in fodder:
                     if s in have and spent < spend_cap:
                         swap(s)
+            elif strategy == "coursier_v2":
+                if cyc in have and spent < spend_cap:
+                    swap(cyc)
             elif strategy == "once":
                 todo = sorted(have - wanted, key=lambda s: wt[s]) if _lvl + 1 == swap_from > 1 else [got]
                 for s in todo:
@@ -382,13 +400,11 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
         base = spent
         traj = [len(have & wanted)]                  # wanted skills after 0, 1, 2... cleanup coupons
         if strategy != "natural":
-            for s in sorted(have - wanted, key=lambda s: wt[s]):     # rarest unwanted first (see simulate)
-                slot = s
-                while slot is not None and slot not in wanted and not wanted <= have:
-                    slot = swap(slot)
-                    traj.append(len(have & wanted))
-                if wanted <= have:
+            while not wanted <= have and len(traj) < 100000:      # level-30 cleanup (see _rarest_unwanted)
+                out = _rarest_unwanted(have, wanted, rank)
+                if out is None or swap(out) is None:
                     break
+                traj.append(len(have & wanted))
         need = base + len(traj) - 1 if wanted <= have else float("inf")
         needed.append(need)
         last = len(traj) - 1
@@ -432,7 +448,7 @@ def _neighbors(value, grid, lo, hi):
     return range(max(lo, below + 1), min(hi, above - 1) + 1)
 
 
-def optimize(horse, M, max_budget=50, strategies=("coursier", "once", "hard"), levels=None, caps=None,
+def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "once", "hard"), levels=None, caps=None,
              runs=(1000, 4000), top=6, max_close=15, refine=True, seed=1, progress=None, **kw):
     """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
     'wanted' (average wanted skills).

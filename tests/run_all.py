@@ -98,7 +98,7 @@ code, out = run("horse_skills.py", "--horse-file", "tests/data/sim_mythical_dine
 check("horse_skills --horse-file (simulator reading)", code == 0 and "MISMATCH" not in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "300", "--coupons", "20")
 rows = {l.split("\t")[0]: l.split("\t") for l in out.splitlines() if not l.startswith("#")}
-ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "hard", "ideal"}
+ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "coursier_v2", "hard", "ideal"}
 if ok:
     first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
@@ -114,6 +114,34 @@ code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--tr
 m = re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M)
 check("horse_skills --optimize", code == 0 and [b for b, _ in m] == ["0", "1", "2", "3"]
       and float(m[3][1]) >= float(m[0][1]) and "coupons for a 50%" in out, out)
+code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Guru 20", "--optimize", "2",
+               "--engine", "python")
+m = re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M)
+check("horse_skills --optimize --engine python", code == 0 and [b for b, _ in m] == ["0", "1", "2"]
+      and "plain-Python engine" in out, out)
+# fast engine (needs numba; skipped otherwise): same model as the plain-Python one, so the same chances within noise
+code, out = run("-c", "import sys; sys.path.insert(0, '.'); import bdo.horses_fast as F; print(F.available())")
+if out.strip() == "True":
+    code, out = run("-c", """
+import math, sys
+sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "Mythical Diné"); M = h.M(21.7, 0, 0)
+for st, L, cap in (("coursier_v2", 15, 9), ("coursier", 20, 5), ("at30", 1, 0)):
+    a = F.Evaluator(h, M, max_budget=20).plan(st, L, cap, runs=8000, seed=3)["full"]
+    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3)["full"]
+    z = max(abs(a[B] - b[B]) / math.sqrt(b[B] * (1 - b[B]) / 4000 + a[B] * (1 - a[B]) / 8000) for B in (10, 15, 20))
+    print(st, round(z, 2), "OK" if z < 4 else "DIFF")
+""")
+    check("horses_fast agrees with bdo.horses (same plans, within noise)", code == 0 and "DIFF" not in out
+          and out.count("OK") == 3, out)
+    code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
+    m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
+    check("horse_skills --optimize --engine numba (coursier_v2 best at 10 coupons, about 62%)",
+          code == 0 and "fast engine" in out and 55 <= float(m.get("10", 0)) <= 70
+          and re.search(r"^10\t[\d.]+%\tcoursier_v2", out, re.M), out)
+else:
+    print("skip horses_fast checks (numba not installed)")
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")
