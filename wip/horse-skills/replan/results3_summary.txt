@@ -1,0 +1,16 @@
+T8 example (bdolytics icon horse_71) | Skilled 1 | 20 coupons | level-1 plan [12, 6, 20, 0, 12] (70.8%) | 1200 horses
+full set: fixed 69.9%, re-planned 70.3%, gain +0.38 points (se 0.57; 95% range -0.73 to +1.49)
+learned skills at 30: difference -0.06 (se 0.03)
+coupons spent while leveling: difference -0.42 (se 0.05)
+  level 10: V0 until T, then V2 1173, V2 27
+  level 15: V0 until T, then V2 1089, V2 111
+  level 20: V0 until T, then V2 758, V2 431, V0 8, All at 30 3
+  level 25: V2 706, V0 until T, then V2 238, All at 30 211, V0 36
+Doom (T9) | Beginner 1 | 20 coupons | level-1 plan [6, 4, 15, 0, 0] (80.8%) | 1200 horses
+full set: fixed 79.8%, re-planned 79.6%, gain -0.17 points (se 0.38; 95% range -0.92 to +0.58)
+learned skills at 30: difference -0.10 (se 0.02)
+coupons spent while leveling: difference +0.26 (se 0.04)
+  level 10: V2 742, V0 until T, then V2 458
+  level 15: V2 909, V0 until T, then V2 291
+  level 20: V2 1152, V0 until T, then V2 48
+  level 25: V2 1095, All at 30 94, V0 until T, then V2 1
