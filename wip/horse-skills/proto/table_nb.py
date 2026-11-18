@@ -9,7 +9,8 @@ approximation); the table just grows as plans reach new level-30 states.
 
 Leveling strategies: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural (no cleanup),
 5 coursier V1 (swap Hind Kick / Fore Chop only while the other one is learned: no loop),
-6 coursier V2 (only ever swap the first fodder skill, Hind Kick).
+6 coursier V2 (only ever swap the first fodder skill, Hind Kick),
+7 cycle Fore Chop instead, 8 cycle whichever of the two is learned first, 9 V2 + every other unwanted skill swapped once.
 """
 import numpy as np
 import numba as nb
@@ -192,6 +193,7 @@ def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level
     spent = 0
     t = tickets
     pts = points
+    first = -1                                   # first fodder skill learned (strategy 8)
     for lvl in range(start_level, max_level):
         got = -1
         while True:
@@ -215,9 +217,38 @@ def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level
             t -= 1
         if got >= 0:
             have |= np.int64(1) << got
+            if first < 0:
+                for q in range(len(fod)):
+                    if fod[q] == got:
+                        first = got
         if lvl + 1 < swap_from or spent >= spend_cap:
             continue
-        if st == 1 or st == 5 or st == 6:
+        if st == 7 or st == 8 or st == 9:
+            # cycle exactly one fodder skill, keep the other(s): 7 = the second one (Fore Chop), 8 = the first one
+            # learned, 9 = Hind Kick plus every other unwanted skill swapped once when learned
+            cyc = -1
+            if st == 7 and len(fod) > 1:
+                cyc = fod[1]
+            elif st == 8:
+                cyc = first
+            elif st == 9 and len(fod) > 0:
+                cyc = fod[0]
+            if cyc >= 0 and (have >> cyc) & 1 and spent < spend_cap:
+                nw, have, state = F._swap(cyc, have, pts, state, w, n, rare, point_bonus)
+                if nw >= 0:
+                    spent += 1
+                    pts += 1
+            if st == 9 and got >= 0 and got != cyc and not (wmask >> got) & 1 and (have >> got) & 1:
+                is_fod = False
+                for q in range(len(fod)):
+                    if fod[q] == got:
+                        is_fod = True
+                if not is_fod and spent < spend_cap:
+                    nw, have, state = F._swap(got, have, pts, state, w, n, rare, point_bonus)
+                    if nw >= 0:
+                        spent += 1
+                        pts += 1
+        elif st == 1 or st == 5 or st == 6:
             nf = len(fod)
             for q in range(nf):
                 s = fod[q]
@@ -282,7 +313,8 @@ def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_lev
     return S, base, pts
 
 
-STRAT = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v1": 5, "coursier_v2": 6}
+STRAT = {"at30": 0, "coursier": 1, "once": 2, "hard": 3, "natural": 4, "coursier_v1": 5, "coursier_v2": 6,
+         "cycle_fc": 7, "cycle_first": 8, "v2_once": 9}
 
 
 class Evaluator:
