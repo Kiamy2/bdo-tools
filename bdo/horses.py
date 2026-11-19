@@ -341,8 +341,10 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
 
 def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
                   wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30,
-                  switch_at=DEFAULT_SWITCH_AT, coupon=None):
+                  switch_at=DEFAULT_SWITCH_AT, coupon=None, points_reset=False):
     """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate().
+    points_reset: Skill Change Points go back to 0 when a Change Coupon gives the desired skill (unconfirmed in-game;
+    without it they keep growing by 1 per coupon).
     coupon: a Mount Skill Selection Coupon used at the very end on the last missing skill, if the horse holds an
     unwanted skill to change (at least as many learned skills as wanted ones). 'planned': every Change Coupon keeps
     the rarest missing skill for it (desired skill = the second rarest missing); 'fallback': only the level-30
@@ -382,7 +384,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             have.discard(out)
             have.add(new)
             spent += 1
-            pts += 1
+            pts = 0 if points_reset and new == target else pts + 1
             return new
 
         for _lvl in range(start_level, max_level):
