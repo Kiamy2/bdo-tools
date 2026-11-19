@@ -1,0 +1,11 @@
+full set: 99.99%
+level reached with the full set: average 25.7 | by level 25 or earlier: 54% | 26: 10% | later: 36%
+coupons used for it: average 13.5 | median 13 | 18 or fewer: 91% | 13 or fewer: 55%
+empty level-ups (first try) from level 5 to 26: average 7.9 | 8 or more: 58%
+learned skills at level 10: you 8, average 7.9, horses with fewer than you 30%, as many or more 70%
+learned skills at level 14: you 10, average 10.9, horses with fewer than you 12%, as many or more 88%
+learned skills at level 18: you 13, average 13.5, horses with fewer than you 22%, as many or more 78%
+learned skills at level 20: you 14, average 15.1, horses with fewer than you 13%, as many or more 87%
+learned skills at level 24: you 18, average 18.0, horses with fewer than you 35%, as many or more 65%
+learned skills at level 26: you 20, average 18.8, horses with fewer than you 61%, as many or more 39%
+all 20 learnable skills by level 26: 39%
