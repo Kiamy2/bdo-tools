@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-21
+- Skill Change Points now go back to 0 when a Change Coupon gives the desired skill (seen in-game twice; before, the model let them grow by 1 per coupon). Both engines, while leveling and in the level-30 cleanup; `simulate_plan`'s `points_reset` option is gone (always on). Chances drop in hard cases, e.g. the T8 example at Skilled 1, best plan with 20 coupons: 61% instead of 71%.
+- `bdo/horses_fast.py`: the exact level-30 cleanup is swept by wanted skills held, then points (the reset breaks the old order by points); `cleanup_values` lost its `bound` argument. `--optimize` on the T8 example: about 20 s / 0.5 GB at 20 coupons, 45 s / 1.2 GB at 40 (`--low-memory`: 0.8 GB).
+
 ## 2026-11-19
 - `data/horse_skills.json`: T9 Doom and T8 example weights refined to 4 decimals from in-game simulator readings at Artisan 8 (`tests/data/sim_doom_t9_artisan8.csv`, `sim_t8_choky_artisan8.csv`); all within bdolytics' 0.01 rounding. They reproduce the earlier independent readings (Doom at Artisan 7, T8 at Professional 10) to 0.0001 points.
 

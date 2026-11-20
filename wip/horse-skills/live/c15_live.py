@@ -3,6 +3,8 @@ without the Skill Change Points reset on a hit. Plain-Python engine (simulate_pl
 full set took, inf if the horse has too few skills), all coupons available (budget large), 4 tickets used on every
 empty level-up. Prints, per plan: average coupons, 90th / 99th percentile, chance of the full set within 49.
 Usage: python3 -I c15_live.py
+The points_reset option was removed from simulate_plan in K3 (reset always on): to rerun, use bdo/ from commit
+27110f8 or earlier.
 """
 import math
 import sys

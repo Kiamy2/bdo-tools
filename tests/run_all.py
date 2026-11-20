@@ -125,6 +125,34 @@ f = lambda c: H.simulate_plan(h, M, "coursier_v2", 10, 12, 20, runs=1500, seed=5
 print(f(None) + 0.1 < f("fallback") <= 1, f(None) + 0.1 < f("planned") <= 1)
 """)
 check("bdo.horses simulate_plan with a Selection Coupon (planned / fallback beat none)", code == 0 and out.strip() == "True True", out)
+# Skill Change Points back to 0 when a coupon gives the desired skill: a 2-coupon case computed by hand
+RESET_CASE = """
+import math, sys
+sys.path.insert(0, ".")
+from bdo import horses as H
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(7.1, 0, 0)
+wt = h.weights; pool = list(wt); r = lambda s: (wt[s], pool.index(s))
+X, Y = sorted(set(H.TRAVEL_SET) & set(pool), key=r)[:2]
+o1 = min((s for s in pool if s not in H.TRAVEL_SET), key=r)
+learned = [s for s in pool if s not in (X, Y)]
+# level 30, 20 points, every skill but the two rarest wanted ones X, Y; 2 coupons. Coupon 1 swaps the rarest unwanted
+# skill o1, drawing X (desired, boosted) or Y. Coupon 2: if X came, the points are back to 0 and Y is drawn against o1
+# unboosted; if Y came, 21 points boost X against o1.
+b0, b1 = 1 + 0.25 * 20, 1 + 0.25 * 21
+pX = wt[X] * b0 / (wt[X] * b0 + wt[Y])
+second = (1 - pX) * wt[X] * b1 / (wt[X] * b1 + wt[o1])
+exact = pX * wt[Y] / (wt[Y] + wt[o1]) + second
+no_reset = pX * wt[Y] * b1 / (wt[Y] * b1 + wt[o1]) + second
+"""
+code, out = run("-c", RESET_CASE + """
+N = 40000
+a = H.simulate_plan(h, M, "at30", 1, 0, 2, runs=N, seed=9, start_level=30, learned=learned, points=20)["full"][2]
+b = H.simulate(h, M, "at30", 2, runs=N, seed=9, start_level=30, learned=learned, points=20)["all_wanted"]
+se = math.sqrt(exact * (1 - exact) / N)
+print(abs(a - exact) < 4 * se, abs(b - exact) < 4 * se, no_reset - exact > 20 * se, round(exact, 4), round(a, 4), round(b, 4))
+""")
+check("bdo.horses: points reset on a desired hit (simulate_plan and simulate match a hand-computed 2-coupon case)",
+      code == 0 and out.startswith("True True True"), out)
 # coursier_switch with a threshold never reached is coursier, with 0 it's coursier_v2 (same random numbers)
 code, out = run("-c", """
 import sys
@@ -161,7 +189,7 @@ from bdo import horses as H, horses_fast as F
 h = H.get_horse(H.load_data(), "Mythical Diné"); M = h.M(21.7, 0, 0)
 for st, L, cap, T in (("coursier_v2", 15, 9, 0), ("coursier", 20, 5, 0), ("at30", 1, 0, 0), ("coursier_switch", 8, 15, 11)):
     a = F.Evaluator(h, M, max_budget=20).plan(st, L, cap, runs=8000, seed=3, switch_at=T)["full"]
-    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3, switch_at=T, points_reset=True)["full"]
+    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3, switch_at=T)["full"]
     z = max(abs(a[B] - b[B]) / math.sqrt(b[B] * (1 - b[B]) / 4000 + a[B] * (1 - a[B]) / 8000) for B in (15, 20))
     print(st, round(z, 2), "OK" if z < 4 else "DIFF")
 """)
@@ -180,6 +208,14 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
 """)
     check("horses_fast coursier_switch limits: T=0 is coursier_v2, T never reached is coursier",
           code == 0 and out.strip() == "True True", out)
+    code, out = run("-c", RESET_CASE + """
+from bdo import horses_fast as F
+ev = F.Evaluator(h, M, max_budget=2, start_level=30, learned=learned, points=20)
+f = ev.plan("at30")["full"][2]
+print(abs(f - exact) < 1e-5, round(f, 6), round(exact, 6))
+""")
+    check("horses_fast: points reset on a desired hit (exact cleanup matches the hand-computed 2-coupon case)",
+          code == 0 and out.startswith("True"), out)
     code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 61%)",

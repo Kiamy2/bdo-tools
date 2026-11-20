@@ -1,6 +1,6 @@
 # Horse skills: how they're learned, and how to get the ones you want
 
-Report of 2026-11-18. It explains how a horse picks a skill when it levels up, checks that against the game, and compares ways of using Mount Skill Change Coupons, so you can skip straight to the conclusions.
+Report of 2026-11-18. **Outdated draft:** its numbers were computed before the Skill Change Points reset was known (points go back to 0 when a coupon gives the desired skill, seen in-game on 2026-11-19); the tool includes the reset since 2026-11-20 and a new report will replace this one. It explains how a horse picks a skill when it levels up, checks that against the game, and compares ways of using Mount Skill Change Coupons, so you can skip straight to the conclusions.
 
 Everything here can be reproduced with [horse_skills.py](horse_skills.md), a command-line tool in this repo (commands at the end). It also finds the best plan for your own horse, Training level and coupons. The horse data it uses (each skill's weight, explained below) is in [data/horse_skills.json](../data/horse_skills.json).
 
@@ -11,7 +11,7 @@ Everything here can be reproduced with [horse_skills.py](horse_skills.md), a com
   - the **Mount Brand Spell Stone**, applied to the horse.
 - **a/b/c:** some results are given as three numbers: **a** = no boost, **b** = one boost (the gear set *or* the brand stone, they're equal), **c** = both boosts.
 - **Coupon:** a Mount Skill Change Coupon. It replaces one learned skill with a random unlearned one. You mark one skill as **desired** to make it more likely.
-  - Each coupon used gives the horse a **Skill Change Point**, and points make the desired skill more likely still.
+  - Each coupon used gives the horse a **Skill Change Point**, and points make the desired skill more likely still. A coupon that gives the desired skill sets the points back to 0.
   - Innate skills (the ones the horse is born with) can't be swapped.
 - **Ticket:** a Mount Level Down Ticket. It undoes a level-up so it can be redone.
 - **Travel set:** the skills this report counts as wanted, mainly for getting around (list and reasons in [The travel set](#the-travel-set)). **Full set:** ending at level 30 with every skill of the travel set.
@@ -61,7 +61,7 @@ Everything here can be reproduced with [horse_skills.py](horse_skills.md), a com
 - **Cap:** if the skill chances would add up to more than 100%, they're scaled down to exactly 100%, and "nothing" becomes 0%. A fresh Mythical Diné reaches the cap once the Training bonus plus boosts reach 36.4%, for example at Master 14, or at Artisan 7 with both boosts.
 - **Sprint** was innate on every horse checked, although bdolytics lists a weight for it.
 
-**Coupons:** the new skill is drawn among the unlearned skills, minus the one removed, using the same weights. The desired skill's weight is multiplied by (1 + 0.25 × Skill Change Points): ×1.25 at 1 point and ×1.5 at 2 points, both read in the game's coupon window. Further points are assumed to keep adding 0.25 each, and points are assumed to reset only when a horse is awakened into a Mythical (see [Limits](#limits)).
+**Coupons:** the new skill is drawn among the unlearned skills, minus the one removed, using the same weights. The desired skill's weight is multiplied by (1 + 0.25 × Skill Change Points): ×1.25 at 1 point and ×1.5 at 2 points, both read in the game's coupon window. Further points are assumed to keep adding 0.25 each. A coupon that gives the desired skill sets the points back to 0 (seen in-game on 2026-11-19; the numbers in this draft assume no reset, see [Limits](#limits)).
 
 ### How this was checked
 
@@ -180,7 +180,7 @@ With Coursier V2, the number of coupons kept for level 30 hardly matters: V2 onl
 
 ## Limits
 
-- **The Skill Change Point bonus beyond 2 points is assumed** to keep growing by +0.25 per point (checked at 1 and 2). It's also unknown whether points reset when you obtain the desired skill; the model assumes they don't. The bonus matters a lot: without it, the chances of the full set drop sharply.
+- **The Skill Change Point bonus beyond 2 points is assumed** to keep growing by +0.25 per point (checked at 1 and 2). The points do reset when a coupon gives the desired skill (seen in-game after this draft); this draft's numbers assume they don't, the tool includes the reset. The bonus matters a lot: without it, the chances of the full set drop sharply.
 - **Weights are rounded:** bdolytics rounds to 0.01, which is a few percent for the rarest skills. The Diné's weights were refined from an in-game reading; the Doom's and the T8's weren't.
 - **Plans are fixed at level 1.** The tool doesn't follow your horse level by level, but you can run it again from your horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
 - **Not modelled:** the Mount Skill Selection Coupon (one guaranteed skill per horse, 3,100 Pearls). It would help most at level 30 on the last rare skill, as long as the horse holds an unwanted skill to replace.

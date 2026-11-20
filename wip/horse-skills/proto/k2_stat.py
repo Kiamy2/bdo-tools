@@ -1,5 +1,5 @@
 """K2 check: fast engine (reset in leveling and in the exact cleanup) against the plain-Python simulation
-bdo.horses.simulate_plan(points_reset=True), different random numbers, so within noise.
+bdo.horses.simulate_plan (reset always on since K3; points_reset=True before), different random numbers, so within noise.
 Run from the repo root: python3 -I wip/horse-skills/proto/k2_stat.py"""
 import math, sys
 sys.path.insert(0, ".")
@@ -19,7 +19,7 @@ for name, tr, (st, L, cap, T), cp in cases:
     h = H.get_horse(data, name)
     M = h.M(H.training_bonus(tr), 0, 0)
     a = F.Evaluator(h, M, max_budget=20).plans([(st, L, cap, T)], runs=20000, seed=11, tails=True, coupon=cp)[(st, L, cap, T)]
-    b = H.simulate_plan(h, M, st, L, cap, 20, runs=6000, seed=12, switch_at=T, coupon=cp, points_reset=True)
+    b = H.simulate_plan(h, M, st, L, cap, 20, runs=6000, seed=12, switch_at=T, coupon=cp)
     zs = []
     for B in (cap, 10, 15, 20):
         if B < cap:

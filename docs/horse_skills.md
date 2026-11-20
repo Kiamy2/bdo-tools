@@ -22,7 +22,7 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,9
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
 - `--coupons` (default 30) or `--sweep 0,10,20`: Mount Skill Change Coupons available. `--tickets`: Mount Level Down Tickets (default 0).
 - `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategies swap out (default `Hind Kick, Fore Chop`; `coursier_v2` cycles only the heaviest of them). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1). `--switch-at`: the learned-skill count at which `coursier_switch` changes from `coursier` to `coursier_v2` swaps (default 12).
-- `--points`: Skill Change Points the horse already has. `--point-bonus`: how much each point raises the desired skill (default 0.25, see the report).
+- `--points`: Skill Change Points the horse already has. `--point-bonus`: how much each point raises the desired skill (default 0.25, see the report). Each Change Coupon adds 1 point, except one that gives the desired skill: then the points go back to 0 (seen in-game).
 - `--runs` (default 5000) and `--seed`: simulation size and random seed. Results move by about ±1 point between seeds at 5000 runs.
 
 ## Strategies
@@ -44,7 +44,7 @@ The simulation prints one row per strategy (descriptions in `--help` and the rep
 
 ```
 strategy  coupons  skills at 30   wanted at 30   all wanted    coupons used  <=1 missing    worst 5%
-coursier  30       18.8/19.3/19.6 13.0/13.0/13.0 97%/99%/100%  23/23/23      99%/100%/100%  0/0/0
+coursier  30       18.7/19.3/19.5 12.9/12.9/13.0 92%/95%/97%   24/23/23      99%/100%/100%  1/0/0
 ```
 (Mythical Diné, Artisan 7, 30 coupons.)
 
@@ -56,17 +56,20 @@ coursier  30       18.8/19.3/19.6 13.0/13.0/13.0 97%/99%/100%  23/23/23      99%
 
 ## Best plan per budget (`--optimize N`)
 
+> **Being rechecked:** the Skill Change Points reset (see `--points`) is in the model since 2026-11-20, so every chance the tool prints includes it. Some findings quoted here come from studies done before it and are being redone: the general rule's plans, "no other cleanup choice gains anything" (strategies above), "the plan best for the full set is also the safest" and the Selection Coupon targeting gain (below).
+
 `--optimize 30` searches, for every budget from 0 to 30 coupons, the best plan: the strategy, the level to start swapping, how many coupons to keep for level 30, and for `coursier_switch` the learned-skill count to switch at (9 to 16). It prints the plans tied with the best (within 1 point) for two goals, the full set and the most wanted skills on average, then the coupons needed for a 50 / 80 / 90 / 95% chance of the full set. Works from a horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
 
 ```
 coupons  full set: chance  tied plans                              most wanted: avg  tied plans  at30: chance, avg
-10       62.6%             coursier_v2: from lvl 10-16, keep 0-3  12.46             ...         32.3%, 11.94
-20       71.2%             coursier_switch: from lvl 7-11, V0 until 10-13 learned skills, then V2, keep 0-10   ...
+10       21.5%             coursier_v2: from lvl 10-20, keep 0-7 | coursier_switch: ...  10.59  ...  16.8%, 10.48
+20       61.4%             coursier_switch: from lvl 9-13, V0 until 10-12 learned skills, then V2, keep 0-12   ...
 ```
+(T8 example, Skilled 1, `--optimize 20`.)
 
-After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 10, V0 until 11 learned skills, then V2, keep 5  70.7%  rule (best 71.2%)`. It's the general rule's plan (the same for everyone, chosen to lose the least over many horses and Training levels) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
+After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 10, V0 until 11 learned skills, then V2, keep 5  61.3%  rule (best 61.4%)`. It's the general rule's plan (the same for everyone, chosen to lose the least over many horses and Training levels) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
 
-**Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons, 70% becomes about 93%.
+**Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons, 61% becomes about 91%.
 - `planned`: you'll use it for sure. Every Change Coupon, while leveling and at level 30, then aims at the **second** rarest missing skill (the desired skill), keeping the rarest for the Selection Coupon. The plan search and every chance include it. This targeting is only a bit better (up to about 0.6 points) **if you do use the coupon**; if you might keep it, don't use it while leveling.
 - `fallback`: a safety net. The plans stay the ones without it, and the suggested plans get a `with Selection Coupon` column: your chance if, at level 30, you decide to use it (from then on, Change Coupons aim at the second rarest missing skill). Decide at 30, depending on how leveling went.
 
@@ -74,7 +77,7 @@ Last, a table of the **average learned skills when reaching each level** (innate
 
 **Level Down Tickets** (`--tickets N`): they're used on every level-up that teaches nothing, from your current level on. With tickets, the suggested plans get a `keeping tickets` column: the same plan's chance if you don't use them. Rerun the tool partway through leveling (`--level`, `--learned`, `--points`, `--tickets`) to see whether your remaining tickets are worth spending on this horse.
 
-- **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 15 seconds and 0.5 GB of memory for 20 coupons, 30 seconds and 0.7 GB for 40 (measured on the T8 example, 2 cores). `--low-memory` keeps the level-30 values as 16-bit numbers: about 0.1 GB less at 40 coupons, same speed, chances within 0.001 points (a plan right at the edge of a tied range can move in or out of it).
+- **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 20 seconds and 0.5 GB of memory for 20 coupons, 45 seconds and 1.2 GB for 40 (measured on the T8 example, 2 cores). `--low-memory` keeps the level-30 values as 16-bit numbers: about 0.4 GB less at 40 coupons, same speed, chances within 0.001 points (a plan right at the edge of a tied range can move in or out of it).
 - **Plain Python** (`--engine python`, or when numba isn't installed): a grid of plans refined around the best ones (`coursier_switch` thresholds 9, 11, 13, 15, then their neighbors), simulated. Several minutes and noisier, same model.
 
 ## Your own horse (`--horse-file`)
