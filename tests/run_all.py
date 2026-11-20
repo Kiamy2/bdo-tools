@@ -161,7 +161,7 @@ from bdo import horses as H, horses_fast as F
 h = H.get_horse(H.load_data(), "Mythical Diné"); M = h.M(21.7, 0, 0)
 for st, L, cap, T in (("coursier_v2", 15, 9, 0), ("coursier", 20, 5, 0), ("at30", 1, 0, 0), ("coursier_switch", 8, 15, 11)):
     a = F.Evaluator(h, M, max_budget=20).plan(st, L, cap, runs=8000, seed=3, switch_at=T)["full"]
-    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3, switch_at=T)["full"]
+    b = H.simulate_plan(h, M, st, L, cap, 20, runs=4000, seed=3, switch_at=T, points_reset=True)["full"]
     z = max(abs(a[B] - b[B]) / math.sqrt(b[B] * (1 - b[B]) / 4000 + a[B] * (1 - a[B]) / 8000) for B in (15, 20))
     print(st, round(z, 2), "OK" if z < 4 else "DIFF")
 """)
@@ -182,8 +182,8 @@ print(same(g(7, 0), g(6, 0)), same(g(7, 99), g(1, 0)))
           code == 0 and out.strip() == "True True", out)
     code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
-    check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 71%)",
-          code == 0 and 66 <= float(m.get("20", 0)) <= 76
+    check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 61%)",
+          code == 0 and 56 <= float(m.get("20", 0)) <= 66
           and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
     lv = {int(l.split("\t")[0]): [float(x) for x in l.split("\t")[1:]] for l in out.split("# Average learned")[-1].splitlines()
           if re.match(r"^\d+\t[\d.]+", l)}

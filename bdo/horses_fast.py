@@ -97,12 +97,24 @@ if nb is not None:
         return new, have, state
 
     @nb.njit(cache=True)
+    def _swap_r(out, have, pts, state, w, n, rare, pb, keep):
+        """Like _swap_k, with Skill Change Points: back to 0 when the coupon gives the desired skill, else + 1.
+        Returns (new skill or -1, have, state, points)."""
+        free = ~have & ~(np.int64(1) << out)
+        target = _target(free, rare, keep)
+        new, have, state = _swap_k(out, have, pts, state, w, n, rare, pb, keep)
+        if new < 0:
+            return new, have, state, pts
+        return new, have, state, (0 if new == target else pts + 1)
+
+    @nb.njit(cache=True)
     def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
                  rare, pb, points, max_level, switch_at, keep):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
         coursier_v2 for good). keep: coupons keep the rarest missing skill for a Selection Coupon (see _target).
+        Skill Change Points: + 1 per coupon, back to 0 when it gives the desired skill.
         Returns (held skills, coupons spent while leveling, Skill Change Points)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
@@ -142,16 +154,14 @@ if nb is not None:
             if st == 1 or (st == 7 and not latched):
                 for s in fod:
                     if (have >> s) & 1 and spent < spend_cap:
-                        nw, have, state = _swap_k(s, have, pts, state, w, n, rare, pb, keep)
+                        nw, have, state, pts = _swap_r(s, have, pts, state, w, n, rare, pb, keep)
                         if nw >= 0:
                             spent += 1
-                            pts += 1
             elif st == 6 or st == 7:
                 if cyc >= 0 and (have >> cyc) & 1 and spent < spend_cap:
-                    nw, have, state = _swap_k(cyc, have, pts, state, w, n, rare, pb, keep)
+                    nw, have, state, pts = _swap_r(cyc, have, pts, state, w, n, rare, pb, keep)
                     if nw >= 0:
                         spent += 1
-                        pts += 1
             elif st == 2:
                 if lvl + 1 == swap_from and swap_from > 1:
                     todo = np.empty(n, np.int64)
@@ -163,15 +173,13 @@ if nb is not None:
                     for q in range(m):
                         s = todo[q]
                         if (have >> s) & 1 and not (wmask >> s) & 1 and spent < spend_cap:
-                            nw, have, state = _swap_k(s, have, pts, state, w, n, rare, pb, keep)
+                            nw, have, state, pts = _swap_r(s, have, pts, state, w, n, rare, pb, keep)
                             if nw >= 0:
                                 spent += 1
-                                pts += 1
                 elif got >= 0 and not (wmask >> got) & 1 and (have >> got) & 1 and spent < spend_cap:
-                    nw, have, state = _swap_k(got, have, pts, state, w, n, rare, pb, keep)
+                    nw, have, state, pts = _swap_r(got, have, pts, state, w, n, rare, pb, keep)
                     if nw >= 0:
                         spent += 1
-                        pts += 1
             elif st == 3:
                 todo = np.empty(n, np.int64)
                 m = 0
@@ -182,10 +190,9 @@ if nb is not None:
                 for q in range(m):
                     slot = todo[q]
                     while slot >= 0 and not (wmask >> slot) & 1 and (have >> slot) & 1 and spent < spend_cap:
-                        slot, have, state = _swap_k(slot, have, pts, state, w, n, rare, pb, keep)
+                        slot, have, state, pts = _swap_r(slot, have, pts, state, w, n, rare, pb, keep)
                         if slot >= 0:
                             spent += 1
-                            pts += 1
         return have, spent, pts
 
     @nb.njit(cache=True, parallel=True)
@@ -202,14 +209,19 @@ if nb is not None:
             pts[r] = c
         return S, base, pts
 
-    # --- exact level-30 cleanup, swept by Skill Change Points ----------------------------------------------------
+    # --- exact level-30 cleanup --------------------------------------------------------------------------------
     # For an end-of-leveling state (held skills S, points p) and c coupons left, the cleanup rule (swap the rarest
     # unwanted skill held, desired = rarest missing wanted skill) gives exact values: P(missing <= t wanted skills)
-    # for t < J (t = 0: the full set), then the expected wanted skills. A coupon always moves p to p + 1, so the
-    # states are grouped by points level and computed from the highest level down, two levels in memory at a time.
-    # Only points + coupons left <= bound is needed (bound = starting points + largest budget): every value a horse
-    # asks for satisfies it, also if the game reset the points (that only lowers them). Values aren't kept between
-    # batches: Evaluator.plans simulates a batch of plans first, then one sweep answers all of it.
+    # for t < J (t = 0: the full set), then the expected wanted skills. A cleanup coupon never lowers the number g
+    # of wanted skills held: it either draws an unwanted skill (same g, points p + 1), another wanted skill (g + 1,
+    # p + 1) or the desired one (g + 1, points back to 0). So the states are computed by group g from the highest
+    # down, and within a group by points from the highest down.
+    # Each state only gets values for c = 0..cmax, cmax = C - (fewest coupons used to reach it, those spent while
+    # leveling included): that is all a horse can ask for (found by a search from the end-of-leveling states).
+    # Values aren't kept between batches: Evaluator.plans simulates a batch of plans first, then one sweep answers
+    # all of it.
+
+    PMASK = (1 << PBITS) - 1
 
     @nb.njit(cache=True)
     def _slot(S, wmask, order):
@@ -244,66 +256,100 @@ if nb is not None:
         return m
 
     @nb.njit(cache=True)
-    def _succ(keys, bound, w, n, wmask, order, rare, pb, sel):
-        """Successor keys (points p + 1) of the states that can still use a coupon (p < bound). sel = 1: a Selection
-        Coupon is kept for the end, so the cleanup stops at one missing skill and keeps the rarest for it."""
-        nW = _pop(wmask)
-        out = np.empty(len(keys) * n, np.int64)
-        m_tot = 0
-        nxt = np.empty(n, np.int64)
-        prb = np.empty(n, np.float64)
-        for k in keys:
-            S = k >> PBITS
-            p = k & ((1 << PBITS) - 1)
-            if _pop(S & wmask) >= nW - sel or p >= bound:
-                continue
-            o = _slot(S, wmask, order)
-            if o < 0:
-                continue
-            m = _trans_k(S, p, o, w, n, rare, pb, nxt, prb, sel > 0)
-            for i in range(m):
-                out[m_tot] = (nxt[i] << PBITS) | (p + 1)
-                m_tot += 1
-        return out[:m_tot]
+    def _trans_r(k, out, w, n, rare, pb, nxt, prb, keep):
+        """Like _trans_k for the state key k, with the next state keys: points back to 0 if the coupon gives the
+        desired skill, else + 1."""
+        S = k >> PBITS
+        p = k & PMASK
+        full = (np.int64(1) << n) - 1
+        target = _target(~S & ~(np.int64(1) << out) & full, rare, keep)
+        m = _trans_k(S, p, out, w, n, rare, pb, nxt, prb, keep)
+        for i in range(m):
+            new = nxt[i] & ~S
+            nxt[i] = (nxt[i] << PBITS) | (0 if target >= 0 and new == (np.int64(1) << target) else p + 1)
+        return m
 
-    def _levels(start, bound, w, n, wmask, order, rare, pb, sel=0, chunk=200_000):
-        """Sorted keys of every state reachable from the start keys, per points level."""
-        start = np.unique(start)
-        ps = start & ((1 << PBITS) - 1)
-        levels, nxt = {}, np.empty(0, np.int64)
-        for p in range(int(ps.min()), bound + 1):
-            cur = np.union1d(nxt, start[ps == p])
-            levels[p] = cur
-            parts = [np.unique(_succ(cur[i:i + chunk], bound, w, n, wmask, order, rare, pb, sel))
-                     for i in range(0, len(cur), chunk)]
-            nxt = np.unique(np.concatenate(parts)) if parts else np.empty(0, np.int64)
-        return levels
+    @nb.njit(cache=True)
+    def _moves(k, wmask, nW, sel, order):
+        """Skill a cleanup coupon swaps out in state k, or -1 when the cleanup is over (sel = 1: a Selection Coupon
+        is kept for the end, so the cleanup stops at one missing skill and keeps the rarest for it)."""
+        S = k >> PBITS
+        if nW - _pop(S & wmask) <= sel:
+            return -1
+        return _slot(S, wmask, order)
 
     @nb.njit(cache=True, parallel=True)
-    def _sweep_level(K, Kn, Vn, V, cmax, J, enc, dec, q, w, n, wmask, order, rare, pb, sel):
-        """Values V[row, c, t] of the states K at one points level (c = 0..cmax), from those of the next level
-        (keys Kn, values Vn). q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t].
-        sel: see _succ (the values are then those of the cleanup alone, before the Selection Coupon)."""
+    def _succ(keys, w, n, wmask, order, rare, pb, sel):
+        """Successor keys of the given states (one cleanup coupon), -1 where there are fewer than n."""
         nW = _pop(wmask)
-        for b in nb.prange((len(K) + 4095) // 4096):
+        out = np.full(len(keys) * n, -1, np.int64)
+        for j in nb.prange(len(keys)):
             nxt = np.empty(n, np.int64)
             prb = np.empty(n, np.float64)
-            rows2 = np.empty(n, np.int64)
+            o = _moves(keys[j], wmask, nW, sel, order)
+            if o >= 0:
+                m = _trans_r(keys[j], o, w, n, rare, pb, nxt, prb, sel > 0)
+                out[j * n:j * n + m] = nxt[:m]
+        return out
+
+    def _reach(hkeys, base, C, w, n, wmask, order, rare, pb, sel=0, chunk=500_000):
+        """Sorted keys of every state the cleanup can reach from the end-of-leveling states hkeys (base: coupons
+        spent while leveling), and cmax (see above)."""
+        o = np.lexsort((base, hkeys))
+        hk, hb = hkeys[o], base[o]
+        first = np.ones(len(hk), bool)
+        first[1:] = hk[1:] != hk[:-1]
+        hk, hb = hk[first], hb[first]                       # each key with its fewest coupons spent
+        seen, keys, cmax = np.empty(0, np.int64), [], []
+        nxt = np.empty(0, np.int64)
+        for u in range(int(hb.min()), C + 1):
+            cur = np.setdiff1d(np.union1d(nxt, hk[hb == u]), seen, assume_unique=True)
+            keys.append(cur)
+            cmax.append(np.full(len(cur), C - u, np.int16))
+            seen = np.union1d(seen, cur)
+            if u == C:
+                break
+            parts = [np.unique(_succ(cur[i:i + chunk], w, n, wmask, order, rare, pb, sel))
+                     for i in range(0, len(cur), chunk)]
+            nxt = np.unique(np.concatenate(parts)) if parts else np.empty(0, np.int64)
+            nxt = nxt[nxt >= 0]
+        keys, cmax = np.concatenate(keys), np.concatenate(cmax)
+        o = np.argsort(keys)
+        return keys[o], cmax[o]
+
+    @nb.njit(cache=True, parallel=True)
+    def _sweep(K, cm, off, V, KA, offA, VA, KB, offB, VB, KZ, offZ, VZ, J, enc, dec, q, w, n, wmask, order, rare,
+               pb, sel):
+        """Values V[off[r] + c, t] (c = 0..cm[r]) of the states K of one block (wanted skills g, points p), from
+        those of the blocks (g, p + 1) (A), (g + 1, p + 1) (B) and (g + 1, 0) (Z): see cleanup_values.
+        q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t]."""
+        nW = _pop(wmask)
+        for b in nb.prange((len(K) + 1023) // 1024):
+            nxt = np.empty(n, np.int64)
+            prb = np.empty(n, np.float64)
+            rows = np.empty(n, np.int64)
+            blk = np.empty(n, np.int64)
             acc = np.empty(J + 1, np.float64)
-            for r in range(b * 4096, min(len(K), (b + 1) * 4096)):
+            for r in range(b * 1024, min(len(K), (b + 1) * 1024)):
                 k = K[r]
-                S = k >> PBITS
-                p = k & ((1 << PBITS) - 1)
-                hw = _pop(S & wmask)
+                hw = _pop((k >> PBITS) & wmask)
                 miss = nW - hw
                 m = 0
-                if miss > sel and cmax > 0:
-                    o = _slot(S, wmask, order)
+                if cm[r] > 0:
+                    o = _moves(k, wmask, nW, sel, order)
                     if o >= 0:
-                        m = _trans_k(S, p, o, w, n, rare, pb, nxt, prb, sel > 0)
+                        m = _trans_r(k, o, w, n, rare, pb, nxt, prb, sel > 0)
                 for i in range(m):
-                    rows2[i] = np.searchsorted(Kn, (nxt[i] << PBITS) | (p + 1))
-                for c in range(cmax + 1):
+                    if _pop((nxt[i] >> PBITS) & wmask) == hw:
+                        blk[i] = 0
+                        rows[i] = offA[np.searchsorted(KA, nxt[i])]
+                    elif nxt[i] & PMASK:
+                        blk[i] = 1
+                        rows[i] = offB[np.searchsorted(KB, nxt[i])]
+                    else:
+                        blk[i] = 2
+                        rows[i] = offZ[np.searchsorted(KZ, nxt[i])]
+                for c in range(cm[r] + 1):
                     if c == 0 or m == 0:
                         for t in range(J):
                             acc[t] = 1.0 if miss <= t else 0.0
@@ -312,26 +358,39 @@ if nb is not None:
                         for t in range(J + 1):
                             acc[t] = 0.0
                         for i in range(m):
+                            x = rows[i] + c - 1
                             for t in range(J + 1):
-                                acc[t] += prb[i] * (Vn[rows2[i], c - 1, t] * dec[t])
+                                if blk[i] == 0:
+                                    v = VA[x, t]
+                                elif blk[i] == 1:
+                                    v = VB[x, t]
+                                else:
+                                    v = VZ[x, t]
+                                acc[t] += prb[i] * (v * dec[t])
                     for t in range(J + 1):
                         x = acc[t] * enc[t]
                         if q:
                             x = np.floor(x + 0.5)
-                        V[r, c, t] = x
+                        V[off[r] + c, t] = x
 
     @nb.njit(cache=True)
-    def _accumulate(hkeys, base, plan, cap, idx, K, V, dec, C, acc):
+    def _accumulate(hkeys, base, plan, cap, idx, K, off, V, dec, C, acc):
         """Adds each horse's values to acc[plan, budget] for every budget from its plan's cap to C."""
         for i in idx:
-            r = np.searchsorted(K, hkeys[i])
+            r = off[np.searchsorted(K, hkeys[i])]
             for B in range(max(cap[i], base[i]), C + 1):
                 for t in range(acc.shape[2]):
-                    acc[plan[i], B, t] += V[r, B - base[i], t] * dec[t]
+                    acc[plan[i], B, t] += V[r + B - base[i], t] * dec[t]
 
-    def cleanup_values(hkeys, base, plan, cap, nplans, C, bound, J, low_memory, w, n, wmask, order, rare, pb, sel=0):
+    def cleanup_values(hkeys, base, plan, cap, nplans, C, J, low_memory, w, n, wmask, order, rare, pb, sel=0,
+                       stats=None):
         """Sums over the horses of each plan of the exact cleanup values, per budget: acc[plan, B, t] (see above).
-        hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling."""
+        hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling.
+        The states are split in blocks (wanted skills g, points p); block (g, p) needs (g, p + 1), (g + 1, p + 1)
+        and (g + 1, 0), so a block of group g + 1 is dropped as soon as group g no longer needs it.
+        stats: a dict, filled with the number of states and the most values held at once."""
+        if int((hkeys & PMASK).max()) + C > PMASK:
+            raise ValueError(f"Skill Change Points above {PMASK}")
         nv = J + 1
         if low_memory:
             enc = np.full(nv, 65535.0)
@@ -341,17 +400,43 @@ if nb is not None:
             enc = dec = np.ones(nv)
             dt = np.float32
         acc = np.zeros((nplans, C + 1, nv))
-        levels = _levels(hkeys, bound, w, n, wmask, order, rare, pb, sel)
-        hl = hkeys & ((1 << PBITS) - 1)
-        Kn, Vn = np.empty(0, np.int64), np.zeros((0, 1, nv), dt)
-        for p in sorted(levels, reverse=True):
-            K = levels.pop(p)
-            V = np.empty((len(K), bound - p + 1, nv), dt)
-            _sweep_level(K, Kn, Vn, V, bound - p, J, enc, dec, low_memory, w, n, wmask, order, rare, pb, sel)
-            idx = np.nonzero(hl == p)[0]
-            if len(idx):
-                _accumulate(hkeys, base, plan, cap, idx, K, V, dec, C, acc)
-            Kn, Vn = K, V
+        keys, cmax = _reach(hkeys, base, C, w, n, wmask, order, rare, pb, sel)
+        g_all = _popcounts((keys >> PBITS) & wmask)
+        hg = _popcounts((hkeys >> PBITS) & wmask)
+        hpts = hkeys & PMASK
+        groups = {}                                  # g -> {p: (keys, cmax)}, values computed later
+        for g in np.unique(g_all):
+            s = g_all == g
+            K, cm = keys[s], cmax[s]
+            ps = K & PMASK
+            groups[int(g)] = {int(p): (K[ps == p], cm[ps == p]) for p in np.unique(ps)}
+        del keys, cmax, g_all
+        empty = (np.empty(0, np.int64), np.zeros(1, np.int64), np.zeros((1, nv), dt))
+        done = {}                                    # (g, p) -> (keys, offsets, values)
+        held = peak = n_states = 0
+        for g in sorted(groups, reverse=True):
+            levels = groups.pop(g)
+            for p in sorted(levels, reverse=True):
+                K, cm = levels.pop(p)
+                n_states += len(K)
+                off = np.zeros(len(K), np.int64)
+                off[1:] = np.cumsum(cm[:-1].astype(np.int64) + 1)
+                V = np.empty((int(off[-1]) + int(cm[-1]) + 1, nv), dt)
+                held += len(V)
+                peak = max(peak, held)
+                A, B, Z = (done.get(x, empty) for x in ((g, p + 1), (g + 1, p + 1), (g + 1, 0)))
+                _sweep(K, cm, off, V, *A, *B, *Z, J, enc, dec, low_memory, w, n, wmask, order, rare, pb, sel)
+                idx = np.nonzero((hg == g) & (hpts == p))[0]
+                if len(idx):
+                    _accumulate(hkeys, base, plan, cap, idx, K, off, V, dec, C, acc)
+                done[(g, p)] = (K, off, V)
+                if (g + 1, p + 1) in done:                        # only block (g, p) needed it
+                    held -= len(done.pop((g + 1, p + 1))[2])
+                del K, cm, off, V, A, B, Z
+            for x in [x for x in done if x[0] == g + 1]:          # the rest of group g + 1
+                held -= len(done.pop(x)[2])
+        if stats is not None:
+            stats.update(states=n_states, peak_values=peak * nv)
         return acc
 
     @nb.njit(cache=True)
@@ -432,7 +517,7 @@ if nb is not None:
             nb_ = len(batch)
             T = TAILS if tails else 1
             if not sel:
-                acc = cleanup_values(hk, hb, hp, hc, nb_, C, self.points + C, T, self.low_memory, w, n, wmask, order,
+                acc = cleanup_values(hk, hb, hp, hc, nb_, C, T, self.low_memory, w, n, wmask, order,
                                      rare, self.pb)
                 full = lambda j, B: acc[j, B, 0]
                 wanted = lambda j, B: acc[j, B, T]
@@ -442,7 +527,7 @@ if nb is not None:
                 # (which stops at one missing skill) shifted by one; the others (j + nb_) can't use it
                 spare = _popcounts(hk >> PBITS) >= nW
                 J = T + 1
-                acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, self.points + C, J,
+                acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, J,
                                      self.low_memory, w, n, wmask, order, rare, self.pb, 1)
                 n_sp = np.bincount(hp[spare], minlength=nb_)
                 full = lambda j, B: acc[j, B, 1] + acc[j + nb_, B, 0]

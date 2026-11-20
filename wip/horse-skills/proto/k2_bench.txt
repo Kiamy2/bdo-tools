@@ -1,0 +1,10 @@
+new T8 example (b Skilled 1 20                                18.6 s  peak    484 MB  rc 0  | 20	61.4%	coursier_switch: from lvl 9-13, V0 until 10-12 lear
+old T8 example (b Skilled 1 20                                14.5 s  peak    408 MB  rc 0  | 20	70.6%	coursier_switch: from lvl 7-11, V0 until 10-13 lear
+new T8 example (b Skilled 1 40                                43.5 s  peak   1204 MB  rc 0  | 40	93.2%	coursier_switch: from lvl 2-11, V0 until 11-16 lear
+old T8 example (b Skilled 1 40                                30.0 s  peak    628 MB  rc 0  | 40	94.8%	coursier_switch: from lvl 2-11, V0 until 11-16 lear
+new Mythical Diné Artisan 7 20                                14.2 s  peak    423 MB  rc 0  | 20	89.1%	coursier_v2: from lvl 2-13, keep 0-12 | coursier_sw
+old Mythical Diné Artisan 7 20                                11.5 s  peak    371 MB  rc 0  | 20	93.0%	coursier_switch: from lvl 10-12, V0 until 9-11 lear
+new T8 example (b Skilled 1 40 --low-memory                   45.8 s  peak    814 MB  rc 0  | 40	93.2%	coursier_switch: from lvl 2-11, V0 until 11-16 lear
+old T8 example (b Skilled 1 40 --low-memory                   30.8 s  peak    533 MB  rc 0  | 40	94.8%	coursier_switch: from lvl 2-11, V0 until 11-16 lear
+new T8 example (b Skilled 1 20 --selection-coupon planned     19.3 s  peak    543 MB  rc 0  | 20	90.9%	coursier_switch: from lvl 2-16, V0 until 10-16 lear
+old T8 example (b Skilled 1 20 --selection-coupon planned     14.8 s  peak    459 MB  rc 0  | 20	94.1%	coursier_switch: from lvl 2-12, V0 until 10-16 lear

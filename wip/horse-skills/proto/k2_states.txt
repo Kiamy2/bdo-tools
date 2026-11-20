@@ -1,0 +1,13 @@
+C=40 horses 520000 states 3718834 reach 2.6s values 72062856
+ g=3: states      1007 values       20016  p-levels 40 largest level values        962
+ g=4: states     19355 values      375781  p-levels 41 largest level values      17929
+ g=5: states    156116 values     2992508  p-levels 41 largest level values     141200
+ g=6: states    575226 values    11003880  p-levels 41 largest level values     503407
+ g=7: states   1098595 values    21111705  p-levels 41 largest level values     960428
+ g=8: states   1043317 values    20269134  p-levels 41 largest level values     918367
+ g=9: states    584294 values    11489419  p-levels 41 largest level values     526141
+ g=10: states    201000 values     3996799  p-levels 41 largest level values     185414
+ g=11: states     39756 values      797581  p-levels 41 largest level values      37344
+ g=12: states       168 values        6033  p-levels 13 largest level values       2701
+J=1: 6.3s states 3718834 peak values 46.7M = 178 MB, maxrss 510 MB
+J=5: 7.5s states 3718834 peak values 140.1M = 534 MB, maxrss 907 MB

@@ -1,0 +1,9 @@
+Mythical Diné  Artisan 7  coursier_v2     15  9  0 None     full@20 fast 0.879 python 0.875  max|z| 1.62 over 12
+Mythical Diné  Artisan 7  coursier        20  5  0 None     full@20 fast 0.765 python 0.761  max|z| 1.63 over 12
+Mythical Diné  Artisan 7  at30             1  0  0 None     full@20 fast 0.653 python 0.647  max|z| 1.48 over 12
+T8 example (bd Skilled 1  coursier_switch  8 15 11 None     full@20 fast 0.606 python 0.600  max|z| 2.69 over 9
+T8 example (bd Skilled 1  coursier_switch  8 12 12 planned  full@20 fast 0.908 python 0.909  max|z| 0.94 over 9
+T8 example (bd Skilled 1  coursier        10 10  0 fallback full@20 fast 0.897 python 0.894  max|z| 1.69 over 12
+Doom (T9)      Artisan 8  hard            12 10  0 None     full@20 fast 0.512 python 0.510  max|z| 1.12 over 12
+Doom (T9)      Artisan 8  once            12 10  0 None     full@20 fast 0.622 python 0.628  max|z| 1.66 over 12
+RESULT OK worst z 2.69
