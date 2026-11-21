@@ -1,0 +1,182 @@
+# In-game growth simulator readings sent by the user as screenshots on 2026-11-17 and 2026-11-18 (French client),
+# transcribed by hand on 2026-11-21 (session where they were still on disk). One row per value shown.
+# Columns: reading (one screenshot; the upload file name in brackets in the comments below), horse (name and
+# in-game 'Apparence'), training, horse_level, boosts (none / gear = 'Set équin', brand = 'Marquage de monture'),
+# innate ('Compétences de base' shown), skill (as shown), percent ('base' = innate).
+reading,horse,training,horse_level,boosts,innate,skill,percent
+# [755e4abb] Mythical Diné 'Fylaee', gear box ticked
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Compétence non apprise,3.4516
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Ruade,16.4321
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Cabrade,14.4108
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Dérapage,4.069
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Sprint,base
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Accélérer,5.8072
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Saut haut,3.8212
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Arrêt d'urgence,5.1249
+dine_a7_gear,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,Sprint,Accél. Fulgurante,1.575
+# [ef6b7b7e] same horse, no boosts
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Compétence non apprise,10.7826
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Ruade,15.1844
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Cabrade,13.3166
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Dérapage,3.76
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Sprint,base
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Accélérer,5.3662
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Saut haut,3.531
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Arrêt d'urgence,4.7358
+dine_a7,Mythical Diné Fylaee (Type 6),Artisan 7,2,none,Sprint,Accél. Fulgurante,1.4554
+# [d84db913] same horse, High Jump learned ('Acquis'); Training and boosts not in the crop: the values fit Artisan 7, no boosts (none 11.7532 and Ruade 15.6382 reproduced exactly)
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Compétence non apprise,11.7532
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Ruade,15.6382
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Cabrade,13.7145
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Dérapage,3.8724
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Sprint,base
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Accélérer,5.5266
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Saut haut,learned
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Arrêt d'urgence,4.8773
+dine_a7_highjump,Mythical Diné Fylaee (Type 6),Artisan 7 (inferred),2,none (inferred),Sprint + High Jump learned,Accél. Fulgurante,1.4989
+# [11f97bab, 81d5893b] lower part of the list, gear box ticked, nothing learned (fits the gear reading above: Charge 2.6319 x 16.4321 / 15.1844 = 2.848); innate skills of the Diné shown as base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Charge,2.8482
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Pas latéraux,0.7857
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Recul rapide,6.2228
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Sauts continus,4.2361
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Hurlement de cheval,3.9022
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Prudence,2.6235
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Brève chevauchée,3.5904
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,S : Ruade,3.4594
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,S : Cabrade,3.2465
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,cut (S : Accél. Fulgurante),0.4755
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,S : Pas latéraux,0.2483
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Esprit de destrier,base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Double saut,base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,S : Charge,9.764
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Terre de vie,base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Terre de Protection,3.9056
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Sprint argenté,base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Triple saut,base
+dine_a7_gear_low,Mythical Diné Fylaee (Type 6),Artisan 7,2,gear,7 innate,Protection d'Okiara,base
+# [1bdf947c] Diné, Master 20: the 100% cap ('no skill' 0%)
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Compétence non apprise,0
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Ruade,17.0196
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Cabrade,14.926
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Dérapage,4.2144
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Sprint,base
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Accélérer,6.0148
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Saut haut,3.9577
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Arrêt d'urgence,5.3081
+dine_master20,Mythical Diné Fylaee (Type 6),Maître 20,2,none,Sprint,Accél. Fulgurante,1.6314
+# [3a5bbc8b] Diné, Guru 57 (the cap too)
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Compétence non apprise,0
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Ruade,17.0194
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Cabrade,14.9259
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Dérapage,4.2144
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Sprint,base
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Accélérer,6.0148
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Saut haut,3.9578
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Arrêt d'urgence,5.3081
+dine_guru57,Mythical Diné Fylaee (Type 6),Gourou 57,2,none,Sprint,Accél. Fulgurante,1.6314
+# [f1096f5b] Diné, Professional 10
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Compétence non apprise,14.3746
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Ruade,14.5731
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Cabrade,12.7805
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Dérapage,3.6086
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Sprint,base
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Accélérer,5.1501
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Saut haut,3.3889
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Arrêt d'urgence,4.5451
+dine_pro10,Mythical Diné Fylaee (Type 6),Professionnel 10,2,none,Sprint,Accél. Fulgurante,1.3968
+# [21bb88a8] crop of the list only; 'no skill' 0% = the cap (same values as Master 20 / Guru 57, last digits differ by 1)
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Compétence non apprise,0
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Ruade,17.0196
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Cabrade,14.926
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Dérapage,4.2144
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Sprint,base
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Accélérer,6.0148
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Saut haut,3.9578
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Arrêt d'urgence,5.3081
+dine_cap_crop,Mythical Diné Fylaee (Type 6),not shown (a capped setting),2,not shown,Sprint,Accél. Fulgurante,1.6313
+# [c2f26378] coupon window ('Gérer les compétences' + 'Infos sur les chances de compétence'): Diné, swapping out Saut haut (100% shown on its icon), desired skill Accél. Fulgurante, Skill Change Points +1; the game notes: chances include the points, rounded to the 5th decimal. Visible part of the list only; the horse's held skills are not shown
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Ruade,17.6458
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Cabrade,15.4752
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Dérapage,4.3696
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Accélérer,6.2361
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Arrêt d'urgence,5.5035
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Accél. Fulgurante (desired),2.1142
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Charge,3.0586
+dine_coupon_1pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Pas latéraux,0.8438
+# [f144b7cb] T8 'Choky', Artisan 7
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Compétence non apprise,24.3074
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Ruade,10.9722
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Cabrade,10.9722
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Dérapage,3.6261
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Sprint,base
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Accélérer,3.6965
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Saut haut,4.5062
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Arrêt d'urgence,4.5297
+choky_a7,T8 Choky (Type 1; male),Artisan 7,1,none,Sprint,Accél. Fulgurante,1.7367
+# [9779c7f1] Diné, brand box ('Marquage de monture') ticked: same values as the gear box (both +0.10)
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Compétence non apprise,3.4516
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Ruade,16.4321
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Cabrade,14.4108
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Dérapage,4.069
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Sprint,base
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Accélérer,5.8072
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Saut haut,3.8212
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Arrêt d'urgence,5.1249
+dine_a7_brand,Mythical Diné Fylaee (Type 6),Artisan 7,2,brand,Sprint,Accél. Fulgurante,1.575
+# [45b0a62f] a crop of the bdolytics T10 table (Mythical Doom, Diné, Arduanatt; Hind Kick to Quick Ride): see bdolytics_t9_t10_2026-11-17.csv
+# [ca7c6f43, 5803bc9e, a3dcb9ae] T9 Doom, Artisan 7: the whole list over three scroll positions (S : Ruade 3.7592 appears in two of them)
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Compétence non apprise,2.8289
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Ruade,20.3054
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Cabrade,16.955
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Dérapage,2.677
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Sprint,base
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Accélérer,4.9057
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Saut haut,3.2279
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Arrêt d'urgence,5.5663
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Accél. Fulgurante,1.1162
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Charge,2.9322
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Pas latéraux,0.6481
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Recul rapide,5.1326
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Sauts continus,3.494
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Hurlement de cheval,4.1382
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Prudence,2.1251
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Brève chevauchée,2.9085
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,S : Ruade,3.7592
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,S : Cabrade,3.449
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,S : Accél. Fulgurante,0.3145
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,S : Pas latéraux,0.1925
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Deux places,3.7851
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Esprit de destrier,base
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Double saut,base
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,S : Charge,6.8132
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Trot infernal,base
+doom_a7,T9 Doom (Type 3; female),Artisan 7,1,none,Sprint + Esprit de destrier + Double saut + Trot infernal,Galop funeste,2.7253
+# [2295da44] T8 'Choky', Professional 10
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Compétence non apprise,27.3544
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Ruade,10.5304
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Cabrade,10.5304
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Dérapage,3.4801
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Sprint,base
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Accélérer,3.5477
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Saut haut,4.3248
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Arrêt d'urgence,4.3472
+choky_pro10,T8 Choky (Type 1; male),Professionnel 10,1,none,Sprint,Accél. Fulgurante,1.6668
+# [5beeb6a1] T8 'Choky', Artisan 7, gear box ticked
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Compétence non apprise,18.0877
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Ruade,11.8737
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Cabrade,11.8737
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Dérapage,3.924
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Sprint,base
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Accélérer,4.0002
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Saut haut,4.8764
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Arrêt d'urgence,4.9019
+choky_a7_gear,T8 Choky (Type 1; male),Artisan 7,1,gear,Sprint,Accél. Fulgurante,1.8794
+# [f34f26f7] (2026-11-18) coupon window: Diné, swapping out Hurlement de cheval (18% shown on its icon), desired S : Pas latéraux, Skill Change Points +2; visible part of the list (the 2-point check of the point bonus: x1.5 on the desired skill); held skills not shown
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Prudence,3.1713
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Brève chevauchée,4.3402
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,S : Ruade,4.1817
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,S : Cabrade,3.9245
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,S : Accél. Fulgurante,0.5749
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,S : Pas latéraux (desired),0.4502
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,S : Charge,11.8027
+dine_coupon_2pt,Mythical Diné Fylaee (Type 6),-,-,-,Sprint + held skills not shown,Terre de Protection,4.7211

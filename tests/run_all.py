@@ -141,6 +141,34 @@ print(worst < 0.002, n, round(worst, 4))
 """)
 check("T8 types (aliases too) reproduce every value of the simulator readings (within 0.002 points)",
       code == 0 and out.startswith("True"), out)
+# the older readings (2026-11-17/18: Diné, T9 Doom, Choky at several Training levels and boosts, a learned skill)
+code, out = run("-c", """
+import csv, re, sys
+sys.path.insert(0, '.')
+from bdo import horses as H
+d = H.load_data(); res = H.skill_resolver(d)
+HORSE = {"Mythical Diné": "Mythical Diné", "T9 Doom": "Doom (T9)", "T8 Choky": "T8 Type 1"}
+TR = {"Maître 20": "Master 20", "Gourou 57": "Guru 57", "Professionnel 10": "Professional 10"}
+rows = [r for r in csv.reader(l for l in open('tests/data/sim_older_2026-11-17.csv') if not l.startswith('#'))][1:]
+worst, n, bad = 0, 0, []
+for reading, horse, tr, lvl, boosts, innate, skill, pct in rows:
+    if pct in ("base", "learned") or "coupon" in reading or "not shown" in tr:
+        continue
+    h = H.get_horse(d, next(v for k, v in HORSE.items() if horse.startswith(k)))
+    tr = TR.get(tr, tr).replace(" (inferred)", "")
+    M = 1 + H.training_bonus(tr) / 100 + (0.10 if boosts.startswith(("gear", "brand")) else 0)
+    w = dict(h.weights)
+    if "High Jump learned" in innate:
+        w.pop("High Jump")
+    U = sum(w.values()); k = min(M / (U + h.W), 1 / U)
+    m = re.match(r'cut [(](.*)[)]', skill); name = m.group(1) if m else skill
+    pred = 100 * (1 - k * U) if name == 'Compétence non apprise' else 100 * k * w[res(name)]
+    e = abs(pred - float(pct)); worst = max(worst, e); n += 1
+    if e > 0.002: bad.append((reading, skill, pct, round(pred, 4)))
+print(worst < 0.002, n, round(worst, 4), bad[:8])
+""")
+check("older simulator readings (tests/data/sim_older_2026-11-17.csv) reproduced within 0.002 points",
+      code == 0 and out.startswith("True"), out)
 code, out = run("horse_skills.py", "T8 Type 5", "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")
 code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")
 code3, out3 = run("horse_skills.py", "T8 Type 5", "--training", "Artisan 7", "--coupons", "10", "--strategy",
