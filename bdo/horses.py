@@ -350,6 +350,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     cleanup does (a choice made at level 30); None: no Selection Coupon. 'natural' uses no coupon of any kind.
 
     Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
+    used[B] (average Change Coupons used: while leveling, then the cleanup until done or stuck),
     tails[B] (chances of missing at most 0..TAILS - 1 wanted skills), for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
     needed per run for the full set, inf when the horse has too few skills); skill_counts (sorted, per run).
     """
@@ -363,7 +364,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     if strategy == "at30":
         spend_cap = 0
     nb = max_budget + 1
-    full_n, wanted_sum = [0] * nb, [0] * nb
+    full_n, wanted_sum, used_sum = [0] * nb, [0] * nb, [0] * nb
     tail_n = [[0] * TAILS for _ in range(nb)]
     needed, counts = [], []
     for _ in range(runs):
@@ -446,6 +447,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             if strategy == "natural":
                 j = 0
             wanted_sum[B] += traj[min(j, last)]
+            used_sum[B] += base + min(j, last)
             full_n[B] += traj[min(j, last)] == len(wanted)
             miss = len(wanted) - traj[min(j, last)]
             for t in range(miss, TAILS):
@@ -455,6 +457,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     return {"full": [full_n[B] / runs if B >= spend_cap else None for B in range(nb)],
             "wanted": [wanted_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "tails": [[x / runs for x in tail_n[B]] if B >= spend_cap else None for B in range(nb)],
+            "used": [used_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
 
 

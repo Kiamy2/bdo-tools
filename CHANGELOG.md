@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-21
+- `Evaluator.plans(used=True)` and `simulate_plan()` return `used[B]`: the expected number of Change Coupons used with B coupons available (while leveling, then the level-30 cleanup until the set is complete or it can't go on). Exact in the fast engine (one more value in the cleanup sweep, `cleanup_values(used=True)`).
 - Skill Change Points now go back to 0 when a Change Coupon gives the desired skill (seen in-game twice; before, the model let them grow by 1 per coupon). Both engines, while leveling and in the level-30 cleanup; `simulate_plan`'s `points_reset` option is gone (always on). Chances drop in hard cases, e.g. the T8 example at Skilled 1, best plan with 20 coupons: 61% instead of 71%.
 - `bdo/horses_fast.py`: the exact level-30 cleanup is swept by wanted skills held, then points (the reset breaks the old order by points); `cleanup_values` lost its `bound` argument. `--optimize` on the T8 example: about 20 s / 0.5 GB at 20 coupons, 45 s / 1.2 GB at 40 (`--low-memory`: 0.8 GB).
 

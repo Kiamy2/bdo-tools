@@ -216,6 +216,28 @@ print(abs(f - exact) < 1e-5, round(f, 6), round(exact, 6))
 """)
     check("horses_fast: points reset on a desired hit (exact cleanup matches the hand-computed 2-coupon case)",
           code == 0 and out.startswith("True"), out)
+    code, out = run("-c", RESET_CASE + """
+from bdo import horses_fast as F
+r = F.Evaluator(h, M, max_budget=8, start_level=30, learned=learned, points=20).plans([("at30", 1, 0, 0)], runs=10,
+                                                                                    used=True)[("at30", 1, 0, 0)]
+u, f = r["used"], r["full"]
+print(u[0] == 0 and all(abs(u[B] - u[B - 1] - (1 - f[B - 1])) < 1e-5 for B in range(1, 9)), u[2], u[8])
+""")
+    check("horses_fast used[B]: expected coupons used (the cleanup goes on while the set isn't full: "
+          "used[B] - used[B - 1] = 1 - full[B - 1])", code == 0 and out.startswith("True 2.0"), out)
+    code, out = run("-c", """
+import math, sys
+sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "Doom (T9)"); M = h.M(0, 0, 0)
+for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
+    a = F.Evaluator(h, M, max_budget=25).plans([p], runs=20000, seed=3, used=True, coupon=cp)[p]["used"]
+    b = H.simulate_plan(h, M, *p[:3], 25, runs=4000, seed=4, coupon=cp)["used"]
+    print(all(abs(a[B] - b[B]) < 4 * B / 2 / math.sqrt(4000) for B in (10, 25)), [round(a[B], 2) for B in (10, 25)],
+          [round(b[B], 2) for B in (10, 25)])
+""")
+    check("horses_fast used[B] agrees with bdo.horses simulate_plan (within noise)",
+          code == 0 and out.count("True") == 2, out)
     code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 61%)",

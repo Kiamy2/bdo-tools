@@ -322,14 +322,16 @@ if nb is not None:
                pb, sel):
         """Values V[off[r] + c, t] (c = 0..cm[r]) of the states K of one block (wanted skills g, points p), from
         those of the blocks (g, p + 1) (A), (g + 1, p + 1) (B) and (g + 1, 0) (Z): see cleanup_values.
-        q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t]."""
+        q: store as 16-bit fixed point (value x enc[t], rounded); read back with dec[t]. With len(enc) = J + 2, the
+        last value is the expected number of cleanup coupons used."""
         nW = _pop(wmask)
+        nv = len(enc)
         for b in nb.prange((len(K) + 1023) // 1024):
             nxt = np.empty(n, np.int64)
             prb = np.empty(n, np.float64)
             rows = np.empty(n, np.int64)
             blk = np.empty(n, np.int64)
-            acc = np.empty(J + 1, np.float64)
+            acc = np.empty(nv, np.float64)
             for r in range(b * 1024, min(len(K), (b + 1) * 1024)):
                 k = K[r]
                 hw = _pop((k >> PBITS) & wmask)
@@ -354,12 +356,14 @@ if nb is not None:
                         for t in range(J):
                             acc[t] = 1.0 if miss <= t else 0.0
                         acc[J] = hw
+                        if nv > J + 1:
+                            acc[J + 1] = 0.0
                     else:
-                        for t in range(J + 1):
+                        for t in range(nv):
                             acc[t] = 0.0
                         for i in range(m):
                             x = rows[i] + c - 1
-                            for t in range(J + 1):
+                            for t in range(nv):
                                 if blk[i] == 0:
                                     v = VA[x, t]
                                 elif blk[i] == 1:
@@ -367,7 +371,9 @@ if nb is not None:
                                 else:
                                     v = VZ[x, t]
                                 acc[t] += prb[i] * (v * dec[t])
-                    for t in range(J + 1):
+                    if nv > J + 1 and c > 0 and m > 0:
+                        acc[J + 1] += 1.0
+                    for t in range(nv):
                         x = acc[t] * enc[t]
                         if q:
                             x = np.floor(x + 0.5)
@@ -383,18 +389,21 @@ if nb is not None:
                     acc[plan[i], B, t] += V[r + B - base[i], t] * dec[t]
 
     def cleanup_values(hkeys, base, plan, cap, nplans, C, J, low_memory, w, n, wmask, order, rare, pb, sel=0,
-                       stats=None):
+                       stats=None, used=False):
         """Sums over the horses of each plan of the exact cleanup values, per budget: acc[plan, B, t] (see above).
+        used: one more value, acc[..., J + 1]: the expected number of Change Coupons the cleanup uses.
         hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling.
         The states are split in blocks (wanted skills g, points p); block (g, p) needs (g, p + 1), (g + 1, p + 1)
         and (g + 1, 0), so a block of group g + 1 is dropped as soon as group g no longer needs it.
         stats: a dict, filled with the number of states and the most values held at once."""
         if int((hkeys & PMASK).max()) + C > PMASK:
             raise ValueError(f"Skill Change Points above {PMASK}")
-        nv = J + 1
+        nv = J + 1 + bool(used)
         if low_memory:
             enc = np.full(nv, 65535.0)
             enc[J] = 65535.0 / max(1, _pop(wmask))
+            if used:
+                enc[J + 1] = 65535.0 / max(1, C)
             dec, dt = 1.0 / enc, np.uint16
         else:
             enc = dec = np.ones(nv)
@@ -473,7 +482,8 @@ if nb is not None:
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
             self.low_memory = low_memory
 
-        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None):
+        def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None,
+                  used=False):
             """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
             seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
             B = 0..max_budget (None below spend_cap), skills (average skills at 30); with tails=True also
@@ -482,7 +492,9 @@ if nb is not None:
             an unwanted skill to change, i.e. at least as many learned skills as wanted ones). 'planned': every
             Change Coupon (leveling and level 30) keeps the rarest missing skill for it (desired skill = the second
             rarest missing); 'fallback': only the level-30 cleanup does (decided at 30); None: no Selection Coupon.
-            The 'natural' strategy uses no coupon of any kind."""
+            The 'natural' strategy uses no coupon of any kind.
+            used=True: also used[B] = the expected number of Change Coupons used with B coupons available (while
+            leveling, then at level 30; the cleanup stops once it's done or can't go on)."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             C, out, batch, nW = self.C, {}, [], self.n_wanted
@@ -503,6 +515,8 @@ if nb is not None:
                     res["full"], res["wanted"] = [float((miss == 0).mean())] * (C + 1), [float((nW - miss).mean())] * (C + 1)
                     if tails:
                         res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
+                    if used:
+                        res["used"] = [0.0] * (C + 1)
                 else:
                     hk.append((S << PBITS) | pts)
                     hb.append(base)
@@ -518,7 +532,8 @@ if nb is not None:
             T = TAILS if tails else 1
             if not sel:
                 acc = cleanup_values(hk, hb, hp, hc, nb_, C, T, self.low_memory, w, n, wmask, order,
-                                     rare, self.pb)
+                                     rare, self.pb, used=used)
+                use = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0]
                 wanted = lambda j, B: acc[j, B, T]
                 tail = lambda j, B, t: acc[j, B, t]
@@ -528,12 +543,16 @@ if nb is not None:
                 spare = _popcounts(hk >> PBITS) >= nW
                 J = T + 1
                 acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, J,
-                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1)
+                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1, used=used)
+                use = lambda j, B: acc[j, B, J + 1] + acc[j + nb_, B, J + 1]
                 n_sp = np.bincount(hp[spare], minlength=nb_)
                 full = lambda j, B: acc[j, B, 1] + acc[j + nb_, B, 0]
                 wanted = lambda j, B: acc[j, B, J] + n_sp[j] - acc[j, B, 0] + acc[j + nb_, B, J]
                 tail = lambda j, B, t: acc[j, B, t + 1] + acc[j + nb_, B, t]
+            bsum = np.bincount(hp, weights=hb, minlength=nb_)               # coupons spent while leveling
             for j, (p, cap) in enumerate(batch):
+                if used:
+                    out[p]["used"] = [float((bsum[j] + use(j, B)) / runs) if B >= cap else None for B in range(C + 1)]
                 out[p]["full"] = [float(full(j, B) / runs) if B >= cap else None for B in range(C + 1)]
                 out[p]["wanted"] = [float(wanted(j, B) / runs) if B >= cap else None for B in range(C + 1)]
                 if tails:
