@@ -85,6 +85,9 @@ def main():
                     help="--optimize: suggest the best plan found for every budget, even when the general rule's "
                     "plan is within 1 point of it (by default the rule's plan is suggested then: the best of many "
                     "near-tied plans is partly luck, and the rule changes smoothly with the budget)")
+    ap.add_argument("--coupons-used", nargs="?", const="all", metavar="N,N,..",
+                    help="with --optimize: for the suggested plans of these budgets (default all), the chance of the "
+                         "full set with at most B coupons in total for each B, and the spread of coupons used")
     ap.add_argument("--lang", default="en", choices=["en", "fr"], help="skill names in output")
     a = ap.parse_args()
 
@@ -109,6 +112,11 @@ def main():
             ap.error("--training is required, e.g. --training 'Artisan 7'")
         bonus = H.training_bonus(a.training)
         learned = names_list(a.learned, resolve)
+        for x in [x for x in learned if x not in horse.weights]:
+            why = ("innate for this horse: innate skills are not learned skills (in-game count = learned + innate)"
+                   if x in horse.born_with else "not learnable by this horse")
+            print(f"# note: ignoring {x!r} in --learned: {why}", file=sys.stderr)
+        learned = [x for x in dict.fromkeys(learned) if x in horse.weights]
         wset = (a.wanted or H.default_wanted_set(horse)).strip().lower()
         wanted = list(H.WANTED_SETS[wset]) if wset in H.WANTED_SETS else names_list(a.wanted, resolve)
         fodder = names_list(a.fodder, resolve) if a.fodder else None
@@ -122,6 +130,17 @@ def main():
             raise H.DataError(f"--target takes percentages like 50,80,90, not {a.target!r}")
         if any(not 0 < x <= 100 for x in targets):
             raise H.DataError("--target percentages must be above 0 and at most 100")
+        if a.coupons_used is not None:
+            if a.optimize is None:
+                raise H.DataError("--coupons-used works with --optimize")
+            try:
+                used_budgets = (list(range(1, a.optimize + 1)) if a.coupons_used == "all"
+                                else sorted({int(x) for x in a.coupons_used.split(",")}))
+            except ValueError:
+                raise H.DataError(f"--coupons-used takes coupon budgets like 2,3,4, not {a.coupons_used!r}")
+            if any(not 1 <= x <= a.optimize for x in used_budgets):
+                raise H.DataError(f"--coupons-used budgets must be from 1 to the --optimize maximum ({a.optimize})")
+            a.used_budgets = used_budgets
     except H.DataError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 2
@@ -129,12 +148,21 @@ def main():
     fr = data["skills_fr"]
     show = (lambda s: fr.get(s) or s) if a.lang == "fr" else (lambda s: s)
     M = horse.M(bonus, a.gear, a.brand)
-    head = f"# {horse.name} (T{horse.tier})" if horse.tier and f"T{horse.tier}" not in horse.name else f"# {horse.name}"
+    typed = H.typed_name(data, a.horse) if a.horse and not a.horse_file else horse.name
+    name = horse.name if typed == horse.name else f"{typed} (an alias of {horse.name}: the same data)"
+    head = f"# {name} (T{horse.tier})" if horse.tier and f"T{horse.tier}" not in name else f"# {name}"
     head += f" | Training bonus {bonus:g}%" + (" + gear" if a.gear else "") + (" + brand" if a.brand else "")
     head += f" | data {horse.date or 'undated'}: {horse.source}"
     head += f"\n# wanted: {wset + ' set' if wset in H.WANTED_SETS else 'your list'}"
     if not a.wanted:
         head += f" (the default for a T{horse.tier or '?'}; --wanted courser / travel / your own list)"
+    sure = H.sure_hits(horse, learned, wanted)
+    if sure:
+        head += (f"\n# every skill left to learn is wanted ({', '.join(map(show, sure))}): any swap is a sure hit; what"
+                 "\n# matters is which skill you give up (level-ups may teach it back)")
+    inn = horse.born_with
+    a.learned_text = (f"learned: {len(learned)}" + (f" + {len(inn)} innate ({', '.join(map(show, inn))}) = "
+                      f"{len(learned) + len(inn)} in game" if inn else "") + f": {', '.join(map(show, learned)) or '-'}")
 
     if a.odds or a.check:
         p, none = horse.odds(M, set(learned) | set(horse.born_with))
@@ -168,7 +196,7 @@ def main():
         return 0
 
     if a.optimize is not None:
-        return optimize_report(a, horse, bonus, learned, wanted, fodder, head)
+        return optimize_report(a, horse, bonus, learned, wanted, fodder, head, show)
     if a.selection_coupon or a.always_best:
         print(f"ERROR: {'--selection-coupon' if a.selection_coupon else '--always-best'} works with --optimize",
               file=sys.stderr)
@@ -176,7 +204,7 @@ def main():
     budgets = [int(x) for x in a.sweep.split(",")] if a.sweep else [a.coupons]
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
     print(head)
-    print(f"# level {a.level} -> 30 | learned: {', '.join(map(show, learned)) or '-'} | tickets {a.tickets} | "
+    print(f"# level {a.level} -> 30 | {a.learned_text} | tickets {a.tickets} | "
           f"{a.runs} runs | reserve {a.reserve} | swaps from level {a.swap_from} | switch at {a.switch_at} learned skills | "
           f"wanted: {len(W)} skills, learnable: {len(horse.weights)}")
     print("# cells a/b/c = no boost / gear set or brand stone / both")
@@ -219,7 +247,7 @@ def main():
     return 0
 
 
-def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
+def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda s: s):
     import time
     from bdo import horses_fast as HF
     M = horse.M(bonus, a.gear, a.brand)
@@ -259,8 +287,10 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
                     "spending cap and threshold around the best ones (plain-Python engine)")
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
-    print(f"# level {a.level} -> 30 | learned: {', '.join(learned) or '-'} | tickets {a.tickets} | "
-          f"wanted: {nw} skills | {len(res)} plans in stage 2 | {time.time() - t0:.0f}s")
+    print(f"# level {a.level} -> 30 | tickets {a.tickets} | wanted: {nw} skills | {len(res)} plans in stage 2 | "
+          f"{time.time() - t0:.0f}s")
+    print(f"# {a.learned_text}")
+    n = len(learned)
     print(f"# Searched: {searched}.")
     if planned:
         print("# With a Selection Coupon PLANNED: every chance below includes it, used at the very end on the last")
@@ -278,8 +308,8 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         tf = H.tied_plans(res, B, "full", 0.01)
         tw = H.tied_plans(res, B, "wanted", 0.05)
         best_full.append(res[tf[0]]["full"][B])
-        print(f"{B}\t{100 * res[tf[0]]['full'][B]:.1f}%\t{H.describe_plans(tf, B)}\t"
-              f"{res[tw[0]]['wanted'][B]:.2f}\t{H.describe_plans(tw, B)}\t"
+        print(f"{B}\t{100 * res[tf[0]]['full'][B]:.1f}%\t{H.describe_plans(tf, B, n, a.level)}\t"
+              f"{res[tw[0]]['wanted'][B]:.2f}\t{H.describe_plans(tw, B, n, a.level)}\t"
               f"{100 * at30['full'][B]:.1f}%, {at30['wanted'][B]:.2f}")
     for t in (0.5, 0.8, 0.9, 0.95):
         b = next((B for B, x in enumerate(best_full) if x >= t), None)
@@ -295,7 +325,8 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     print("# V0 = coursier swaps (once per level: Fore Chop, then Hind Kick, if held), V2 = coursier_v2 swaps (once")
     print("# per level: Hind Kick only); learned skills don't count innate ones; keep = coupons kept for level 30.")
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
-    print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more).")
+    print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more); used: coupons used on average (a horse that doesn't get the")
+    print("# full set counts every coupon it used); per full set: used / full set (more failures make it higher).")
     sug = {B: H.suggested_plan(res, B, 0.01, a.level, a.always_best, wanted) for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
     if a.selection_coupon == "fallback":
@@ -309,7 +340,8 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         print("# plan); the other columns use them on every level-up that teaches nothing, from now on.")
         extra_head += "\tkeeping tickets"
         extras.append(evaluate([v[0] for v in sug.values()], coupon=planned, tickets=0))
-    print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%" + extra_head + "\tsource")
+    print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%\tused\tper full set" + extra_head
+          + "\tsource")
     for B in range(1, a.optimize + 1):
         plan, src, rc = sug[B]
         best = res[H.tied_plans(res, B, "full", 0)[0]]["full"][B]
@@ -318,19 +350,22 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         tl = res[plan]["tails"][B]
         w5 = H.worst5(tl)
         ex = "".join(f"\t{100 * e[plan]['full'][B]:.1f}%" for e in extras)
-        print(f"{B}\t{H.plan_name(plan, B)}\t{100 * res[plan]['full'][B]:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
-              f"{w5 if w5 is not None else f'{H.TAILS}+'}{ex}\t{note}")
+        u, f = res[plan]["used"][B], res[plan]["full"][B]
+        print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{100 * f:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
+              f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{u:.2f}\t{f'{u / f:.2f}' if f else '-'}{ex}\t{note}")
     # average learned skills per level, one column per suggested plan (the budgets it's suggested for)
     groups = {}
     for B in range(1, a.optimize + 1):
         groups.setdefault(sug[B][0], []).append(B)
+    span = lambda bs: ",".join(f"{x[0]}" if x[0] == x[-1] else f"{x[0]}-{x[-1]}" for x in _runs(bs))
+    if a.coupons_used is not None:
+        coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n)
     k = {k2: v for k2, v in kw.items() if k2 != "start_level"}
     if engine == "numba":
         ev = HF.Evaluator(horse, M, max_budget=a.optimize, **kw)
         curves = {p: ev.learned_by_level(p, 4000, a.seed + 1000, planned) for p in groups}
     else:
         curves = {p: H.learned_by_level(horse, M, p, 1000, a.seed + 1000, a.level, coupon=planned, **k) for p in groups}
-    span = lambda bs: ",".join(f"{x[0]}" if x[0] == x[-1] else f"{x[0]}-{x[-1]}" for x in _runs(bs))
     cols = []                                     # merge plans whose averages stay within 0.2 skills at every level
     for p, bs in groups.items():
         c = next((c for c in cols if max(abs(curves[p][L] - curves[c[0]][L]) for L in curves[p]) < 0.2), None)
@@ -347,6 +382,48 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     for L in range(a.level, 31):
         print(f"{L}\t" + "\t".join(f"{curves[p][L]:.1f}" for p, _ in cols))
     return 0
+
+
+def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n):
+    """--coupons-used: for the suggested plans of the chosen budgets, the chance of the full set with at most B
+    coupons in total (each plan followed as planned while leveling, then the level-30 cleanup until the full set),
+    and the spread of coupons used. Same horses as the suggested-plan table (its full-set column at the plan's own
+    budget)."""
+    from bdo import horses_fast as HF
+    C = max(20, a.optimize + 10)
+    groups = {}
+    for B in a.used_budgets:
+        groups.setdefault(sug[B][0], []).append(B)
+    plans = list(groups)
+    if engine == "numba":
+        ev = HF.Evaluator(horse, M, max_budget=C, low_memory=a.low_memory, **kw)
+        r = ev.plans(sorted(set(plans)), 4000, a.seed + 1000, coupon=planned, used=True, at_most=True)
+    else:
+        r = {p: H.simulate_plan(horse, M, p[0], p[1], p[2], C, runs=4000, seed=a.seed + 1000, switch_at=p[3],
+                                coupon=planned, **kw) for p in plans}
+    lab = {p: f"{span(bs)} coupon{'s' if bs != [1] else ''}" for p, bs in groups.items()}
+    print()
+    print("# Coupons used by the suggested plans (--coupons-used): each plan followed as planned while leveling (as for")
+    print("# its own budget), then the level-30 cleanup goes on until the full set, up to "
+          f"{C} coupons in total. Same horses as above.")
+    for p in plans:
+        print(f"# plan for {lab[p]}: {H.plan_name(p, None, n, a.level)}")
+    print("# at most B coupons: chance of the full set with at most B coupons in total. At a plan's own budget, it's")
+    print("# the 'full set' column above; below it, only the horses whose leveling spent fewer coupons can count.")
+    print("# Rows stop once every plan is at 99% (see the 99% column below).")
+    am = {p: r[p]["at_most"] for p in plans}
+    last = next((B for B in range(C + 1) if all(am[p][B] >= 0.99 for p in plans)), C)
+    last = min(C, max(last, max(a.used_budgets) + 2))
+    print("at most B coupons\t" + "\t".join(f"plan for {lab[p]}" for p in plans))
+    for B in range(last + 1):
+        print(f"{B}\t" + "\t".join(f"{100 * am[p][B]:.1f}%" for p in plans))
+    q = lambda p, x: next((str(B) for B, v in enumerate(am[p]) if v >= x - 1e-9), f">{C}")
+    print(f"# average: coupons used on average, with up to {C} (a horse still missing a skill counts every coupon it")
+    print(f"# used); median / 90% / 99%: coupons that give the full set to half / 90% / 99% of horses (>{C}: more).")
+    print(f"# full set with {C}: chance of the full set with up to {C} coupons in total.")
+    print(f"plan\taverage\tmedian\t90%\t99%\tfull set with {C}")
+    for p in plans:
+        print(f"plan for {lab[p]}\t{r[p]['used'][C]:.2f}\t{q(p, 0.5)}\t{q(p, 0.9)}\t{q(p, 0.99)}\t{100 * am[p][C]:.1f}%")
 
 
 def _runs(values):

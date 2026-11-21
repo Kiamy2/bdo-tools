@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-22
+- `--optimize --coupons-used [N,N,..]`: for the suggested plans of these budgets (default all), the chance of the full set with at most B coupons in total for every B (the plan followed as planned while leveling, then the level-30 cleanup until the full set), and the coupons used on average, median, 90% and 99%. `Evaluator.plans(at_most=True)` and `simulate_plan()` return `at_most[B]` (exact cleanup in the fast engine).
+- The `--optimize` suggested plans show `used` (expected coupons used with that budget) and `per full set` (used / full-set chance); the fast `optimize()` returns `used`.
+- Plans are printed in their effective form for the horse (`effective_plan()`; `plan_name()` and `describe_plans()` take `learned_count` and `start_level`): a `coursier_switch` threshold already reached is V2, a start level already passed is the next level.
+- The header shows the horse as typed when it's an alias ("T8 Type 6 (an alias of T8 Type 4: the same data)", `typed_name()`), the learned skills in the `--lang` language with the in-game count ("15 + 1 innate (Sprint) = 16 in game"), and says when every skill left to learn is wanted (`sure_hits()`). Innate or unlearnable skills in `--learned` are ignored with a note.
+
 ## 2026-11-21
 - The general rule now depends on the target set (C43, checked over 148 courser and 60 travel situations): 1 coupon: all at level 30; 2-24: V2 from level max(10, 31 - 1.75 x N), keep 1 (courser set with 2-6 coupons: from level 30 - 2 x N); 25+: from level 10, V0 until 12 learned skills, then V2, spending at most 24 while leveling. `rule_plan(budget, start_level, wanted)`, `rule_target()`; `suggested_plan(..., wanted)`.
 - Named target sets: `--wanted courser` (what a T8 needs for courser training: Charge, Drift, Sprint, Instant Accel, Sideways, S: Instant Accel, S: Sideways) and `--wanted travel`; the tool's default is `courser` for a T8 and `travel` otherwise, and the output says which set it used. Library functions keep `TRAVEL_SET` as their default (`COURSER_SET`, `WANTED_SETS`, `default_wanted_set()` added).

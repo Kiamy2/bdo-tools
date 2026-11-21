@@ -483,7 +483,7 @@ if nb is not None:
             self.low_memory = low_memory
 
         def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None,
-                  used=False):
+                  used=False, at_most=False):
             """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
             seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
             B = 0..max_budget (None below spend_cap), skills (average skills at 30); with tails=True also
@@ -494,7 +494,11 @@ if nb is not None:
             rarest missing); 'fallback': only the level-30 cleanup does (decided at 30); None: no Selection Coupon.
             The 'natural' strategy uses no coupon of any kind.
             used=True: also used[B] = the expected number of Change Coupons used with B coupons available (while
-            leveling, then at level 30; the cleanup stops once it's done or can't go on)."""
+            leveling, then at level 30; the cleanup stops once it's done or can't go on).
+            at_most=True: also at_most[B] for every B = 0..max_budget, below spend_cap too: the chance of the full
+            set with at most B coupons in total when the plan is followed as planned (its leveling as for its own
+            budget, then the cleanup until the full set). It's full[B] from spend_cap on; below, only the horses
+            whose leveling spent at most B coupons can count."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             C, out, batch, nW = self.C, {}, [], self.n_wanted
@@ -517,11 +521,13 @@ if nb is not None:
                         res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
                     if used:
                         res["used"] = [0.0] * (C + 1)
+                    if at_most:
+                        res["at_most"] = list(res["full"])
                 else:
                     hk.append((S << PBITS) | pts)
                     hb.append(base)
                     hp.append(np.full(runs, len(batch), np.int64))
-                    hc.append(np.full(runs, spend_cap, np.int64))
+                    hc.append(np.full(runs, 0 if at_most else spend_cap, np.int64))   # cleanup values from this budget
                     batch.append((p, spend_cap))
                 if progress:
                     progress(label, i + 1, len(plans))
@@ -554,6 +560,8 @@ if nb is not None:
                 if used:
                     out[p]["used"] = [float((bsum[j] + use(j, B)) / runs) if B >= cap else None for B in range(C + 1)]
                 out[p]["full"] = [float(full(j, B) / runs) if B >= cap else None for B in range(C + 1)]
+                if at_most:                          # below cap, the sums only hold horses that spent <= B leveling
+                    out[p]["at_most"] = [float(full(j, B) / runs) for B in range(C + 1)]
                 out[p]["wanted"] = [float(wanted(j, B) / runs) if B >= cap else None for B in range(C + 1)]
                 if tails:
                     out[p]["tails"] = [[float(tail(j, B, t) / runs) for t in range(T)] if B >= cap else None
@@ -587,7 +595,8 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
     (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
     and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses, and the
-    general rule's plan for every budget (H.rule_plan), with the chances of missing at most 0..4 wanted skills.
+    general rule's plan for every budget (H.rule_plan), with the chances of missing at most 0..4 wanted skills
+    and the expected coupons used.
     coupon: see Evaluator.plans (the search then aims at the full set with the Selection Coupon).
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
@@ -621,4 +630,4 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
     final = promising() | {H.rule_plan(B, start_level, kw.get("wanted")) for B in range(max_budget + 1)}
-    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon)
+    return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon, used=True)

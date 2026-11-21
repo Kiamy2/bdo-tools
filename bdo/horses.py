@@ -14,6 +14,7 @@ Model (fitted to the in-game "Growth simulator" on 2026-11-17, see docs/horse-sk
   the desired skill's weight is multiplied by (1 + point_bonus * Skill Change Points). Each coupon adds 1 point,
   except one that gives the desired skill: the points go back to 0 (seen in-game, 2026-11-19).
 """
+import bisect
 import json
 import math
 import os
@@ -142,6 +143,22 @@ def get_horse(data, name):
             return Horse(key, h["weights"], h["no_skill_weight"], h["born_with"], h.get("tier"), h.get("source", ""),
                          h.get("date", ""), h.get("no_skill_weight_note", ""))
     raise DataError(f"unknown horse {name!r}; known: {', '.join(data['horses'])}")
+
+
+def typed_name(data, name):
+    """The data's spelling of the name or alias the user typed (e.g. 'T8 Type 6', an alias of 'T8 Type 4')."""
+    want = compact(name)
+    for key, h in data["horses"].items():
+        for x in [key] + h.get("aliases", []):
+            if compact(x) == want:
+                return x
+    return name
+
+
+def sure_hits(horse, learned, wanted):
+    """The skills left to learn when every one of them is wanted (any swap then gives a wanted skill), else []."""
+    left = [s for s in horse.weights if s not in set(learned)]
+    return left if left and set(left) <= set(wanted) else []
 
 
 def skill_resolver(data):
@@ -365,7 +382,9 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     Returns a dict: full[B] (chance of every wanted skill with B coupons), wanted[B] (average wanted skills),
     used[B] (average Change Coupons used: while leveling, then the cleanup until done or stuck),
     tails[B] (chances of missing at most 0..TAILS - 1 wanted skills), for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
-    needed per run for the full set, inf when the horse has too few skills); skill_counts (sorted, per run).
+    needed per run for the full set, inf when the horse has too few skills); at_most[B] for every B (the chance of
+    the full set with at most B coupons in total, the plan followed as planned: see horses_fast.Evaluator.plans);
+    skill_counts (sorted, per run).
     """
     rng = random.Random(seed)
     pool = list(horse.weights)
@@ -471,6 +490,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             "wanted": [wanted_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "tails": [[x / runs for x in tail_n[B]] if B >= spend_cap else None for B in range(nb)],
             "used": [used_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
+            "at_most": [bisect.bisect_right(needed, B) / runs for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
 
 
@@ -528,10 +548,23 @@ def rule_plan(budget, start_level=1, wanted=None):
     return (st, max(lv, start_level + 1), cap, T)
 
 
-def plan_name(plan, budget=None):
-    """A plan in words: 'from lvl 10, V0 until 11 learned skills, then V2, keep 5' (V0 = coursier swaps, V2 =
-    coursier_v2 swaps; keep = coupons kept for the level-30 cleanup, shown when the budget is given)."""
+def effective_plan(plan, learned_count=0, start_level=0):
+    """The plan as it plays out for a horse at start_level that already has learned_count learned skills (innate
+    ones not counted): coursier_switch with a threshold the horse has reached is plain coursier_v2, and a start
+    level already passed is the next level."""
     st, lv, cap, T = plan
+    if st in ("natural", "at30"):
+        return plan
+    if st == "coursier_switch" and learned_count >= T:
+        st, T = "coursier_v2", 0
+    return (st, max(lv, start_level + 1), cap, T)
+
+
+def plan_name(plan, budget=None, learned_count=0, start_level=0):
+    """A plan in words: 'from lvl 10, V0 until 11 learned skills, then V2, keep 5' (V0 = coursier swaps, V2 =
+    coursier_v2 swaps; keep = coupons kept for the level-30 cleanup, shown when the budget is given). In its
+    effective form for a horse at start_level with learned_count learned skills (see effective_plan)."""
+    st, lv, cap, T = effective_plan(plan, learned_count, start_level)
     if st == "natural":
         return "no coupons"
     if st == "at30":
@@ -623,9 +656,10 @@ def tied_plans(res, B, goal, margin):
     return sorted((p for p in ok if res[p][goal][B] >= best - margin), key=lambda p: -res[p][goal][B])
 
 
-def describe_plans(plans, budget):
+def describe_plans(plans, budget, learned_count=0, start_level=0):
     """Short text for a set of tied plans: per strategy, the span of start levels, of coupons kept, and for
-    coursier_switch of the threshold."""
+    coursier_switch of the threshold. Plans in their effective form (see effective_plan)."""
+    plans = list(dict.fromkeys(effective_plan(p, learned_count, start_level) for p in plans))
     parts, seen = [], []
     for p in plans:
         if p[0] not in seen:

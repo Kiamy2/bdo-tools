@@ -69,7 +69,7 @@ coupons  full set: chance  tied plans                              most wanted: 
 
 After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `10  from lvl 14, V2 until lvl 30, keep 1  21.3%  rule (best 21.5%)`, or `20  from lvl 10, V0 until 11 learned skills, then V2, keep 8  61.2%  best (rule: 59.8%)` (T8 example, Skilled 1, travel set). It's the general rule's plan (the same for everyone, see below) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. `--always-best` suggests the best plan found for every budget instead (the best of many near-tied plans is partly luck, which is why the rule is preferred by default).
 
-V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
+V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Plans are printed in their effective form for your horse: a `coursier_switch` threshold your horse has already reached prints as plain V2 (e.g. "V0 until 9 learned skills, then V2" for a horse with 15 is "V2"), and a start level already passed prints as your next level. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. `used` is the average number of coupons used with that budget (a horse that doesn't get the full set counts every coupon it used), and `per full set` is `used` divided by the full-set chance: a plan that saves coupons by failing more often shows a higher value. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
 
 The **general rule** (N = coupons) depends a little on the target set:
 - N = 1: no swaps while leveling; use the coupon at level 30.
@@ -81,6 +81,21 @@ It was checked with fresh horses over 148 courser situations (the default T8 typ
 **Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons and the travel set, 61% becomes about 91%.
 - `planned`: you'll use it for sure. Every Change Coupon, while leveling and at level 30, then aims at the **second** rarest missing skill (the desired skill), keeping the rarest for the Selection Coupon. The plan search and every chance include it. This targeting is only a bit better (up to about 0.6 points) **if you do use the coupon**; if you might keep it, don't use it while leveling.
 - `fallback`: a safety net. The plans stay the ones without it, and the suggested plans get a `with Selection Coupon` column: your chance if, at level 30, you decide to use it (from then on, Change Coupons aim at the second rarest missing skill). Decide at 30, depending on how leveling went.
+
+**Coupons used by a plan** (`--coupons-used`, or `--coupons-used 2,3` for some budgets only): for the suggested plans, the chance of the full set with **at most B coupons in total**, for every B, when you follow the plan as planned while leveling and the level-30 cleanup goes on until the full set (up to 20 coupons in total, or the `--optimize` maximum + 10). It answers "if I follow the 3-coupon plan, what's my chance of being done with only 2?" and "the 2-coupon plan, then a 3rd coupon at level 30?". At a plan's own budget the value is its `full set` chance in the table above (the same horses); below it, only the horses whose leveling spent fewer coupons can count. Then, per plan, the coupons used on average, and the coupons that give the full set to half, 90% and 99% of horses. On the T8 Type 6 of the first live test (level 19, 15 learned skills, Artisan 9, gear):
+```
+at most B coupons  plan for 2 coupons  plan for 3 coupons
+2                  51.8%               32.9%
+3                  63.2%               92.6%
+4                  71.6%               94.6%
+plan                average  median  90%  99%  full set with 20
+plan for 2 coupons  3.66     2       7    13   100.0%
+plan for 3 coupons  2.91     3       3    9    100.0%
+```
+
+The tool also says when **every skill left to learn is wanted**: any swap then gives a wanted skill, and what matters is which skill you give up (level-ups may teach it back). The header shows the learned skills with the count the game shows (`learned: 15 + 1 innate (Sprint) = 16 in game`); innate skills given in `--learned` are ignored, with a note.
+
+**Noise:** the suggested plans and these numbers come from 4,000 horses, and every plan is played on the same horses, so the whole table can be off by a point or so, every plan in the same direction (on the example above, the `at30` plan's chances at 1-4 coupons came out 1.3-1.4 points above a 40,000-horse check). Differences between plans are more precise than the chances themselves.
 
 Last, a table of the **average learned skills when reaching each level** (innate ones not counted), one column per suggested plan (plans within 0.2 skills of each other share a column). Rerunning the tool partway through leveling, compare your horse with it: below average means leveling is going worse than usual.
 

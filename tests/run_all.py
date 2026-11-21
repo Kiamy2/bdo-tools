@@ -321,7 +321,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
           and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
     sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
-                    r"([\d.]+)%\t(\d)\t(rule|best)", out, re.M)
+                    r"([\d.]+)%\t(\d)\t[\d.]+\t[\d.]+\t(rule|best)", out, re.M)
     check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best; "
           "full set <= missing 1 <= missing 2)", sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0
           and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
@@ -337,7 +337,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
                     "--tickets", "2")
     rows = [sugrow(out, B) for B in (8, 10, 12)]
     check("--selection-coupon fallback and --tickets: extra columns (with the coupon >= without; keeping the tickets "
-          "<= using them, within noise)", code == 0 and all(rows) and all(pct(x[6]) >= pct(x[2]) and pct(x[7]) <= pct(x[2]) + 1
+          "<= using them, within noise)", code == 0 and all(rows) and all(pct(x[8]) >= pct(x[2]) and pct(x[9]) <= pct(x[2]) + 1
                                                             for x in rows), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
@@ -348,8 +348,56 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
     check("horse_skills --optimize --engine numba (coursier_v2 best at 10 coupons, about 62%)",
           code == 0 and "fast engine" in out and 55 <= float(m.get("10", 0)) <= 70
           and re.search(r"^10\t[\d.]+%\tcoursier_v2", out, re.M), out)
+    # --coupons-used and the effective plan, on the state of the 2026-11-21 live chat (T8 Type 6, 15 learned skills,
+    # every skill left to learn wanted)
+    T6L = ("Hind Kick,Fore Chop,Drift,Start Accel,High Jump,Quick Stop,Charge,Quick Back,Streak Leap,Roar,Caution,"
+           "Quick Ride,S: Hind Kick,S: Fore Chop,S: Sideways")
+    code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
+                    T6L + ",Sprint", "--optimize", "5", "--coupons-used", "2,3", "--lang", "fr")
+    sug = {l.split("\t")[0]: l.split("\t") for l in out.split("# Coupons used")[0].splitlines()
+           if re.match(r"^[1-5]\t(from|no swaps)", l)}
+    am = {int(l.split("\t")[0]): [pct(x) for x in l.split("\t")[1:]] for l in out.split("at most B coupons\t")[-1].splitlines()
+          if re.match(r"^\d+\t[\d.]+%", l)}
+    check("horse_skills --coupons-used: at a plan's own budget, 'at most B coupons' is its full-set chance; rising",
+          code == 0 and len(sug) == 5 and am and am[2][0] == pct(sug["2"][2]) and am[3][1] == pct(sug["3"][2])
+          and all(am[B][j] <= am[B + 1][j] for B in range(len(am) - 1) for j in (0, 1)), out)
+    check("horse_skills --coupons-used: spread table (average, median, 90% / 99%), used and per full set columns",
+          re.search(r"^plan for 2 coupons\t[\d.]+\t\d+\t\d+\t\d+\t[\d.]+%$", out, re.M)
+          and all(abs(float(sug[B][6]) / float(sug[B][7]) - pct(sug[B][2]) / 100) < 0.01 for B in sug), out)
+    check("horse_skills: effective plan (a switch threshold already reached prints as V2), alias as typed, in-game "
+          "count, French names in learned:, sure-hit note, innate skill in --learned ignored with a note",
+          "V0 until 9 learned" not in out and "T8 Type 6 (an alias of T8 Type 4" in out
+          and "learned: 15 + 1 innate (Sprint) = 16 in game: Ruade, Cabrade" in out
+          and "every skill left to learn is wanted (" in out and "ignoring 'Sprint' in --learned: innate" in out, out)
+    code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 Type 6"); M = h.M(23.1, True)
+kw = dict(start_level=19, learned=sys.argv[1].split(","), wanted=H.COURSER_SET)
+ps = [("at30", 1, 0, 0), ("coursier_v2", 20, 2, 0)]
+r = F.Evaluator(h, M, max_budget=10, **kw).plans(ps, 20000, 5, at_most=True)
+ok = True
+for p in ps:
+    py = H.simulate_plan(h, M, *p[:3], 10, runs=8000, seed=6, **kw)
+    ok &= all(abs(r[p]["at_most"][B] - py["at_most"][B]) < 0.025 for B in range(11))
+    ok &= all(r[p]["full"][B] is None or r[p]["full"][B] == r[p]["at_most"][B] for B in range(11))
+print(ok, [round(100 * x, 1) for x in r[ps[1]]["at_most"][:5]])
+""", T6L)
+    check("horses_fast at_most[B] agrees with bdo.horses simulate_plan (within noise) and equals full[B] from the cap",
+          code == 0 and out.startswith("True"), out)
 else:
     print("skip horses_fast checks (numba not installed)")
+code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+print(H.effective_plan(("coursier_switch", 20, 2, 9), 15, 19), H.effective_plan(("coursier_switch", 1, 2, 16), 15, 19),
+      H.effective_plan(("at30", 1, 0, 0), 15, 19), H.plan_name(("coursier_switch", 10, 4, 12), 5, 12, 0))
+""")
+check("effective_plan: a reached switch threshold is V2, a passed start level is the next level",
+      code == 0 and out.strip() == "('coursier_v2', 20, 2, 0) ('coursier_switch', 20, 2, 16) ('at30', 1, 0, 0) "
+      "from lvl 10, V2 until lvl 30, keep 1", out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons-used")
+check("horse_skills: --coupons-used without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")
