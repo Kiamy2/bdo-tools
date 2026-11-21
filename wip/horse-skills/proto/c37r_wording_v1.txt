@@ -1,0 +1,48 @@
+# C37r S1: compact wording. Bands: 1 | 2-18 V2 | 19-22 V0 then V2 | 23-40 V0 then V2.
+# V2 band: from level max(8, round(29 - 1.5 x N)), keep 1 up to 8 coupons, else 1.  (stage-1 band score: worst 11.29, avg -0.32)
+# middle band: from level 11, V0 until 10 learned skills, then V2, keep 1.  (worst 1.13, avg -0.33)
+# high band: from level 10, V0 until 12 learned skills, then V2, spend at most 24 while leveling.  (worst 0.9, avg -0.21)
+# next best band edges (overall worst, N1, N2): (11.29, 19, 22), (11.29, 17, 22), (11.29, 22, 26), (11.29, 18, 23), (11.29, 22, 25)
+
+# Rechecked with 4000 fresh horses per case (seed 3003), worst / average loss over the 72 reliable cases (points), Arduanatt worst; wording vs the per-budget fit
+N	wording plan	wording worst	avg	Ard	fit plan	fit worst	avg	Ard	wording worst case
+1	no swaps while leveling, every coupon at level 30	0.8	-0.1	0.1	no swaps while leveling, every coupon at level 30	0.8	-0.1	0.1	Doom | Guru 20 | both
+2	from lvl 26, V2 until lvl 30, keep 1	7.5	0.9	1.1	from lvl 28, V2 until lvl 30, keep 1	2.3	0.1	0.6	Doom | Guru 20 | both
+3	from lvl 24, V2 until lvl 30, keep 1	8.1	1.8	1.8	from lvl 26, V2 until lvl 30, keep 1	3.0	0.2	1.7	Doom | Guru 20 | none
+4	from lvl 23, V2 until lvl 30, keep 1	4.9	0.9	0.7	from lvl 24, V0 until 12 learned skills, then V2, keep 1	1.7	0.1	1.7	Doom | Artisan 7 | none | level 12, 9 skills
+5	from lvl 22, V2 until lvl 30, keep 1	2.1	0.2	1.6	from lvl 23, V2 until lvl 30, keep 1	3.4	0.2	3.4	Doom | Skilled 1 | none
+6	from lvl 20, V2 until lvl 30, keep 1	2.1	0.1	1.1	from lvl 21, V2 until lvl 30, keep 1	1.9	-0.2	2.6	Doom | Artisan 7 | none | level 8, 6 skills
+7	from lvl 18, V2 until lvl 30, keep 1	2.3	0.5	1.0	from lvl 18, V2 until lvl 30, keep 1	2.3	0.5	1.0	Doom | Professional 10 | gear
+8	from lvl 17, V2 until lvl 30, keep 1	1.1	0.1	0.7	from lvl 18, V2 until lvl 30, keep 1	1.7	0.2	1.1	Doom | Beginner 1 | gear
+9	from lvl 16, V2 until lvl 30, keep 1	0.9	-0.1	1.3	from lvl 17, V2 until lvl 30, keep 0	1.8	0.3	1.3	Mythical Diné | Artisan 7 | gear
+10	from lvl 14, V2 until lvl 30, keep 1	1.2	-0.4	1.0	from lvl 14, V2 until lvl 30, keep 1	1.2	-0.4	1.0	T8 example | Artisan 7 | none | level 8, 2 skills
+11	from lvl 12, V2 until lvl 30, keep 1	1.4	-0.2	0.9	from lvl 11, V2 until lvl 30, keep 1	1.2	-0.1	1.1	Doom | Beginner 1 | none
+12	from lvl 11, V2 until lvl 30, keep 1	0.9	-0.2	0.9	from lvl 11, V2 until lvl 30, keep 1	0.9	-0.2	0.9	Doom | Beginner 1 | none
+13	from lvl 10, V2 until lvl 30, keep 1	1.6	-0.4	0.6	from lvl 10, V2 until lvl 30, keep 1	1.6	-0.4	0.6	Doom | Beginner 1 | none
+14	from lvl 8, V2 until lvl 30, keep 1	1.3	-0.4	0.9	from lvl 10, V2 until lvl 30, keep 1	1.6	-0.4	0.4	Doom | Beginner 1 | none
+15	from lvl 8, V2 until lvl 30, keep 1	0.7	-0.4	0.7	from lvl 11, V2 until lvl 30, keep 2	0.6	-0.3	0.2	Doom | Beginner 1 | none
+16	from lvl 8, V2 until lvl 30, keep 1	0.5	-0.4	0.6	from lvl 11, V2 until lvl 30, keep 3	0.6	-0.2	0.2	Doom | Beginner 1 | none
+17	from lvl 8, V2 until lvl 30, keep 1	0.4	-0.3	0.5	from lvl 3, V2 until lvl 30, keep 2	0.8	-0.3	0.5	T8 example | Artisan 7 | both
+18	from lvl 8, V2 until lvl 30, keep 1	0.5	-0.3	0.4	from lvl 4, V2 until lvl 30, keep 3	0.6	-0.2	0.4	T8 example | Artisan 7 | both
+19	from lvl 11, V0 until 10 learned skills, then V2, keep 1	3.3	0.2	1.5	from lvl 3, V2 until lvl 30, keep 4	0.6	-0.2	0.1	Doom | Beginner 1 | none
+20	from lvl 11, V0 until 10 learned skills, then V2, keep 1	2.9	0.2	1.1	from lvl 11, V0 until 10 learned skills, then V2, keep 4	2.9	0.2	1.1	Doom | Beginner 1 | none
+21	from lvl 11, V0 until 10 learned skills, then V2, keep 1	2.5	0.1	0.8	from lvl 10, V0 until 11 learned skills, then V2, keep 1	2.6	0.1	0.9	Doom | Beginner 1 | none
+22	from lvl 11, V0 until 10 learned skills, then V2, keep 1	2.2	0.2	0.7	from lvl 11, V0 until 10 learned skills, then V2, keep 6	2.2	0.2	0.7	Doom | Beginner 1 | none
+23	from lvl 10, V0 until 12 learned skills, then V2, keep 0	2.3	0.1	0.9	from lvl 10, V0 until 12 learned skills, then V2, keep 2	2.3	0.1	0.9	Doom | Beginner 1 | none
+24	from lvl 10, V0 until 12 learned skills, then V2, keep 0	1.4	0.0	0.7	from lvl 10, V0 until 12 learned skills, then V2, keep 3	1.4	0.0	0.7	Doom | Beginner 1 | none
+25	from lvl 10, V0 until 12 learned skills, then V2, keep 1	1.2	-0.0	0.1	from lvl 10, V0 until 12 learned skills, then V2, keep 4	1.2	-0.0	0.1	Doom | Beginner 1 | none
+26	from lvl 10, V0 until 12 learned skills, then V2, keep 2	1.2	-0.0	-0.0	from lvl 10, V0 until 12 learned skills, then V2, keep 9	1.2	-0.0	-0.0	T8 example | Beginner 1 | none
+27	from lvl 10, V0 until 12 learned skills, then V2, keep 3	1.2	-0.0	-0.0	from lvl 8, V0 until 13 learned skills, then V2, keep 5	1.2	-0.1	-0.0	T8 example | Beginner 1 | none
+28	from lvl 10, V0 until 12 learned skills, then V2, keep 4	0.6	-0.0	0.0	from lvl 10, V0 until 13 learned skills, then V2, keep 7	1.0	-0.0	0.0	T8 example | Artisan 7 | none
+29	from lvl 10, V0 until 12 learned skills, then V2, keep 5	0.6	-0.0	0.1	from lvl 10, V0 until 13 learned skills, then V2, keep 11	1.0	-0.0	0.0	T8 example | Beginner 1 | none
+30	from lvl 10, V0 until 12 learned skills, then V2, keep 6	0.7	0.0	0.1	from lvl 10, V0 until 13 learned skills, then V2, keep 14	1.1	0.0	0.1	T8 example | Beginner 1 | none
+31	from lvl 10, V0 until 12 learned skills, then V2, keep 7	0.7	0.0	0.1	from lvl 10, V0 until 13 learned skills, then V2, keep 15	1.0	0.0	0.1	T8 example | Beginner 1 | none
+32	from lvl 10, V0 until 12 learned skills, then V2, keep 8	0.8	0.0	0.1	from lvl 8, V0 until 14 learned skills, then V2, keep 6	0.7	-0.1	0.0	T8 example | Beginner 1 | none
+33	from lvl 10, V0 until 12 learned skills, then V2, keep 9	0.8	0.0	0.2	from lvl 4, V0 until 14 learned skills, then V2, keep 3	0.6	-0.1	0.0	T8 example | Beginner 1 | none
+34	from lvl 10, V0 until 12 learned skills, then V2, keep 10	0.8	0.1	0.2	from lvl 4, V0 until 14 learned skills, then V2, keep 4	0.4	-0.1	0.0	T8 example | Beginner 1 | none
+35	from lvl 10, V0 until 12 learned skills, then V2, keep 11	0.8	0.1	0.7	from lvl 4, V0 until 14 learned skills, then V2, keep 5	0.3	-0.1	0.0	T8 example | Beginner 1 | none
+36	from lvl 10, V0 until 12 learned skills, then V2, keep 12	0.8	0.1	0.8	from lvl 4, V0 until 14 learned skills, then V2, keep 6	0.2	-0.1	0.0	T8 example | Beginner 1 | none
+37	from lvl 10, V0 until 12 learned skills, then V2, keep 13	0.8	0.1	0.8	from lvl 4, V0 until 14 learned skills, then V2, keep 7	0.2	-0.1	0.0	T8 example | Beginner 1 | none
+38	from lvl 10, V0 until 12 learned skills, then V2, keep 14	0.6	0.1	0.9	from lvl 9, V0 until 14 learned skills, then V2, keep 14	0.5	-0.0	0.4	Mythical Diné | Skilled 1 | none
+39	from lvl 10, V0 until 12 learned skills, then V2, keep 15	0.7	0.1	0.9	from lvl 2, V0 until 13 learned skills, then V2, keep 9	0.1	-0.1	0.2	Mythical Diné | Skilled 1 | none
+40	from lvl 10, V0 until 12 learned skills, then V2, keep 16	0.7	0.1	0.9	from lvl 2, V0 until 13 learned skills, then V2, keep 10	0.1	-0.1	0.2	Mythical Diné | Skilled 1 | none
