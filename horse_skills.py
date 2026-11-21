@@ -296,7 +296,7 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
     print("# per level: Hind Kick only); learned skills don't count innate ones; keep = coupons kept for level 30.")
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more).")
-    sug = {B: H.suggested_plan(res, B, 0.01, a.level, a.always_best) for B in range(1, a.optimize + 1)}
+    sug = {B: H.suggested_plan(res, B, 0.01, a.level, a.always_best, wanted) for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
     if a.selection_coupon == "fallback":
         print("# with Selection Coupon: the full-set chance if, at level 30, you decide to use your Selection Coupon")

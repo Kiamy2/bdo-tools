@@ -620,5 +620,5 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     near = {(st, lv, c2, T) for st, lv, cap, T in promising() if st == "coursier_switch"
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
-    final = promising() | {H.rule_plan(B, start_level) for B in range(max_budget + 1)}
+    final = promising() | {H.rule_plan(B, start_level, kw.get("wanted")) for B in range(max_budget + 1)}
     return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon)

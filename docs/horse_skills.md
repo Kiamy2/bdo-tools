@@ -67,15 +67,16 @@ coupons  full set: chance  tied plans                              most wanted: 
 ```
 (T8 example, Skilled 1, `--optimize 20 --wanted travel`.)
 
-After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 11, V0 until 10 learned skills, then V2, keep 1  60.8%  rule (best 61.2%)`. It's the general rule's plan (the same for everyone, see below) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. `--always-best` suggests the best plan found for every budget instead (the best of many near-tied plans is partly luck, which is why the rule is preferred by default).
+After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `10  from lvl 14, V2 until lvl 30, keep 1  21.3%  rule (best 21.5%)`, or `20  from lvl 10, V0 until 11 learned skills, then V2, keep 8  61.2%  best (rule: 59.8%)` (T8 example, Skilled 1, travel set). It's the general rule's plan (the same for everyone, see below) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. `--always-best` suggests the best plan found for every budget instead (the best of many near-tied plans is partly luck, which is why the rule is preferred by default).
 
 V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
 
-The **general rule** (N = coupons), for the travel set. It was fitted over 63 situations (3 horses, 6 Training levels, 3 boosts, and horses partway through leveling), up to 40 coupons: it stays within about 1 point of the best single plan for each budget, and loses 0.6-3 points against each situation's own best plan.
+The **general rule** (N = coupons) depends a little on the target set:
 - N = 1: no swaps while leveling; use the coupon at level 30.
-- N = 2-19: from level max(10, 31 - 1.75 x N), rounded (halves up), do V2 until level 30, keep 1 coupon.
-- N = 20-21: from level 11, do V0 until 10 learned skills, then V2 until level 30, keep 1.
-- N = 22 or more: from level 10, do V0 until 12 learned skills, then V2 until level 30, spending at most 24 coupons while leveling.
+- N = 2-24: do V2 until level 30, keeping 1 coupon, from level max(10, 31 - 1.75 x N), rounded (halves up). With the courser set and 2-6 coupons, start earlier: from level 30 - 2 x N (26, 24, 22, 20, 18).
+- N = 25 or more: from level 10, do V0 until 12 learned skills, then V2 until level 30, spending at most 24 coupons while leveling.
+
+It was checked with fresh horses over 148 courser situations (the default T8 types, 6 Training levels, 3 boosts, and horses partway through leveling) and 60 travel situations (Mythical Diné, Doom and Arduanatt), up to 40 coupons. Against each situation's own best plan it loses 1.8-3.5 points at 2-8 coupons and at most 1.7 above for the courser set; 1.9-3.9 at 2-7 coupons and at most 2.5 above for the travel set. For a T8 or T9 aiming at the travel set it can be further off (the switch to V2 is better there at 20-24 coupons); `--optimize` then suggests its best plan instead.
 
 **Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons and the travel set, 61% becomes about 91%.
 - `planned`: you'll use it for sure. Every Change Coupon, while leveling and at level 30, then aims at the **second** rarest missing skill (the desired skill), keeping the rarest for the Selection Coupon. The plan search and every chance include it. This targeting is only a bit better (up to about 0.6 points) **if you do use the coupon**; if you might keep it, don't use it while leveling.

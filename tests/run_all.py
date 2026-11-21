@@ -109,13 +109,14 @@ if ok:
     first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
-code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; "
-                "print(H.rule_plan(1), H.rule_plan(6), H.rule_plan(9), H.rule_plan(15), H.rule_plan(20), "
-                "H.rule_plan(23), H.rule_plan(30), H.rule_plan(20, start_level=15))")
-check("rule_plan: the compact rule's bands (1 / 2-19 / 20-21 / 22+), halves rounded up, partway horse",
-      code == 0 and out.strip() == "('at30', 1, 0, 0) ('coursier_v2', 21, 5, 0) ('coursier_v2', 15, 8, 0) "
-      "('coursier_v2', 10, 14, 0) ('coursier_switch', 11, 19, 10) ('coursier_switch', 10, 23, 12) "
-      "('coursier_switch', 10, 24, 12) ('coursier_switch', 16, 19, 10)", out)
+code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; c = H.COURSER_SET; "
+                "print(H.rule_plan(1), H.rule_plan(6), H.rule_plan(6, wanted=c), H.rule_plan(2, wanted=c), "
+                "H.rule_plan(9), H.rule_plan(15), H.rule_plan(24), H.rule_plan(25), H.rule_plan(30, wanted=c), "
+                "H.rule_plan(20, start_level=15))")
+check("rule_plan: the compact rules (1 / 2-24 V2 / 25+ switch; courser starts 2-6), halves rounded up, partway horse",
+      code == 0 and out.strip() == "('at30', 1, 0, 0) ('coursier_v2', 21, 5, 0) ('coursier_v2', 18, 5, 0) "
+      "('coursier_v2', 26, 1, 0) ('coursier_v2', 15, 8, 0) ('coursier_v2', 10, 14, 0) ('coursier_v2', 10, 23, 0) "
+      "('coursier_switch', 10, 24, 12) ('coursier_switch', 10, 24, 12) ('coursier_v2', 16, 19, 0)", out)
 code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; "
                 "h = H.get_horse(H.load_data(), 'T8 example (bdolytics icon horse_71)'); "
                 "d = H.get_horse(H.load_data(), 'Mythical Diné'); "
