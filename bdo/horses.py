@@ -49,6 +49,17 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               # Dream / Mythical / Voltarion skills that can be learned (not innate)
               "Wings of Freedom", "Earth of Protection", "Dark Sprint", "Lightning Charge",
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
+# Courser set: what a T8 needs (with level 30) to become a Dream Horse (T9) through courser training.
+COURSER_SET = ["Charge", "Drift", "Sprint", "Instant Accel", "Sideways", "S: Instant Accel", "S: Sideways"]
+WANTED_SETS = {"travel": TRAVEL_SET, "courser": COURSER_SET}
+
+
+def default_wanted_set(horse):
+    """The horse_skills tool's default target set: 'courser' for a T8 (Dream Horse goal), else 'travel'. (Library
+    functions keep TRAVEL_SET as their default.)"""
+    return "courser" if horse.tier == 8 else "travel"
+
+
 CLASSIC_FODDER = ["Fore Chop", "Hind Kick"]       # in the order V0 swaps them (C42: Fore Chop first is a bit better)
 STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard", "ideal"]
 SWITCH_TS = list(range(9, 17))
@@ -127,7 +138,7 @@ def horse_names(data):
 def get_horse(data, name):
     want = compact(name)
     for key, h in data["horses"].items():
-        if compact(key) == want:
+        if want in [compact(x) for x in [key] + h.get("aliases", [])]:
             return Horse(key, h["weights"], h["no_skill_weight"], h["born_with"], h.get("tier"), h.get("source", ""),
                          h.get("date", ""), h.get("no_skill_weight_note", ""))
     raise DataError(f"unknown horse {name!r}; known: {', '.join(data['horses'])}")

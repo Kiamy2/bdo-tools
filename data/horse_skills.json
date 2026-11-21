@@ -273,7 +273,245 @@
    "no_skill_weight": 39.2016,
    "no_skill_weight_note": "from the in-game simulator reading (not 100 - sum of weights for this horse)",
    "verified": "2026-11-17, in-game simulator ('Choky', male): Artisan 7, Professional 10, gear box; 7 skills and 'none'",
-   "weights_note": "bdolytics rounds weights to 0.01; refined here to 4 decimals from the in-game simulator reading tests/data/sim_t8_choky_artisan8.csv (2026-11-19; all within bdolytics rounding). 'No skill' weight from the same reading."
+   "weights_note": "bdolytics rounds weights to 0.01; refined here to 4 decimals from the in-game simulator reading tests/data/sim_t8_choky_artisan8.csv (2026-11-19; all within bdolytics rounding). 'No skill' weight from the same reading.",
+   "aliases": [
+    "T8 Type 1",
+    "Choky"
+   ]
+  },
+  "T8 Type 2": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_47",
+   "date": "2026-11-21",
+   "aliases": [
+    "T8 Type 7"
+   ],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 8.25,
+    "Fore Chop": 8.25,
+    "Drift": 2.88,
+    "Start Accel": 3.75,
+    "High Jump": 3.2,
+    "Quick Stop": 3.02,
+    "Instant Accel": 1.41,
+    "Charge": 2.46,
+    "Sideways": 0.7875,
+    "Quick Back": 5.45,
+    "Streak Leap": 4.75,
+    "Roar": 4.02,
+    "Caution": 3.7,
+    "Quick Ride": 3.75,
+    "S: Hind Kick": 4.125,
+    "S: Fore Chop": 4.125,
+    "S: Instant Accel": 0.705,
+    "S: Sideways": 0.225,
+    "Two-seater": 0.9
+   },
+   "no_skill_weight": 37.991,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Type 2 at Artisan 9 and Artisan 7, Type 7 at Artisan 7 (same chances); top of the list"
+  },
+  "T8 Type 3": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_79",
+   "date": "2026-11-21",
+   "aliases": [],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 9.45,
+    "Fore Chop": 9.45,
+    "Drift": 3.09,
+    "Start Accel": 3.25,
+    "High Jump": 3.3,
+    "Quick Stop": 3.5,
+    "Instant Accel": 1.48,
+    "Charge": 2.8,
+    "Sideways": 0.7875,
+    "Quick Back": 3.7,
+    "Streak Leap": 3.25,
+    "Roar": 3.8,
+    "Caution": 2.6,
+    "Quick Ride": 3.95,
+    "S: Hind Kick": 4.125,
+    "S: Fore Chop": 4.125,
+    "S: Instant Accel": 0.74,
+    "S: Sideways": 0.225,
+    "Two-seater": 0.9
+   },
+   "no_skill_weight": 39.12,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Type 3 at Artisan 7; top of the list"
+  },
+  "T8 Type 4": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_277",
+   "date": "2026-11-21",
+   "aliases": [
+    "T8 Type 6",
+    "T8 Type 9"
+   ],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 10.6,
+    "Fore Chop": 10.6,
+    "Drift": 2.25,
+    "Start Accel": 3.25,
+    "High Jump": 3.6,
+    "Quick Stop": 3.86,
+    "Instant Accel": 1.2,
+    "Charge": 3.23,
+    "Sideways": 0.7875,
+    "Quick Back": 3.8,
+    "Streak Leap": 3.75,
+    "Roar": 3.56,
+    "Caution": 2.6,
+    "Quick Ride": 3.25,
+    "S: Hind Kick": 4.6,
+    "S: Fore Chop": 4.6,
+    "S: Instant Accel": 0.6,
+    "S: Sideways": 0.225
+   },
+   "no_skill_weight": 34.683,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Types 4 and 9 at Artisan 7 (same chances; Type 6 the same per the user); top of the list. No Two-seater: the 'no skill' chance fits only that bdolytics variant (icons 277 / 32)"
+  },
+  "T8 Type 5": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_83",
+   "date": "2026-11-21",
+   "aliases": [],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 7.2,
+    "Fore Chop": 7.2,
+    "Drift": 3.93,
+    "Start Accel": 5.25,
+    "High Jump": 3.6,
+    "Quick Stop": 3.6,
+    "Instant Accel": 1.76,
+    "Charge": 2.25,
+    "Sideways": 0.7875,
+    "Quick Back": 5.3,
+    "Streak Leap": 5.25,
+    "Roar": 3.6,
+    "Caution": 3.6,
+    "Quick Ride": 5.25,
+    "S: Hind Kick": 3.8,
+    "S: Fore Chop": 3.8,
+    "S: Instant Accel": 0.88,
+    "S: Sideways": 0.225
+   },
+   "no_skill_weight": 48.515,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Type 5 at Artisan 7, full list (S: Instant Accel 0.9248% -> 0.880, S: Sideways 0.2364% -> 0.2249)"
+  },
+  "T8 Type 19": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_83",
+   "date": "2026-11-21",
+   "aliases": [
+    "T8 Type 21"
+   ],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 7.2,
+    "Fore Chop": 7.2,
+    "Drift": 3.93,
+    "Start Accel": 5.25,
+    "High Jump": 3.6,
+    "Quick Stop": 3.6,
+    "Instant Accel": 1.76,
+    "Charge": 2.25,
+    "Sideways": 0.7875,
+    "Quick Back": 5.3,
+    "Streak Leap": 5.25,
+    "Roar": 3.6,
+    "Caution": 3.6,
+    "Quick Ride": 5.25,
+    "S: Hind Kick": 3.8,
+    "S: Fore Chop": 3.8,
+    "S: Instant Accel": 0.88,
+    "S: Sideways": 0.225
+   },
+   "no_skill_weight": 29.958,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Types 19 and 21 at Artisan 7 (same chances); top of the list. Learnable weights from the 'no skill' chance: 67.282 = the S: Instant Accel 0.88 variant"
+  },
+  "T8 Type 20": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_41",
+   "date": "2026-11-21",
+   "aliases": [],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 7.2,
+    "Fore Chop": 7.2,
+    "Drift": 3.93,
+    "Start Accel": 5.25,
+    "High Jump": 3.6,
+    "Quick Stop": 3.6,
+    "Instant Accel": 1.76,
+    "Charge": 2.25,
+    "Sideways": 0.7875,
+    "Quick Back": 5.3,
+    "Streak Leap": 5.25,
+    "Roar": 3.6,
+    "Caution": 3.6,
+    "Quick Ride": 5.25,
+    "S: Hind Kick": 3.8,
+    "S: Fore Chop": 3.8,
+    "S: Instant Accel": 0.74,
+    "S: Sideways": 0.225
+   },
+   "no_skill_weight": 29.958,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Type 20 at Artisan 7; top of the list. Learnable weights from the 'no skill' chance: 67.142 = the S: Instant Accel 0.74 variant (icon 41)"
+  },
+  "T8 Type 22": {
+   "tier": 8,
+   "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_41",
+   "date": "2026-11-21",
+   "aliases": [],
+   "born_with": [
+    "Sprint"
+   ],
+   "weights": {
+    "Hind Kick": 7.2,
+    "Fore Chop": 7.2,
+    "Drift": 3.93,
+    "Start Accel": 5.25,
+    "High Jump": 3.6,
+    "Quick Stop": 3.6,
+    "Instant Accel": 1.76,
+    "Charge": 2.25,
+    "Sideways": 0.7875,
+    "Quick Back": 5.3,
+    "Streak Leap": 5.25,
+    "Roar": 3.6,
+    "Caution": 3.6,
+    "Quick Ride": 5.25,
+    "S: Hind Kick": 3.8,
+    "S: Fore Chop": 3.8,
+    "S: Instant Accel": 0.705,
+    "S: Sideways": 0.225
+   },
+   "no_skill_weight": 29.958,
+   "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
+   "verified": "2026-11-21, in-game simulator: Type 22 at Artisan 7; top of the list. Learnable weights from the 'no skill' chance: 67.107",
+   "weights_note": "S: Instant Accel 0.705 is inferred (not read): the 'no skill' chance fits the icon-41 weights with S: Instant Accel 0.705 instead of 0.74 (0.705 is the Type 2 value); not a bdolytics row"
   }
  }
 }

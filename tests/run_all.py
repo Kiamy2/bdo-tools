@@ -123,6 +123,31 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
                 "H._cycle_skill(H.CLASSIC_FODDER, d.weights))")
 check("V0 swaps Fore Chop first; V2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
       "['Fore Chop', 'Hind Kick'] Hind Kick Hind Kick", out)
+# T8 types: the in-game simulator readings (Artisan 7, level 1, no boosts: Hind Kick and 'no skill' chances)
+code, out = run("-c", """
+import sys; sys.path.insert(0, '.')
+from bdo import horses as H
+d = H.load_data(); M = 1.217
+read = {'T8 Type 2': (9.6775, 22.865), 'T8 Type 7': (9.6775, 22.865), 'T8 Type 3': (11.0964, 24.2362),
+        'T8 Type 4': (12.7667, 20.073), 'T8 Type 9': (12.7667, 20.073), 'T8 Type 5': (7.567, 29.2882),
+        'T8 Type 19': (9.0111, 15.7935), 'T8 Type 21': (9.0111, 15.7935), 'T8 Type 20': (9.0241, 15.8476),
+        'T8 Type 22': (9.0274, 15.8611), 'T8 Type 1': (10.9722, 24.3069)}
+worst = 0
+for n, (hk, no) in read.items():
+    h = H.get_horse(d, n); U = sum(h.weights.values()); T = U + h.W
+    worst = max(worst, abs(100 * M * h.weights['Hind Kick'] / T - hk), abs(100 * (1 - M * U / T) - no))
+print(worst < 0.002, round(worst, 4))
+""")
+check("T8 types (aliases too) reproduce the simulator readings at Artisan 7 (Hind Kick, 'no skill'; within 0.002 points)",
+      code == 0 and out.startswith("True"), out)
+code, out = run("horse_skills.py", "T8 Type 5", "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")
+code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")
+code3, out3 = run("horse_skills.py", "T8 Type 5", "--training", "Artisan 7", "--coupons", "10", "--strategy",
+                  "coursier_v2", "--wanted", "travel")
+check("--wanted: courser set by default for a T8, travel for a T10, named sets accepted",
+      code == 0 and "# wanted: courser set (the default for a T8" in out and "wanted: 6 skills" in out
+      and code2 == 0 and "# wanted: travel set (the default for a T10" in out2
+      and code3 == 0 and "# wanted: travel set\n" in out3 + "\n", out + out2 + out3)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--always-best")
 check("horse_skills: --always-best without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--selection-coupon", "planned")
@@ -254,7 +279,8 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
 """)
     check("horses_fast used[B] agrees with bdo.horses simulate_plan (within noise)",
           code == 0 and out.count("True") == 2, out)
-    code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20")
+    code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--optimize", "20",
+                    "--wanted", "travel")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 61%)",
           code == 0 and 56 <= float(m.get("20", 0)) <= 66

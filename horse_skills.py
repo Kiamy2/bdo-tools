@@ -53,7 +53,10 @@ def main():
     ap.add_argument("--tickets", type=int, default=0, help="Mount Level Down Tickets (used on level-ups that teach nothing)")
     ap.add_argument("--strategy", help="comma-separated subset (default all): "
                     + "; ".join(f"{k} = {v}" for k, v in H.STRATEGY_HELP.items()))
-    ap.add_argument("--wanted", help="wanted skills, comma-separated (default: the travel set, see docs)")
+    ap.add_argument("--wanted", help="wanted skills, comma-separated, or a named set: 'courser' (what a T8 needs for "
+                    "courser training: Charge, Drift, Sprint, Instant Accel, Sideways, S: Instant Accel, S: Sideways) "
+                    "or 'travel' (an example of a finished set for a T10, see docs). Default: courser for a T8, "
+                    "travel otherwise")
     ap.add_argument("--reserve", type=int, default=5, help="coupons the swapping strategies keep for level 30 (default 5)")
     ap.add_argument("--swap-from", type=int, default=1, metavar="LEVEL",
                     help="the swapping strategies only start once the horse reaches this level (default 1)")
@@ -92,7 +95,9 @@ def main():
             print("horse\ttier\tlearnable\tdate\tsource\tno-skill weight")
             for name in H.horse_names(data):
                 h = data["horses"][name]
-                print(f"{name}\t{h['tier']}\t{len(h['weights'])}\t{h['date']}\t{h['source']}\t{h['no_skill_weight_note']}")
+                also = f" (also {', '.join(h['aliases'])})" if h.get("aliases") else ""
+                print(f"{name}{also}\t{h['tier']}\t{len(h['weights'])}\t{h['date']}\t{h['source']}\t"
+                      f"{h['no_skill_weight_note']}")
             return 0
         if a.horse_file:
             horse = H.horse_from_sim_file(a.horse_file, resolve)
@@ -104,7 +109,8 @@ def main():
             ap.error("--training is required, e.g. --training 'Artisan 7'")
         bonus = H.training_bonus(a.training)
         learned = names_list(a.learned, resolve)
-        wanted = names_list(a.wanted, resolve) if a.wanted else None
+        wset = (a.wanted or H.default_wanted_set(horse)).strip().lower()
+        wanted = list(H.WANTED_SETS[wset]) if wset in H.WANTED_SETS else names_list(a.wanted, resolve)
         fodder = names_list(a.fodder, resolve) if a.fodder else None
         strategies = [s.strip() for s in a.strategy.split(",")] if a.strategy else H.STRATEGIES
         for s in strategies:
@@ -126,6 +132,9 @@ def main():
     head = f"# {horse.name} (T{horse.tier})" if horse.tier and f"T{horse.tier}" not in horse.name else f"# {horse.name}"
     head += f" | Training bonus {bonus:g}%" + (" + gear" if a.gear else "") + (" + brand" if a.brand else "")
     head += f" | data {horse.date or 'undated'}: {horse.source}"
+    head += f"\n# wanted: {wset + ' set' if wset in H.WANTED_SETS else 'your list'}"
+    if not a.wanted:
+        head += f" (the default for a T{horse.tier or '?'}; --wanted courser / travel / your own list)"
 
     if a.odds or a.check:
         p, none = horse.odds(M, set(learned) | set(horse.born_with))

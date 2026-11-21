@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-11-21
+- Named target sets: `--wanted courser` (what a T8 needs for courser training: Charge, Drift, Sprint, Instant Accel, Sideways, S: Instant Accel, S: Sideways) and `--wanted travel`; the tool's default is `courser` for a T8 and `travel` otherwise, and the output says which set it used. Library functions keep `TRAVEL_SET` as their default (`COURSER_SET`, `WANTED_SETS`, `default_wanted_set()` added).
+- T8 types in the data file: `T8 Type 2` (also 7), `3`, `4` (also 6, 9), `5`, `19` (also 21), `20`, `22`, with weights from bdolytics and 'no skill' weights from in-game simulator readings (they differ by type: 30.0 to 48.5); the T8 example is also `T8 Type 1` / `Choky`. Horses can have `aliases`; `--list` shows them.
 - The general rule (`rule_plan`, the `--optimize` suggested plans) refitted with the points reset, as a compact rule: 1 coupon: all at level 30; 2-19: V2 from level max(10, 31 - 1.75 x N), keep 1; 20-21: from level 11, V0 until 10 learned skills, then V2, keep 1; 22+: from level 10, V0 until 12 learned skills, then V2, spending at most 24 while leveling. `RULE_FITTED` is gone. Below 5 coupons the old rule spent every coupon while leveling (up to 14 points lost); the new one keeps 1.
 - `--always-best` (with `--optimize`): suggest the best plan found for every budget, not the rule's plan when it's within 1 point.
 - V0 (`coursier`, and the V0 phase of `coursier_switch`) swaps Fore Chop first, then Hind Kick: slightly better when Hind Kick is the heavier. `CLASSIC_FODDER` is now `["Fore Chop", "Hind Kick"]`; `coursier_v2` still cycles the heavier one, Hind Kick on ties.

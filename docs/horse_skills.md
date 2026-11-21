@@ -16,12 +16,12 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,9
 
 ## Inputs
 
-- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below).
+- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below). T8s by type number: `T8 Type 1` to `T8 Type 22` for the default horses read so far (Sprint as the only innate skill; types sharing the same weights are aliases); a horse with other innate skills needs its own reading.
 - `--training`: your Training level, in English or French (`Artisan 7`, `Master 20`, `Gourou 57`), or the bonus itself (`21.7`).
 - `--learned`: skills the horse already has, besides its innate ones. Skill names in English or French, comma-separated (`"High Jump, Dérapage"`).
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
 - `--coupons` (default 30) or `--sweep 0,10,20`: Mount Skill Change Coupons available. `--tickets`: Mount Level Down Tickets (default 0).
-- `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategies swap out, in that order (default `Fore Chop, Hind Kick`; `coursier_v2` cycles only the heaviest of them, Hind Kick on ties). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1). `--switch-at`: the learned-skill count at which `coursier_switch` changes from `coursier` to `coursier_v2` swaps (default 12).
+- `--wanted`: the skills you want: your own comma-separated list, or a named set. `courser` = what a T8 needs (with level 30) for courser training into a Dream Horse (T9): Charge, Drift, Sprint, Instant Accel, Sideways, S: Instant Accel, S: Sideways. `travel` = an example of a finished set for a T10 (the list in the report). Default: `courser` for a T8, `travel` otherwise; the output says which set it used. `--fodder`: what the `coursier` strategies swap out, in that order (default `Fore Chop, Hind Kick`; `coursier_v2` cycles only the heaviest of them, Hind Kick on ties). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1). `--switch-at`: the learned-skill count at which `coursier_switch` changes from `coursier` to `coursier_v2` swaps (default 12).
 - `--points`: Skill Change Points the horse already has. `--point-bonus`: how much each point raises the desired skill (default 0.25, see the report). Each Change Coupon adds 1 point, except one that gives the desired skill: then the points go back to 0 (seen in-game).
 - `--runs` (default 5000) and `--seed`: simulation size and random seed. Results move by about ±1 point between seeds at 5000 runs.
 
@@ -65,17 +65,19 @@ coupons  full set: chance  tied plans                              most wanted: 
 10       21.5%             coursier_v2: from lvl 10-21, keep 0-7 | coursier_switch: ...  10.59  ...  16.8%, 10.48
 20       61.2%             coursier_switch: from lvl 3-12, V0 until 10-11 learned skills, then V2, keep 1-12   ...
 ```
-(T8 example, Skilled 1, `--optimize 20`.)
+(T8 example, Skilled 1, `--optimize 20 --wanted travel`.)
 
 After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 11, V0 until 10 learned skills, then V2, keep 1  60.8%  rule (best 61.2%)`. It's the general rule's plan (the same for everyone, see below) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. `--always-best` suggests the best plan found for every budget instead (the best of many near-tied plans is partly luck, which is why the rule is preferred by default).
 
-The **general rule** (N = coupons). It was fitted over 63 situations (3 horses, 6 Training levels, 3 boosts, and horses partway through leveling), up to 40 coupons: it stays within about 1 point of the best single plan for each budget, and loses 0.6-3 points against each situation's own best plan.
+V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
+
+The **general rule** (N = coupons), for the travel set. It was fitted over 63 situations (3 horses, 6 Training levels, 3 boosts, and horses partway through leveling), up to 40 coupons: it stays within about 1 point of the best single plan for each budget, and loses 0.6-3 points against each situation's own best plan.
 - N = 1: no swaps while leveling; use the coupon at level 30.
 - N = 2-19: from level max(10, 31 - 1.75 x N), rounded (halves up), do V2 until level 30, keep 1 coupon.
 - N = 20-21: from level 11, do V0 until 10 learned skills, then V2 until level 30, keep 1.
-- N = 22 or more: from level 10, do V0 until 12 learned skills, then V2 until level 30, spending at most 24 coupons while leveling. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
+- N = 22 or more: from level 10, do V0 until 12 learned skills, then V2 until level 30, spending at most 24 coupons while leveling.
 
-**Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons, 61% becomes about 91%.
+**Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons and the travel set, 61% becomes about 91%.
 - `planned`: you'll use it for sure. Every Change Coupon, while leveling and at level 30, then aims at the **second** rarest missing skill (the desired skill), keeping the rarest for the Selection Coupon. The plan search and every chance include it. This targeting is only a bit better (up to about 0.6 points) **if you do use the coupon**; if you might keep it, don't use it while leveling.
 - `fallback`: a safety net. The plans stay the ones without it, and the suggested plans get a `with Selection Coupon` column: your chance if, at level 30, you decide to use it (from then on, Change Coupons aim at the second rarest missing skill). Decide at 30, depending on how leveling went.
 
