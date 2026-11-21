@@ -6,3 +6,11 @@ coupons spent while leveling: difference +0.12 (se 0.06)
   level 15: V0 until T, then V2 568, V2 32
   level 20: V0 until T, then V2 570, V2 29, V0 1
   level 25: V0 until T, then V2 454, All at 30 110, V2 17, V0 16
+Mythical Diné | Master 10 | 10 coupons | level-1 plan ['coursier_v2', 14, 10, 0] (73.8%) | 300 horses
+full set: fixed 74.4%, re-planned 74.7%, gain +0.25 points (se 1.30; 95% range -2.30 to +2.81)
+learned skills at 30: difference -0.20 (se 0.04)
+coupons spent while leveling: difference -0.21 (se 0.06)
+  level 10: V2 222, V0 until T, then V2 78
+  level 15: V0 until T, then V2 293, V2 7
+  level 20: V0 until T, then V2 297, V0 2, V2 1
+  level 25: V0 until T, then V2 204, All at 30 74
