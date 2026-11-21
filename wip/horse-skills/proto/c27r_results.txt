@@ -1,0 +1,36 @@
+full set (G) and expected wanted skills (H) after the cleanup: R = rule, W = best wanted desired, A = best any desired; gains vs R
+== Mythical Diné | Artisan 7 | 483831 states, reach 1s, DP 6s
+  no swaps while leveling, every coupon at level 30              10 coupons: G R  28.80% W +0.000 A +0.004 | H R 11.907 W +0.068 A +0.068 | R vs tool 4.2e-08
+  no swaps while leveling, every coupon at level 30              15 coupons: G R  48.48% W +0.000 A +0.001 | H R 12.298 W +0.048 A +0.048 | R vs tool 8.8e-08
+  no swaps while leveling, every coupon at level 30              20 coupons: G R  64.78% W +0.000 A +0.000 | H R 12.553 W +0.029 A +0.029 | R vs tool 1.7e-07
+  from lvl 17, V2 until lvl 30, keep 0                           10 coupons: G R  56.84% W +0.000 A +0.004 | H R 12.390 W +0.031 A +0.031 | R vs tool 5.4e-08
+  from lvl 8, V2 until lvl 30, keep 0                            15 coupons: G R  78.59% W +0.000 A +0.001 | H R 12.736 W +0.013 A +0.013 | R vs tool 1.1e-08
+  from lvl 10, V0 until 11 learned skills, then V2, keep 5       20 coupons: G R  87.92% W +0.000 A +0.000 | H R 12.858 W +0.006 A +0.006 | R vs tool 2.7e-08
+== Doom (T9) | Artisan 7 | 340328 states, reach 0s, DP 4s
+  no swaps while leveling, every coupon at level 30              10 coupons: G R  27.91% W +0.000 A +0.003 | H R 11.899 W +0.065 A +0.065 | R vs tool 1.2e-07
+  no swaps while leveling, every coupon at level 30              15 coupons: G R  46.74% W +0.000 A +0.001 | H R 12.278 W +0.047 A +0.047 | R vs tool 3.5e-08
+  no swaps while leveling, every coupon at level 30              20 coupons: G R  63.33% W +0.000 A +0.000 | H R 12.540 W +0.028 A +0.028 | R vs tool 1.3e-07
+  from lvl 17, V2 until lvl 30, keep 0                           10 coupons: G R  80.20% W +0.000 A +0.001 | H R 12.741 W +0.010 A +0.010 | R vs tool 2.7e-08
+  from lvl 8, V2 until lvl 30, keep 0                            15 coupons: G R  92.71% W +0.000 A +0.000 | H R 12.915 W +0.003 A +0.003 | R vs tool 7.9e-09
+  from lvl 10, V0 until 11 learned skills, then V2, keep 5       20 coupons: G R  96.19% W +0.000 A +0.000 | H R 12.957 W +0.001 A +0.001 | R vs tool 2.2e-08
+== T8 example (bdolytics icon horse_71) | Professional 10 | 1180511 states, reach 1s, DP 13s
+  no swaps while leveling, every coupon at level 30              10 coupons: G R  24.11% W +0.000 A +0.026 | H R 10.759 W +0.098 A +0.098 | R vs tool 4.6e-08
+  no swaps while leveling, every coupon at level 30              15 coupons: G R  42.98% W +0.000 A +0.011 | H R 11.184 W +0.073 A +0.073 | R vs tool 1.0e-07
+  no swaps while leveling, every coupon at level 30              20 coupons: G R  59.23% W +0.000 A +0.004 | H R 11.458 W +0.046 A +0.046 | R vs tool 2.5e-08
+  from lvl 17, V2 until lvl 30, keep 0                           10 coupons: G R  31.66% W +0.000 A +0.029 | H R 10.899 W +0.081 A +0.081 | R vs tool 3.8e-09
+  from lvl 8, V2 until lvl 30, keep 0                            15 coupons: G R  54.30% W +0.000 A +0.015 | H R 11.366 W +0.052 A +0.052 | R vs tool 7.5e-08
+  from lvl 10, V0 until 11 learned skills, then V2, keep 5       20 coupons: G R  71.74% W +0.000 A +0.008 | H R 11.644 W +0.026 A +0.026 | R vs tool 8.5e-08
+== T8 example (bdolytics icon horse_71) | Skilled 1 | 1863872 states, reach 1s, DP 21s
+  no swaps while leveling, every coupon at level 30              10 coupons: G R  16.99% W +0.000 A +0.027 | H R 10.489 W +0.121 A +0.121 | R vs tool 3.7e-08
+  no swaps while leveling, every coupon at level 30              15 coupons: G R  32.98% W +0.000 A +0.013 | H R 10.947 W +0.100 A +0.100 | R vs tool 9.0e-08
+  no swaps while leveling, every coupon at level 30              20 coupons: G R  47.97% W +0.000 A +0.005 | H R 11.246 W +0.069 A +0.069 | R vs tool 4.8e-08
+  from lvl 17, V2 until lvl 30, keep 0                           10 coupons: G R  21.37% W +0.000 A +0.030 | H R 10.587 W +0.108 A +0.108 | R vs tool 4.8e-09
+  from lvl 8, V2 until lvl 30, keep 0                            15 coupons: G R  42.35% W +0.000 A +0.019 | H R 11.132 W +0.078 A +0.078 | R vs tool 7.1e-08
+  from lvl 10, V0 until 11 learned skills, then V2, keep 5       20 coupons: G R  60.69% W +0.000 A +0.012 | H R 11.473 W +0.044 A +0.044 | R vs tool 5.9e-08
+== Doom (T9) | Beginner 1 | 1544136 states, reach 1s, DP 18s
+  no swaps while leveling, every coupon at level 30              10 coupons: G R  11.91% W +0.000 A +0.005 | H R 11.293 W +0.120 A +0.120 | R vs tool 2.8e-08
+  no swaps while leveling, every coupon at level 30              15 coupons: G R  24.73% W +0.000 A +0.003 | H R 11.751 W +0.107 A +0.107 | R vs tool 4.3e-08
+  no swaps while leveling, every coupon at level 30              20 coupons: G R  39.00% W +0.000 A +0.001 | H R 12.090 W +0.081 A +0.081 | R vs tool 1.6e-08
+  from lvl 17, V2 until lvl 30, keep 0                           10 coupons: G R  33.25% W +0.000 A +0.005 | H R 11.817 W +0.068 A +0.068 | R vs tool 6.6e-08
+  from lvl 8, V2 until lvl 30, keep 0                            15 coupons: G R  55.41% W +0.000 A +0.003 | H R 12.338 W +0.043 A +0.043 | R vs tool 4.2e-08
+  from lvl 10, V0 until 11 learned skills, then V2, keep 5       20 coupons: G R  67.17% W +0.000 A +0.002 | H R 12.548 W +0.029 A +0.029 | R vs tool 6.4e-08

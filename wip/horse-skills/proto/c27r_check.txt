@@ -1,0 +1,2 @@
+DP vs recursion, 120 start states x 3 variants x 2 goals, c = 6: worst diff 8.9e-15
+all 186668 reachable states at c = 6: full set W - R max 1.34e-01, states with W > R + 1e-9: 18727; A - R max 4.51e-01
