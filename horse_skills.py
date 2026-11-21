@@ -36,8 +36,8 @@ def main():
     ap.add_argument("--list", action="store_true", help="list the horses in the data file")
     ap.add_argument("--horse-file", metavar="CSV", help="use your own simulator reading instead (see docs/horse_skills.md)")
     ap.add_argument("--training", help="your Training level: 'Artisan 7', 'Master 20', 'Gourou 5'... or a bonus like 21.7")
-    ap.add_argument("--gear", action="store_true", help="Pearl horse gear (4 pieces) worn (--odds/--check)")
-    ap.add_argument("--brand", action="store_true", help="Mount Brand Spell Stone used (--odds/--check)")
+    ap.add_argument("--gear", action="store_true", help="Pearl horse gear (4 pieces) worn (every computation: +0.10)")
+    ap.add_argument("--brand", action="store_true", help="Mount Brand Spell Stone used (every computation: +0.10)")
     ap.add_argument("--learned", help="skills already learned, comma-separated (English or French)")
     ap.add_argument("--odds", action="store_true", help="print the next level-up's odds, like the in-game simulator")
     ap.add_argument("--check", nargs="+", metavar="SKILL=PCT", help="compare odds read in the in-game simulator with the model "
