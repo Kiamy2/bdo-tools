@@ -1,0 +1,49 @@
+# C43 travel10: 60 cases, target ['Sprint', 'Instant Accel', 'S: Instant Accel', 'Drift', 'High Jump', 'Streak Leap', 'Start Accel', 'Quick Ride', 'Charge', 'Sideways', 'S: Sideways', 'Quick Back', 'Quick Stop', 'Wings of Freedom', 'Earth of Protection', 'Dark Sprint', 'Lightning Charge', 'Instant Accel: Flash', 'Drift: Flash', 'Thunderfall']
+# wording bands: 1 | 2-19 V2 | 20-26 switch | 27-40 switch  (empty bands allowed)
+#  V2 band (c0, a, lo, k) = (31, 1.75, 10, 1)  (stage-1 extra worst over the fit (0.66, 3.674295213487413e-05))
+#  middle band (L, T, S, k) = (10, 9, 18, 0)  ((0.29, 0.09983025065490178))
+#  high band (L2, T2, S2, k2) = (4, 13, 30, 0)  ((0.24, 1.7902680805751255e-06))
+# next best: (worst 0.66, bands 3, N1 19, N2 28), (worst 0.66, bands 3, N1 19, N2 24), (worst 0.66, bands 3, N1 18, N2 28), (worst 0.66, bands 3, N1 18, N2 26), (worst 0.66, bands 3, N1 19, N2 25)
+
+# rechecked with 4000 fresh horses per case (seed 3003): worst / average loss vs each case's reference best
+N	fit plan	fit worst/avg (CV worst)	wording plan	wording worst/avg	current rule worst/avg	wording worst case
+1	no swaps while leveling, every coupon at level 30	0.7/-0.2 (2.9)	no swaps while leveling, every coupon at level 30	0.7/-0.2	0.7/-0.2	Mythical Doom | Guru 20 | both
+2	from lvl 28, V0 until 16 learned skills, then V2, keep 1	2.3/-0.0 (7.9)	from lvl 28, V2 until lvl 30, keep 1	2.3/-0.0	2.3/-0.0	Mythical Diné | Master 20 | both
+3	from lvl 26, V2 until lvl 30, keep 1	2.4/-0.0 (2.9)	from lvl 26, V2 until lvl 30, keep 1	2.4/-0.0	2.4/-0.0	Mythical Doom | Guru 20 | both
+4	from lvl 24, V2 until lvl 30, keep 1	1.7/-0.2 (2.0)	from lvl 24, V2 until lvl 30, keep 1	1.7/-0.2	1.7/-0.2	Mythical Arduanatt | Master 20 | both
+5	from lvl 22, V2 until lvl 30, keep 1	2.0/0.1 (1.5)	from lvl 22, V2 until lvl 30, keep 1	2.0/0.1	2.0/0.1	Mythical Doom | Skilled 1 | none
+6	from lvl 21, V2 until lvl 30, keep 1	1.8/-0.4 (2.8)	from lvl 21, V2 until lvl 30, keep 1	1.8/-0.4	1.8/-0.4	Mythical Arduanatt | Professional 10 | both
+7	from lvl 18, V2 until lvl 30, keep 1	2.4/0.3 (2.2)	from lvl 19, V2 until lvl 30, keep 1	2.0/0.2	2.0/0.2	Mythical Diné | Artisan 7 | none | level 8, 4 skills
+8	from lvl 18, V2 until lvl 30, keep 0	1.7/0.2 (0.6)	from lvl 17, V2 until lvl 30, keep 1	1.1/0.1	1.1/0.1	Mythical Doom | Beginner 1 | gear
+9	from lvl 16, V2 until lvl 30, keep 1	1.6/-0.0 (1.9)	from lvl 15, V2 until lvl 30, keep 1	1.6/-0.0	1.6/-0.0	Mythical Diné | Artisan 7 | none | level 8, 4 skills
+10	from lvl 14, V2 until lvl 30, keep 1	1.0/-0.3 (0.8)	from lvl 14, V2 until lvl 30, keep 1	1.0/-0.3	1.0/-0.3	Mythical Arduanatt | Beginner 1 | none
+11	from lvl 11, V2 until lvl 30, keep 1	1.1/0.0 (0.5)	from lvl 12, V2 until lvl 30, keep 1	1.6/-0.1	1.6/-0.1	Mythical Doom | Beginner 1 | none
+12	from lvl 10, V2 until lvl 30, keep 1	1.8/-0.1 (0.4)	from lvl 10, V2 until lvl 30, keep 1	1.8/-0.1	1.8/-0.1	Mythical Doom | Beginner 1 | none
+13	from lvl 10, V2 until lvl 30, keep 1	1.6/-0.2 (0.4)	from lvl 10, V2 until lvl 30, keep 1	1.6/-0.2	1.6/-0.2	Mythical Doom | Beginner 1 | none
+14	from lvl 10, V2 until lvl 30, keep 1	1.6/-0.2 (0.5)	from lvl 10, V2 until lvl 30, keep 1	1.6/-0.2	1.6/-0.2	Mythical Doom | Beginner 1 | none
+15	from lvl 9, V2 until lvl 30, keep 0	1.1/-0.2 (0.4)	from lvl 10, V2 until lvl 30, keep 1	1.4/-0.3	1.4/-0.3	Mythical Doom | Beginner 1 | none
+16	from lvl 9, V2 until lvl 30, keep 1	0.9/-0.2 (0.4)	from lvl 10, V2 until lvl 30, keep 1	1.2/-0.2	1.2/-0.2	Mythical Doom | Beginner 1 | none
+17	from lvl 9, V2 until lvl 30, keep 2	0.7/-0.2 (0.3)	from lvl 10, V2 until lvl 30, keep 1	1.1/-0.2	1.1/-0.2	Mythical Doom | Beginner 1 | none
+18	from lvl 10, V2 until lvl 30, keep 5	0.6/-0.2 (0.0)	from lvl 10, V2 until lvl 30, keep 1	0.6/-0.2	0.6/-0.2	Mythical Doom | Beginner 1 | none
+19	from lvl 10, V2 until lvl 30, keep 6	0.6/-0.2 (0.1)	from lvl 10, V2 until lvl 30, keep 1	0.6/-0.2	0.6/-0.2	Mythical Doom | Beginner 1 | none
+20	from lvl 7, V2 until lvl 30, keep 5	0.1/-0.2 (0.2)	from lvl 10, V0 until 9 learned skills, then V2, keep 2	1.8/-0.0	3.1/0.2	Mythical Doom | Beginner 1 | none
+21	from lvl 8, V2 until lvl 30, keep 6	0.6/-0.2 (1.0)	from lvl 10, V0 until 9 learned skills, then V2, keep 3	1.6/-0.1	2.8/0.1	Mythical Doom | Beginner 1 | none
+22	from lvl 4, V2 until lvl 30, keep 7	0.6/-0.2 (0.9)	from lvl 10, V0 until 9 learned skills, then V2, keep 4	1.3/-0.1	2.9/0.1	Mythical Doom | Beginner 1 | none
+23	from lvl 10, V0 until 9 learned skills, then V2, keep 5	1.2/-0.1 (0.8)	from lvl 10, V0 until 9 learned skills, then V2, keep 5	1.2/-0.1	2.4/0.1	Mythical Doom | Beginner 1 | none
+24	from lvl 7, V0 until 10 learned skills, then V2, keep 6	1.3/-0.0 (1.0)	from lvl 10, V0 until 9 learned skills, then V2, keep 6	1.0/-0.1	1.9/0.0	Mythical Doom | Beginner 1 | none
+25	from lvl 7, V0 until 10 learned skills, then V2, keep 7	1.0/-0.0 (0.7)	from lvl 10, V0 until 9 learned skills, then V2, keep 7	0.9/-0.1	1.6/-0.0	Mythical Doom | Beginner 1 | none
+26	from lvl 8, V0 until 10 learned skills, then V2, keep 8	0.6/-0.1 (0.5)	from lvl 10, V0 until 9 learned skills, then V2, keep 8	0.8/-0.1	1.3/-0.1	Mythical Doom | Beginner 1 | none
+27	from lvl 8, V0 until 10 learned skills, then V2, keep 9	0.6/-0.1 (0.4)	from lvl 4, V0 until 13 learned skills, then V2, keep 0	2.0/-0.1	1.1/-0.1	Mythical Doom | Beginner 1 | none
+28	from lvl 11, V0 until 11 learned skills, then V2, keep 10	0.9/0.0 (0.3)	from lvl 4, V0 until 13 learned skills, then V2, keep 0	1.1/-0.1	0.5/-0.1	Mythical Doom | Beginner 1 | none
+29	from lvl 11, V0 until 12 learned skills, then V2, keep 7	1.0/-0.0 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 0	0.9/-0.1	0.8/-0.1	Mythical Doom | Beginner 1 | none
+30	from lvl 2, V0 until 13 learned skills, then V2, keep 0	0.7/-0.1 (0.2)	from lvl 4, V0 until 13 learned skills, then V2, keep 0	0.7/-0.1	0.8/-0.1	Mythical Doom | Beginner 1 | none
+31	from lvl 2, V0 until 13 learned skills, then V2, keep 1	0.6/-0.1 (0.9)	from lvl 4, V0 until 13 learned skills, then V2, keep 1	0.6/-0.1	0.7/-0.0	Mythical Doom | Beginner 1 | none
+32	from lvl 2, V0 until 13 learned skills, then V2, keep 2	0.2/-0.1 (0.5)	from lvl 4, V0 until 13 learned skills, then V2, keep 2	0.3/-0.1	0.7/-0.0	Mythical Doom | Beginner 1 | none
+33	from lvl 2, V0 until 13 learned skills, then V2, keep 3	0.2/-0.1 (0.4)	from lvl 4, V0 until 13 learned skills, then V2, keep 3	0.2/-0.1	0.7/-0.0	Mythical Doom | Beginner 1 | none
+34	from lvl 2, V0 until 13 learned skills, then V2, keep 4	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 4	0.1/-0.1	0.7/-0.0	Mythical Arduanatt | Skilled 1 | none
+35	from lvl 2, V0 until 13 learned skills, then V2, keep 5	0.0/-0.1 (0.5)	from lvl 4, V0 until 13 learned skills, then V2, keep 5	0.1/-0.1	0.6/0.0	Mythical Diné | Skilled 1 | none
+36	from lvl 2, V0 until 13 learned skills, then V2, keep 6	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 6	0.1/-0.1	0.6/0.0	Mythical Diné | Skilled 1 | none
+37	from lvl 2, V0 until 13 learned skills, then V2, keep 7	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 7	0.1/-0.1	0.6/0.0	Mythical Diné | Skilled 1 | none
+38	from lvl 7, V0 until 14 learned skills, then V2, keep 12	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 8	0.1/-0.1	0.6/0.0	Mythical Diné | Skilled 1 | none
+39	from lvl 7, V0 until 14 learned skills, then V2, keep 13	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 9	0.1/-0.1	0.6/0.0	Mythical Diné | Skilled 1 | none
+40	from lvl 7, V0 until 15 learned skills, then V2, keep 14	0.0/-0.1 (0.1)	from lvl 4, V0 until 13 learned skills, then V2, keep 10	0.1/-0.1	0.5/0.0	Mythical Diné | Skilled 1 | none
