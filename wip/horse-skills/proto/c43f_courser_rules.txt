@@ -1,0 +1,50 @@
+# C43 full courser: 148 cases, target ['Charge', 'Drift', 'Sprint', 'Instant Accel', 'Sideways', 'S: Instant Accel', 'S: Sideways']
+# wording bands: 1 | small 2-8 | V2 9-20 | mid 21-20 | high 21-40 (empty if lo > hi)
+#  small (c0, a, lo, T (0 = V2), k) = (30, 2.0, 2, 0, 1)  (stage-1 max extra worst 0.0)
+#  V2 (c0, a, lo, k) = (29, 1.25, 6, 2)  (1.0)
+#  mid (L, T, S, k) = None  (0.0)
+#  high (L, T, S, k) = (13, 13, 12, 0)  (0.5)
+# next best: (max 1.0, mean 0.17, bands 3: 8/20/40), (max 1.0, mean 0.17, bands 3: 8/21/21), (max 1.0, mean 0.17, bands 3: 8/21/40), (max 1.0, mean 0.17, bands 3: 8/19/19), (max 1.0, mean 0.17, bands 3: 8/19/40)
+
+# rechecked with 4000 fresh horses per case (seed 3003): worst / average loss vs each case's reference best
+N	fit plan	fit worst/avg (CV worst)	wording plan	wording worst/avg	current rule worst/avg	wording worst case
+1	no swaps while leveling, every coupon at level 30	0.7/-0.2 (2.7)	no swaps while leveling, every coupon at level 30	0.7/-0.2	0.7/-0.2	T8 Type 19 | Artisan 7 | none | level 12, 8 skills
+2	from lvl 26, V0 until 14 learned skills, then V2, keep 1	1.2/-0.1 (4.5)	from lvl 26, V2 until lvl 30, keep 1	1.2/-0.1	5.6/0.8	T8 Type 4 | Artisan 7 | gear
+3	from lvl 23, V2 until lvl 30, keep 1	1.7/0.5 (2.1)	from lvl 24, V2 until lvl 30, keep 1	1.9/0.4	6.6/1.6	T8 Type 19 | Artisan 7 | both
+4	from lvl 22, V0 until 9 learned skills, then V2, keep 1	2.0/0.4 (2.5)	from lvl 22, V2 until lvl 30, keep 1	2.0/0.4	5.9/1.5	T8 Type 19 | Master 20 | gear
+5	from lvl 20, V2 until lvl 30, keep 0	3.1/0.5 (5.3)	from lvl 20, V2 until lvl 30, keep 1	2.9/0.2	4.5/1.0	T8 Type 1 | Artisan 7 | none | level 12, 6 skills
+6	from lvl 18, V0 until 9 learned skills, then V2, keep 1	2.9/0.4 (2.8)	from lvl 18, V2 until lvl 30, keep 1	2.5/0.3	4.2/0.9	T8 Type 1 | Artisan 7 | none | level 12, 6 skills
+7	from lvl 18, V0 until 9 learned skills, then V2, keep 1	2.3/0.5 (5.1)	from lvl 16, V2 until lvl 30, keep 1	3.0/0.2	2.3/0.5	T8 Type 1 | Artisan 7 | none | level 12, 6 skills
+8	from lvl 14, V2 until lvl 30, keep 1	2.1/0.0 (2.2)	from lvl 14, V2 until lvl 30, keep 1	2.1/0.0	1.9/0.3	T8 Type 1 | Artisan 7 | none | level 12, 6 skills
+9	from lvl 14, V2 until lvl 30, keep 2	1.5/-0.1 (2.0)	from lvl 18, V2 until lvl 30, keep 2	2.9/0.4	1.1/-0.0	T8 Type 4 | Master 20 | both
+10	from lvl 14, V2 until lvl 30, keep 3	1.2/-0.2 (2.0)	from lvl 17, V2 until lvl 30, keep 2	2.1/0.2	1.2/-0.3	T8 Type 4 | Master 20 | gear
+11	from lvl 14, V2 until lvl 30, keep 4	1.1/-0.3 (2.1)	from lvl 15, V2 until lvl 30, keep 2	1.3/-0.2	1.1/-0.2	T8 Type 4 | Artisan 7 | none
+12	from lvl 14, V2 until lvl 30, keep 5	1.0/-0.4 (0.9)	from lvl 14, V2 until lvl 30, keep 2	1.0/-0.4	1.1/-0.2	T8 Type 5 | Skilled 1 | none | level 8, 5 skills
+13	from lvl 15, V2 until lvl 30, keep 7	1.9/-0.2 (1.2)	from lvl 13, V2 until lvl 30, keep 2	0.8/-0.4	0.9/-0.4	T8 Type 5 | Skilled 1 | none | level 8, 5 skills
+14	from lvl 7, V2 until lvl 30, keep 2	1.1/-0.3 (1.5)	from lvl 12, V2 until lvl 30, keep 2	0.9/-0.3	0.8/-0.4	T8 Type 3 | Beginner 1 | none
+15	from lvl 7, V2 until lvl 30, keep 3	1.0/-0.4 (1.3)	from lvl 10, V2 until lvl 30, keep 2	0.8/-0.4	0.8/-0.4	T8 Type 3 | Beginner 1 | none
+16	from lvl 7, V2 until lvl 30, keep 4	0.9/-0.4 (1.3)	from lvl 9, V2 until lvl 30, keep 2	0.7/-0.4	0.8/-0.4	T8 Type 3 | Beginner 1 | none
+17	from lvl 7, V2 until lvl 30, keep 6	0.8/-0.4 (2.2)	from lvl 8, V2 until lvl 30, keep 2	0.8/-0.3	0.7/-0.3	T8 Type 3 | Beginner 1 | none
+18	from lvl 7, V2 until lvl 30, keep 7	0.8/-0.3 (1.4)	from lvl 7, V2 until lvl 30, keep 2	0.8/-0.3	0.9/-0.2	T8 Type 4 | Skilled 1 | both
+19	from lvl 14, V0 until 9 learned skills, then V2, keep 9	1.3/-0.1 (1.4)	from lvl 6, V2 until lvl 30, keep 2	1.0/-0.1	0.9/-0.2	T8 Type 4 | Skilled 1 | both
+20	from lvl 14, V0 until 9 learned skills, then V2, keep 10	1.3/0.0 (1.2)	from lvl 6, V2 until lvl 30, keep 2	1.0/-0.0	1.1/-0.1	T8 Type 4 | Skilled 1 | both
+21	from lvl 14, V0 until 10 learned skills, then V2, keep 10	1.1/0.0 (0.7)	from lvl 13, V0 until 13 learned skills, then V2, keep 9	2.0/0.0	0.9/-0.0	T8 Type 4 | Beginner 1 | gear
+22	from lvl 12, V0 until 12 learned skills, then V2, keep 10	1.1/-0.0 (1.1)	from lvl 13, V0 until 13 learned skills, then V2, keep 10	1.7/-0.0	1.1/-0.0	T8 Type 4 | Skilled 1 | none
+23	from lvl 13, V0 until 13 learned skills, then V2, keep 10	1.3/-0.0 (1.0)	from lvl 13, V0 until 13 learned skills, then V2, keep 11	1.4/-0.0	0.8/-0.0	T8 Type 4 | Skilled 1 | none
+24	from lvl 13, V0 until 13 learned skills, then V2, keep 11	1.3/-0.0 (1.0)	from lvl 13, V0 until 13 learned skills, then V2, keep 12	1.4/-0.0	0.7/-0.0	T8 Type 4 | Beginner 1 | gear
+25	from lvl 14, V0 until 12 learned skills, then V2, keep 12	1.1/0.1 (0.9)	from lvl 13, V0 until 13 learned skills, then V2, keep 13	1.2/-0.0	0.7/-0.0	T8 Type 4 | Skilled 1 | none
+26	from lvl 14, V0 until 13 learned skills, then V2, keep 10	1.2/0.1 (0.6)	from lvl 13, V0 until 13 learned skills, then V2, keep 14	1.0/-0.0	0.7/0.0	T8 Type 4 | Skilled 1 | none
+27	from lvl 14, V0 until 13 learned skills, then V2, keep 15	0.9/0.1 (0.3)	from lvl 13, V0 until 13 learned skills, then V2, keep 15	0.8/0.0	0.6/0.0	T8 Type 4 | Beginner 1 | gear
+28	from lvl 11, V0 until 13 learned skills, then V2, keep 14	0.5/-0.0 (0.5)	from lvl 13, V0 until 13 learned skills, then V2, keep 16	0.8/0.0	0.6/0.0	T8 Type 4 | Skilled 1 | none
+29	from lvl 7, V0 until 13 learned skills, then V2, keep 11	0.6/-0.1 (0.7)	from lvl 13, V0 until 13 learned skills, then V2, keep 17	0.7/0.0	0.5/0.0	T8 Type 4 | Skilled 1 | none
+30	from lvl 7, V0 until 13 learned skills, then V2, keep 7	0.7/-0.1 (0.5)	from lvl 13, V0 until 13 learned skills, then V2, keep 18	0.7/0.0	0.7/0.0	T8 Type 4 | Beginner 1 | none
+31	from lvl 7, V0 until 13 learned skills, then V2, keep 8	0.6/-0.0 (0.5)	from lvl 13, V0 until 13 learned skills, then V2, keep 19	0.6/0.0	0.6/0.1	T8 Type 2 | Beginner 1 | none
+32	from lvl 7, V0 until 13 learned skills, then V2, keep 9	0.5/-0.0 (0.5)	from lvl 13, V0 until 13 learned skills, then V2, keep 20	0.6/0.1	0.6/0.1	T8 Type 2 | Beginner 1 | none
+33	from lvl 7, V0 until 13 learned skills, then V2, keep 10	0.5/-0.0 (0.4)	from lvl 13, V0 until 13 learned skills, then V2, keep 21	0.6/0.1	0.5/0.1	T8 Type 2 | Beginner 1 | none
+34	from lvl 10, V0 until 14 learned skills, then V2, keep 19	0.6/-0.0 (0.4)	from lvl 13, V0 until 13 learned skills, then V2, keep 22	0.6/0.1	0.5/0.1	T8 Type 2 | Beginner 1 | none
+35	from lvl 10, V0 until 14 learned skills, then V2, keep 21	0.5/-0.0 (0.3)	from lvl 13, V0 until 13 learned skills, then V2, keep 23	0.6/0.0	0.4/0.0	T8 Type 2 | Beginner 1 | none
+36	from lvl 10, V0 until 14 learned skills, then V2, keep 22	0.4/-0.0 (0.2)	from lvl 13, V0 until 13 learned skills, then V2, keep 24	0.5/0.0	0.4/0.0	T8 Type 2 | Beginner 1 | none
+37	from lvl 10, V0 until 14 learned skills, then V2, keep 23	0.3/-0.0 (0.2)	from lvl 13, V0 until 13 learned skills, then V2, keep 25	0.5/0.0	0.4/0.0	T8 Type 2 | Beginner 1 | none
+38	from lvl 10, V0 until 14 learned skills, then V2, keep 24	0.3/-0.0 (0.2)	from lvl 13, V0 until 13 learned skills, then V2, keep 26	0.5/0.0	0.3/0.0	T8 Type 2 | Beginner 1 | none
+39	from lvl 11, V0 until 14 learned skills, then V2, keep 25	0.3/-0.0 (0.1)	from lvl 13, V0 until 13 learned skills, then V2, keep 27	0.4/0.0	0.3/0.0	T8 Type 1 | Beginner 1 | none
+40	from lvl 5, V0 until 14 learned skills, then V2, keep 24	0.4/-0.0 (0.1)	from lvl 13, V0 until 13 learned skills, then V2, keep 28	0.4/0.0	0.3/0.0	T8 Type 1 | Beginner 1 | none
