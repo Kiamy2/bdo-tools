@@ -110,10 +110,21 @@ if ok:
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
 code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; "
-                "print(H.rule_plan(20), H.rule_plan(9), H.rule_plan(27), H.rule_plan(20, start_level=15))")
-check("rule_plan: fitted, formula, nearest fitted below, partway horse", code == 0 and out.strip() ==
-      "('coursier_switch', 10, 15, 11) ('coursier_v2', 16, 9, 0) ('coursier_switch', 9, 22, 14) "
-      "('coursier_switch', 16, 15, 11)", out)
+                "print(H.rule_plan(1), H.rule_plan(6), H.rule_plan(9), H.rule_plan(15), H.rule_plan(20), "
+                "H.rule_plan(23), H.rule_plan(30), H.rule_plan(20, start_level=15))")
+check("rule_plan: the compact rule's bands (1 / 2-19 / 20-21 / 22+), halves rounded up, partway horse",
+      code == 0 and out.strip() == "('at30', 1, 0, 0) ('coursier_v2', 21, 5, 0) ('coursier_v2', 15, 8, 0) "
+      "('coursier_v2', 10, 14, 0) ('coursier_switch', 11, 19, 10) ('coursier_switch', 10, 23, 12) "
+      "('coursier_switch', 10, 24, 12) ('coursier_switch', 16, 19, 10)", out)
+code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; "
+                "h = H.get_horse(H.load_data(), 'T8 example (bdolytics icon horse_71)'); "
+                "d = H.get_horse(H.load_data(), 'Mythical Diné'); "
+                "print(H.CLASSIC_FODDER, H._cycle_skill(H.CLASSIC_FODDER, h.weights), "
+                "H._cycle_skill(H.CLASSIC_FODDER, d.weights))")
+check("V0 swaps Fore Chop first; V2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
+      "['Fore Chop', 'Hind Kick'] Hind Kick Hind Kick", out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--always-best")
+check("horse_skills: --always-best without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--selection-coupon", "planned")
 check("horse_skills: --selection-coupon without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("-c", """
@@ -174,6 +185,11 @@ code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--tr
 m = re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M)
 check("horse_skills --optimize", code == 0 and [b for b, _ in m] == ["0", "1", "2", "3"]
       and float(m[3][1]) >= float(m[0][1]) and "coupons for a 50%" in out, out)
+code2, out2 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Guru 20", "--optimize", "3",
+                  "--always-best")
+src2 = re.findall(r"^\d+\t(?:from lvl|no swaps).*\t(rule|best) \(", out2, re.M)
+check("horse_skills --optimize --always-best: every suggested plan is the best found", code2 == 0 and src2 == ["best"] * 3
+      and "--always-best" in out2, out2)
 code, out = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Guru 20", "--optimize", "2",
                "--engine", "python")
 m = re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M)

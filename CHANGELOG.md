@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-11-21
+- The general rule (`rule_plan`, the `--optimize` suggested plans) refitted with the points reset, as a compact rule: 1 coupon: all at level 30; 2-19: V2 from level max(10, 31 - 1.75 x N), keep 1; 20-21: from level 11, V0 until 10 learned skills, then V2, keep 1; 22+: from level 10, V0 until 12 learned skills, then V2, spending at most 24 while leveling. `RULE_FITTED` is gone. Below 5 coupons the old rule spent every coupon while leveling (up to 14 points lost); the new one keeps 1.
+- `--always-best` (with `--optimize`): suggest the best plan found for every budget, not the rule's plan when it's within 1 point.
+- V0 (`coursier`, and the V0 phase of `coursier_switch`) swaps Fore Chop first, then Hind Kick: slightly better when Hind Kick is the heavier. `CLASSIC_FODDER` is now `["Fore Chop", "Hind Kick"]`; `coursier_v2` still cycles the heavier one, Hind Kick on ties.
 - `Evaluator.plans(used=True)` and `simulate_plan()` return `used[B]`: the expected number of Change Coupons used with B coupons available (while leveling, then the level-30 cleanup until the set is complete or it can't go on). Exact in the fast engine (one more value in the cleanup sweep, `cleanup_values(used=True)`).
 - Skill Change Points now go back to 0 when a Change Coupon gives the desired skill (seen in-game twice; before, the model let them grow by 1 per coupon). Both engines, while leveling and in the level-30 cleanup; `simulate_plan`'s `points_reset` option is gone (always on). Chances drop in hard cases, e.g. the T8 example at Skilled 1, best plan with 20 coupons: 61% instead of 71%.
 - `bdo/horses_fast.py`: the exact level-30 cleanup is swept by wanted skills held, then points (the reset breaks the old order by points); `cleanup_values` lost its `bound` argument. `--optimize` on the T8 example: about 20 s / 0.5 GB at 20 coupons, 45 s / 1.2 GB at 40 (`--low-memory`: 0.8 GB).

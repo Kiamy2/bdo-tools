@@ -21,7 +21,7 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,9
 - `--learned`: skills the horse already has, besides its innate ones. Skill names in English or French, comma-separated (`"High Jump, Dérapage"`).
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
 - `--coupons` (default 30) or `--sweep 0,10,20`: Mount Skill Change Coupons available. `--tickets`: Mount Level Down Tickets (default 0).
-- `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategies swap out (default `Hind Kick, Fore Chop`; `coursier_v2` cycles only the heaviest of them). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1). `--switch-at`: the learned-skill count at which `coursier_switch` changes from `coursier` to `coursier_v2` swaps (default 12).
+- `--wanted`: the skills you want (default: the travel set in the report). `--fodder`: what the `coursier` strategies swap out, in that order (default `Fore Chop, Hind Kick`; `coursier_v2` cycles only the heaviest of them, Hind Kick on ties). `--reserve`: coupons kept for level 30 (default 5). `--swap-from`: level from which the strategies start swapping while leveling (default 1). `--switch-at`: the learned-skill count at which `coursier_switch` changes from `coursier` to `coursier_v2` swaps (default 12).
 - `--points`: Skill Change Points the horse already has. `--point-bonus`: how much each point raises the desired skill (default 0.25, see the report). Each Change Coupon adds 1 point, except one that gives the desired skill: then the points go back to 0 (seen in-game).
 - `--runs` (default 5000) and `--seed`: simulation size and random seed. Results move by about ±1 point between seeds at 5000 runs.
 
@@ -30,13 +30,13 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,9
 `--strategy` takes a comma-separated subset (default all):
 
 - `natural`: no coupons. `at30`: all coupons kept for level 30.
-- `coursier`: swap Hind Kick and Fore Chop each time they're learned. Swapping one often draws the other back, so coupons churn.
-- `coursier_v2` (V2): swap only Hind Kick (the heavier of the two) each time it's learned, and keep Fore Chop. No loop: best with few coupons (see the report).
+- `coursier` (V0): once per level, after the level-up: swap Fore Chop if held, then Hind Kick if held; never more than this one pass per level. Swapping one often draws the other back, so coupons churn. Fore Chop first is slightly better than Hind Kick first when Hind Kick is the heavier (up to about 1 point; none on the T8, where they weigh the same), and swapping again until neither is held is worse (see the report).
+- `coursier_v2` (V2): once per level, after the level-up: swap Hind Kick (the heavier of the two) if held; never Fore Chop. No loop: best with few coupons (see the report).
 - `coursier_switch`: `coursier` (V0) swaps until the horse has `--switch-at` learned skills, then `coursier_v2` (V2) swaps until level 30. The count starts at `--swap-from` (no swaps before); a horse that already has enough skills there goes straight to V2. **Learned skills don't include innate ones:** in-game, the skill list also shows them (7 on a Mythical Diné or Arduanatt, 4 on a T9 Doom, 1 on a T8), so add those when you count. V0 first builds up skills, V2 then stops the Hind Kick ↔ Fore Chop loop: best with many coupons.
 - `once`, `hard`: swap every unwanted skill once / until a wanted one comes. Rarely worth it.
 - `ideal`: unlimited coupons, always holding the rarest skills (the most skills a horse can reach).
 
-Every strategy except `natural` and `ideal` ends with the **level-30 cleanup**: swap the rarest unwanted skill held, with the rarest missing wanted skill as the desired one, until every wanted skill is held or coupons run out. Swapping the rarest first keeps the common skills (Hind Kick...) held, so they don't come back in the next coupon draws. Trying every other choice of skill to swap and of desired skill gains nothing measurable for the full set.
+Every strategy except `natural` and `ideal` ends with the **level-30 cleanup**: swap the rarest unwanted skill held, with the rarest missing wanted skill as the desired one, until every wanted skill is held or coupons run out. Swapping the rarest first keeps the common skills (Hind Kick...) held, so they don't come back in the next coupon draws. Trying every other choice of desired skill gains nothing measurable for the full set (checked with the points reset); other choices of skill to swap gained nothing either (checked before the reset).
 
 ## Output
 
@@ -44,7 +44,7 @@ The simulation prints one row per strategy (descriptions in `--help` and the rep
 
 ```
 strategy  coupons  skills at 30   wanted at 30   all wanted    coupons used  <=1 missing    worst 5%
-coursier  30       18.7/19.3/19.5 12.9/12.9/13.0 92%/95%/97%   24/23/23      99%/100%/100%  1/0/0
+coursier  30       18.8/19.3/19.6 12.9/13.0/13.0 93%/96%/98%   23/23/23      99%/100%/100%  1/0/0
 ```
 (Mythical Diné, Artisan 7, 30 coupons.)
 
@@ -56,18 +56,24 @@ coursier  30       18.7/19.3/19.5 12.9/12.9/13.0 92%/95%/97%   24/23/23      99%
 
 ## Best plan per budget (`--optimize N`)
 
-> **Being rechecked:** the Skill Change Points reset (see `--points`) is in the model since 2026-11-20, so every chance the tool prints includes it. Some findings quoted here come from studies done before it and are being redone: the general rule's plans, "no other cleanup choice gains anything" (strategies above), "the plan best for the full set is also the safest" and the Selection Coupon targeting gain (below).
+> **Being rechecked:** the Skill Change Points reset (see `--points`) is in the model since 2026-11-20, so every chance the tool prints includes it. The general rule and the cleanup's desired-skill choice have been redone with it; two findings quoted here come from studies done before it and are being redone: "the plan best for the full set is also the safest" and the Selection Coupon targeting gain (below).
 
 `--optimize 30` searches, for every budget from 0 to 30 coupons, the best plan: the strategy, the level to start swapping, how many coupons to keep for level 30, and for `coursier_switch` the learned-skill count to switch at (9 to 16). It prints the plans tied with the best (within 1 point) for two goals, the full set and the most wanted skills on average, then the coupons needed for a 50 / 80 / 90 / 95% chance of the full set. Works from a horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
 
 ```
 coupons  full set: chance  tied plans                              most wanted: avg  tied plans  at30: chance, avg
-10       21.5%             coursier_v2: from lvl 10-20, keep 0-7 | coursier_switch: ...  10.59  ...  16.8%, 10.48
-20       61.4%             coursier_switch: from lvl 9-13, V0 until 10-12 learned skills, then V2, keep 0-12   ...
+10       21.5%             coursier_v2: from lvl 10-21, keep 0-7 | coursier_switch: ...  10.59  ...  16.8%, 10.48
+20       61.2%             coursier_switch: from lvl 3-12, V0 until 10-11 learned skills, then V2, keep 1-12   ...
 ```
 (T8 example, Skilled 1, `--optimize 20`.)
 
-After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 10, V0 until 11 learned skills, then V2, keep 5  61.3%  rule (best 61.4%)`. It's the general rule's plan (the same for everyone, chosen to lose the least over many horses and Training levels) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
+After the table, a **suggested plan per budget**: one concrete plan for the full set, such as `20  from lvl 11, V0 until 10 learned skills, then V2, keep 1  60.8%  rule (best 61.2%)`. It's the general rule's plan (the same for everyone, see below) when that plan is within 1 point of the best one found for your horse; otherwise it's the best plan found, and the line says how much the rule would lose. `--always-best` suggests the best plan found for every budget instead (the best of many near-tied plans is partly luck, which is why the rule is preferred by default).
+
+The **general rule** (N = coupons). It was fitted over 63 situations (3 horses, 6 Training levels, 3 boosts, and horses partway through leveling), up to 40 coupons: it stays within about 1 point of the best single plan for each budget, and loses 0.6-3 points against each situation's own best plan.
+- N = 1: no swaps while leveling; use the coupon at level 30.
+- N = 2-19: from level max(10, 31 - 1.75 x N), rounded (halves up), do V2 until level 30, keep 1 coupon.
+- N = 20-21: from level 11, do V0 until 10 learned skills, then V2 until level 30, keep 1.
+- N = 22 or more: from level 10, do V0 until 12 learned skills, then V2 until level 30, spending at most 24 coupons while leveling. V0 = `coursier` swaps, V2 = `coursier_v2` swaps. Each line also shows the bad cases: the chances of missing at most 1 and at most 2 wanted skills, and how many the worst 5% of horses miss. The plan that's best for the full set is also the safest here: in tests over many horses, Training levels and budgets, no plan within 1 point of it had noticeably fewer bad cases.
 
 **Mount Skill Selection Coupon** (`--selection-coupon planned` or `fallback`): one per horse, it changes one of the horse's current skills into the skill you pick. It's best used at the very end, on the last missing skill, and it needs an unwanted skill to change (a horse with fewer learned skills than wanted ones can't use it). It adds a lot in hard cases: on the T8 example at Skilled 1 with 20 coupons, 61% becomes about 91%.
 - `planned`: you'll use it for sure. Every Change Coupon, while leveling and at level 30, then aims at the **second** rarest missing skill (the desired skill), keeping the rarest for the Selection Coupon. The plan search and every chance include it. This targeting is only a bit better (up to about 0.6 points) **if you do use the coupon**; if you might keep it, don't use it while leveling.

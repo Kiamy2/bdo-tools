@@ -60,7 +60,8 @@ def main():
     ap.add_argument("--switch-at", type=int, default=H.DEFAULT_SWITCH_AT, metavar="T",
                     help="coursier_switch: learned skills (innate ones don't count) at which it goes from coursier to "
                     f"coursier_v2 swaps (default {H.DEFAULT_SWITCH_AT})")
-    ap.add_argument("--fodder", help="skills the 'coursier' strategy swaps out (default: Hind Kick,Fore Chop)")
+    ap.add_argument("--fodder", help="skills the 'coursier' strategy swaps out, in that order (default: Fore Chop,"
+                    "Hind Kick)")
     ap.add_argument("--points", type=int, default=0, help="Skill Change Points the horse already has (default 0)")
     ap.add_argument("--point-bonus", type=float, default=0.25, help="desired-skill weight bonus per point (default 0.25)")
     ap.add_argument("--runs", type=int, default=5000, help="simulated levelings per cell (default 5000)")
@@ -77,6 +78,10 @@ def main():
     ap.add_argument("--low-memory", action="store_true",
                     help="--optimize, fast engine: keep the level-30 values as 16-bit numbers (less memory, results "
                     "within about 0.001 points; speed about the same)")
+    ap.add_argument("--always-best", action="store_true",
+                    help="--optimize: suggest the best plan found for every budget, even when the general rule's "
+                    "plan is within 1 point of it (by default the rule's plan is suggested then: the best of many "
+                    "near-tied plans is partly luck, and the rule changes smoothly with the budget)")
     ap.add_argument("--lang", default="en", choices=["en", "fr"], help="skill names in output")
     a = ap.parse_args()
 
@@ -155,8 +160,9 @@ def main():
 
     if a.optimize is not None:
         return optimize_report(a, horse, bonus, learned, wanted, fodder, head)
-    if a.selection_coupon:
-        print("ERROR: --selection-coupon works with --optimize", file=sys.stderr)
+    if a.selection_coupon or a.always_best:
+        print(f"ERROR: {'--selection-coupon' if a.selection_coupon else '--always-best'} works with --optimize",
+              file=sys.stderr)
         return 2
     budgets = [int(x) for x in a.sweep.split(",")] if a.sweep else [a.coupons]
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
@@ -272,12 +278,16 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head):
         print(f"# coupons for a {t:.0%} chance of the full set: {b if b is not None else '> max'} with the best plan, "
               f"{b30 if b30 is not None else '> max'} with at30")
     print()
-    print("# Suggested plan per budget (full set): the general rule's plan when it's within 1 point of the best plan")
-    print("# found, else the best. V0 = coursier swaps (Hind Kick and Fore Chop), V2 = coursier_v2 swaps (Hind Kick")
-    print("# only); learned skills don't count innate ones; keep = coupons kept for the level-30 cleanup.")
+    if a.always_best:
+        print("# Suggested plan per budget (full set): the best plan found (--always-best).")
+    else:
+        print("# Suggested plan per budget (full set): the general rule's plan when it's within 1 point of the best")
+        print("# plan found, else the best (--always-best: always the best).")
+    print("# V0 = coursier swaps (once per level: Fore Chop, then Hind Kick, if held), V2 = coursier_v2 swaps (once")
+    print("# per level: Hind Kick only); learned skills don't count innate ones; keep = coupons kept for level 30.")
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more).")
-    sug = {B: H.suggested_plan(res, B, 0.01, a.level) for B in range(1, a.optimize + 1)}
+    sug = {B: H.suggested_plan(res, B, 0.01, a.level, a.always_best) for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
     if a.selection_coupon == "fallback":
         print("# with Selection Coupon: the full-set chance if, at level 30, you decide to use your Selection Coupon")

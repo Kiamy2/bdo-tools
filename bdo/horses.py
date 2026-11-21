@@ -15,6 +15,7 @@ Model (fitted to the in-game "Growth simulator" on 2026-11-17, see docs/horse-sk
   except one that gives the desired skill: the points go back to 0 (seen in-game, 2026-11-19).
 """
 import json
+import math
 import os
 import random
 
@@ -48,7 +49,7 @@ TRAVEL_SET = ["Sprint", "Instant Accel", "S: Instant Accel", "Drift", "High Jump
               # Dream / Mythical / Voltarion skills that can be learned (not innate)
               "Wings of Freedom", "Earth of Protection", "Dark Sprint", "Lightning Charge",
               "Instant Accel: Flash", "Drift: Flash", "Thunderfall"]
-CLASSIC_FODDER = ["Hind Kick", "Fore Chop"]
+CLASSIC_FODDER = ["Fore Chop", "Hind Kick"]       # in the order V0 swaps them (C42: Fore Chop first is a bit better)
 STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard", "ideal"]
 SWITCH_TS = list(range(9, 17))
 TAILS = 5                                       # bad-outcome chances: missing at most 0..4 wanted skills                  # thresholds the optimizer tries for coursier_switch
@@ -56,7 +57,7 @@ DEFAULT_SWITCH_AT = 12
 STRATEGY_HELP = {
     "natural": "no coupons used",
     "at30": "level naturally, spend all coupons at level 30 on unwanted skills",
-    "coursier": "swap Hind Kick/Fore Chop each time they're learned (keeping a reserve), rest at 30",
+    "coursier": "once per level: swap Fore Chop, then Hind Kick, if held (keeping a reserve), rest at 30",
     "coursier_v2": "swap only Hind Kick (the heavier of the two) each time it's learned and keep Fore Chop: no "
                    "Hind Kick <-> Fore Chop loop (keeping a reserve), rest at 30. Best with few coupons",
     "coursier_switch": "coursier until the horse has --switch-at learned skills (default 12; innate skills don't "
@@ -184,9 +185,10 @@ def horse_from_sim_file(path, resolve):
 # --- simulation ----------------------------------------------------------------------------------------------
 
 def _cycle_skill(fodder, wt):
-    """V2 cycles exactly one fodder skill, the heaviest (first in the list on ties), and keeps the others: a swap
-    of it can then never draw another fodder skill back, so coupons don't churn between them."""
-    return max(fodder, key=lambda s: wt[s]) if fodder else None
+    """V2 cycles exactly one fodder skill, the heaviest, and keeps the others: a swap of it can then never draw
+    another fodder skill back, so coupons don't churn between them. On ties: Hind Kick if it's one of them, else the
+    first in the list (the T8 weighs both the same)."""
+    return max(fodder, key=lambda s: (wt[s], s == "Hind Kick")) if fodder else None
 
 
 def _rarest_unwanted(have, wanted, rank):
@@ -487,31 +489,25 @@ PLAN_LEVELS = [1, 4, 7, 10, 13, 16, 18, 20, 22, 24, 26, 28]
 PLAN_CAPS = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 22, 26, 30]
 
 
-# The general rule: one plan per budget, chosen to lose the least in the worst case over 72 situations (3 horses x
-# 6 Training levels x 3 boosts, and horses partway through leveling), cross-validated (research for the report).
-# Fitted budgets: (strategy, start level, spending cap, threshold); see rule_plan() for the others.
-RULE_FITTED = {
-    5: ("coursier_v2", 23, 4, 0), 8: ("coursier_v2", 18, 8, 0), 10: ("coursier_v2", 17, 10, 0),
-    12: ("coursier_v2", 11, 12, 0), 15: ("coursier_v2", 8, 15, 0), 16: ("coursier_v2", 5, 15, 0),
-    17: ("coursier_v2", 4, 15, 0), 18: ("coursier_switch", 10, 17, 10), 19: ("coursier_switch", 10, 15, 11),
-    20: ("coursier_switch", 10, 15, 11), 21: ("coursier_switch", 10, 17, 12), 22: ("coursier_switch", 10, 18, 13),
-    23: ("coursier_switch", 10, 18, 13), 24: ("coursier_switch", 4, 23, 13), 25: ("coursier_switch", 9, 22, 14),
-    30: ("coursier_switch", 9, 22, 15), 35: ("coursier_switch", 4, 22, 15), 40: ("coursier_switch", 4, 22, 15),
-}
-
-
+# The general rule (C37r, with the points reset): one compact plan per budget, within about 1 point of the best
+# plan per budget fitted over 63 situations (3 horses x 6 Training levels x 3 boosts, and horses partway through
+# leveling; worst loss 0.6-3.0 points), checked with fresh horses (research for the report). Fitted up to 40
+# coupons; larger budgets use the last band (not checked).
 def rule_plan(budget, start_level=1):
-    """The general rule's plan for a coupon budget: the fitted plan (RULE_FITTED); up to 17 coupons otherwise
-    coursier_v2 from level 29 - 1.5 x budget, spending everything; above 17, the nearest fitted budget below
-    (same spending cap). A horse already past the start level starts at its next level."""
-    if budget <= 0:
+    """The general rule's plan for a coupon budget (N):
+    N = 1: no swaps while leveling, the coupon at level 30;
+    N = 2-19: from level max(10, 31 - 1.75 x N, rounded, halves up), V2 until level 30, keep 1;
+    N = 20-21: from level 11, V0 until 10 learned skills, then V2 until level 30, keep 1;
+    N >= 22: from level 10, V0 until 12 learned skills, then V2 until level 30, spending at most 24 while leveling.
+    A horse already past the start level starts at its next level."""
+    if budget <= 1:
         return ("at30", 1, 0, 0)
-    if budget in RULE_FITTED:
-        st, lv, cap, T = RULE_FITTED[budget]
-    elif budget < 17:
-        st, lv, cap, T = "coursier_v2", min(29, max(2, round(29 - 1.5 * budget))), budget, 0
+    if budget <= 19:
+        st, lv, cap, T = "coursier_v2", min(29, max(10, math.floor(31 - 1.75 * budget + 0.5))), budget - 1, 0
+    elif budget <= 21:
+        st, lv, cap, T = "coursier_switch", 11, budget - 1, 10
     else:
-        st, lv, cap, T = RULE_FITTED[max(b for b in RULE_FITTED if b <= budget)]
+        st, lv, cap, T = "coursier_switch", 10, min(24, budget), 12
     return (st, max(lv, start_level + 1), cap, T)
 
 
@@ -591,13 +587,14 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "co
             for p in sorted(final)}
 
 
-def suggested_plan(res, B, margin=0.01, start_level=1):
+def suggested_plan(res, B, margin=0.01, start_level=1, always_best=False):
     """One plan to follow for budget B (full-set goal): the general rule's plan if it's within margin of the best
-    plan in res, else the best. Returns (plan, 'rule' or 'best', the rule plan's chance or None)."""
+    plan in res, else the best (always the best with always_best). Returns (plan, 'rule' or 'best', the rule plan's
+    chance or None)."""
     best = tied_plans(res, B, "full", 0)[0]
     rp = rule_plan(B, start_level)
     rc = res[rp]["full"][B] if rp in res and res[rp]["full"][B] is not None else None
-    if rc is not None and rc >= res[best]["full"][B] - margin:
+    if not always_best and rc is not None and rc >= res[best]["full"][B] - margin:
         return rp, "rule", rc
     return best, "best", rc
 
