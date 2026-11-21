@@ -123,22 +123,23 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
                 "H._cycle_skill(H.CLASSIC_FODDER, d.weights))")
 check("V0 swaps Fore Chop first; V2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
       "['Fore Chop', 'Hind Kick'] Hind Kick Hind Kick", out)
-# T8 types: the in-game simulator readings (Artisan 7, level 1, no boosts: Hind Kick and 'no skill' chances)
+# T8 types: every value of the in-game simulator readings (tests/data/sim_t8_types_2026-11-21.csv, default horses)
 code, out = run("-c", """
-import sys; sys.path.insert(0, '.')
+import csv, re, sys; sys.path.insert(0, '.')
 from bdo import horses as H
-d = H.load_data(); M = 1.217
-read = {'T8 Type 2': (9.6775, 22.865), 'T8 Type 7': (9.6775, 22.865), 'T8 Type 3': (11.0964, 24.2362),
-        'T8 Type 4': (12.7667, 20.073), 'T8 Type 9': (12.7667, 20.073), 'T8 Type 5': (7.567, 29.2882),
-        'T8 Type 19': (9.0111, 15.7935), 'T8 Type 21': (9.0111, 15.7935), 'T8 Type 20': (9.0241, 15.8476),
-        'T8 Type 22': (9.0274, 15.8611), 'T8 Type 1': (10.9722, 24.3069)}
-worst = 0
-for n, (hk, no) in read.items():
-    h = H.get_horse(d, n); U = sum(h.weights.values()); T = U + h.W
-    worst = max(worst, abs(100 * M * h.weights['Hind Kick'] / T - hk), abs(100 * (1 - M * U / T) - no))
-print(worst < 0.002, round(worst, 4))
+d = H.load_data(); res = H.skill_resolver(d); worst, n = 0, 0
+rows = [r for r in csv.reader(l for l in open('tests/data/sim_t8_types_2026-11-21.csv') if not l.startswith('#'))][1:]
+for reading, typ, tr, lvl, boosts, innate, skill, pct in rows:
+    if reading.startswith('special') or pct == 'base':
+        continue
+    h = H.get_horse(d, 'T8 Type ' + typ); M = 1 + H.training_bonus(tr) / 100
+    U = sum(h.weights.values()); T = U + h.W
+    m = re.match(r'cut [(](.*)[)]', skill); name = m.group(1) if m else skill
+    pred = 100 * (1 - M * U / T) if name == 'Compétence non apprise' else 100 * M * h.weights[res(name)] / T
+    worst = max(worst, abs(pred - float(pct))); n += 1
+print(worst < 0.002, n, round(worst, 4))
 """)
-check("T8 types (aliases too) reproduce the simulator readings at Artisan 7 (Hind Kick, 'no skill'; within 0.002 points)",
+check("T8 types (aliases too) reproduce every value of the simulator readings (within 0.002 points)",
       code == 0 and out.startswith("True"), out)
 code, out = run("horse_skills.py", "T8 Type 5", "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")
 code2, out2 = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "10", "--strategy", "coursier_v2")

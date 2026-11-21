@@ -312,7 +312,7 @@
    },
    "no_skill_weight": 37.991,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Type 2 at Artisan 9 and Artisan 7, Type 7 at Artisan 7 (same chances); top of the list"
+   "verified": "2026-11-21, in-game simulator: Type 2 at Artisan 9 and Artisan 7, Type 7 at Artisan 7 (same chances); top of the list; readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 3": {
    "tier": 8,
@@ -345,7 +345,7 @@
    },
    "no_skill_weight": 39.12,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Type 3 at Artisan 7; top of the list"
+   "verified": "2026-11-21, in-game simulator: Type 3 at Artisan 7; top of the list; readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 4": {
    "tier": 8,
@@ -380,7 +380,7 @@
    },
    "no_skill_weight": 34.683,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Types 4 and 9 at Artisan 7 (same chances; Type 6 the same per the user); top of the list. No Two-seater: the 'no skill' chance fits only that bdolytics variant (icons 277 / 32)"
+   "verified": "2026-11-21, in-game simulator: Types 4 and 9 at Artisan 7 (same chances; Type 6 the same per the user); top of the list. No Two-seater: the 'no skill' chance fits only that bdolytics variant (icons 277 / 32); readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 5": {
    "tier": 8,
@@ -412,7 +412,7 @@
    },
    "no_skill_weight": 48.515,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Type 5 at Artisan 7, full list (S: Instant Accel 0.9248% -> 0.880, S: Sideways 0.2364% -> 0.2249)"
+   "verified": "2026-11-21, in-game simulator: Type 5 at Artisan 7, full list (S: Instant Accel 0.9248% -> 0.880, S: Sideways 0.2364% -> 0.2249); readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 19": {
    "tier": 8,
@@ -446,7 +446,7 @@
    },
    "no_skill_weight": 29.958,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Types 19 and 21 at Artisan 7 (same chances); top of the list. Learnable weights from the 'no skill' chance: 67.282 = the S: Instant Accel 0.88 variant"
+   "verified": "2026-11-21, in-game simulator: Types 19 and 21 at Artisan 7 (same chances); top of the list. Learnable weights from the 'no skill' chance: 67.282 = the S: Instant Accel 0.88 variant; readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 20": {
    "tier": 8,
@@ -478,7 +478,7 @@
    },
    "no_skill_weight": 29.958,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Type 20 at Artisan 7; top of the list. Learnable weights from the 'no skill' chance: 67.142 = the S: Instant Accel 0.74 variant (icon 41)"
+   "verified": "2026-11-21, in-game simulator: Type 20 at Artisan 7; top of the list. Learnable weights from the 'no skill' chance: 67.142 = the S: Instant Accel 0.74 variant (icon 41); readings in tests/data/sim_t8_types_2026-11-21.csv"
   },
   "T8 Type 22": {
    "tier": 8,
@@ -510,8 +510,8 @@
    },
    "no_skill_weight": 29.958,
    "no_skill_weight_note": "from the in-game simulator reading (Artisan 7, level 1, no boosts): total weight = Training multiplier / (Hind Kick chance / weight), minus the learnable weights given by the 'no skill' chance; about +-0.05",
-   "verified": "2026-11-21, in-game simulator: Type 22 at Artisan 7; top of the list. Learnable weights from the 'no skill' chance: 67.107",
-   "weights_note": "S: Instant Accel 0.705 is inferred (not read): the 'no skill' chance fits the icon-41 weights with S: Instant Accel 0.705 instead of 0.74 (0.705 is the Type 2 value); not a bdolytics row"
+   "verified": "2026-11-21, in-game simulator: Type 22 at Artisan 7, top of the list and the lower part (S: Instant Accel 0.8838% -> 0.705, S: Sideways 0.2821% -> 0.225); readings in tests/data/sim_t8_types_2026-11-21.csv",
+   "weights_note": "bdolytics icon-41 weights with S: Instant Accel 0.705 instead of 0.74 (read in-game; not a bdolytics row)"
   }
  }
 }

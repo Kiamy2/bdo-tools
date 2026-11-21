@@ -1,0 +1,123 @@
+# In-game growth simulator readings of T8 horses (French client), sent by the user as screenshots on 2026-11-21.
+# Transcribed by hand from the screenshots; one row per value shown. Level-up chances don't depend on the horse level.
+# Columns: reading (one screenshot or scroll position), type (in-game 'Apparence'), training, horse_level, boosts,
+#          innate (skills shown as 'Compétences de base'), skill (as shown), percent ('base' = innate).
+# 'special' readings are registered horses with extra innate skills (out of scope of the T8 rule; kept for the record).
+# Partial lists: only the visible rows; 'cut' = a row whose name was cut off at the top (identified by its value).
+# Type 6: same weights as Type 4 (user's statement, no screenshot).
+reading,type,training,horse_level,boosts,innate,skill,percent
+t2_a9,2,Artisan 9,1,none,Sprint,Compétence non apprise,21.9777
+t2_a9,2,Artisan 9,1,none,Sprint,Ruade,9.7888
+t2_a9,2,Artisan 9,1,none,Sprint,Cabrade,9.7888
+t2_a9,2,Artisan 9,1,none,Sprint,Dérapage,3.4171
+t2_a9,2,Artisan 9,1,none,Sprint,Sprint,base
+t2_a9,2,Artisan 9,1,none,Sprint,Accélérer,4.4494
+t2_a9,2,Artisan 9,1,none,Sprint,Saut haut,3.7969
+t2_a9,2,Artisan 9,1,none,Sprint,Arrêt d'urgence,3.5833
+t2_a9,2,Artisan 9,1,none,Sprint,Accél. Fulgurante,1.673
+t2_a7,2,Artisan 7,1,none,Sprint,Compétence non apprise,22.865
+t2_a7,2,Artisan 7,1,none,Sprint,Ruade,9.6775
+t2_a7,2,Artisan 7,1,none,Sprint,Cabrade,9.6775
+t2_a7,2,Artisan 7,1,none,Sprint,Dérapage,3.3783
+t3_a7,3,Artisan 7,1,none,Sprint,Compétence non apprise,24.2362
+t3_a7,3,Artisan 7,1,none,Sprint,Ruade,11.0964
+t3_a7,3,Artisan 7,1,none,Sprint,Cabrade,11.0964
+t3_a7,3,Artisan 7,1,none,Sprint,Dérapage,3.6283
+t3_a7,3,Artisan 7,1,none,Sprint,Sprint,base
+t3_a7,3,Artisan 7,1,none,Sprint,Accélérer,3.8162
+t4_a7,4,Artisan 7,1,none,Sprint,Compétence non apprise,20.073
+t4_a7,4,Artisan 7,1,none,Sprint,Ruade,12.7667
+t4_a7,4,Artisan 7,1,none,Sprint,Cabrade,12.7667
+t4_a7,4,Artisan 7,1,none,Sprint,Dérapage,2.7099
+t4_a7,4,Artisan 7,1,none,Sprint,Sprint,base
+t4_a7,4,Artisan 7,1,none,Sprint,Accélérer,3.9143
+t5_a7,5,Artisan 7,1,none,Sprint,Compétence non apprise,29.2882
+t5_a7,5,Artisan 7,1,none,Sprint,Ruade,7.567
+t5_a7,5,Artisan 7,1,none,Sprint,Cabrade,7.567
+t5_a7,5,Artisan 7,1,none,Sprint,Dérapage,4.1303
+t5_a7,5,Artisan 7,1,none,Sprint,Sprint,base
+t5_a7,5,Artisan 7,1,none,Sprint,Accélérer,5.5176
+t5_a7_low,5,Artisan 7,1,none,Sprint,cut (Pas latéraux),0.8276
+t5_a7_low,5,Artisan 7,1,none,Sprint,Recul rapide,5.5702
+t5_a7_low,5,Artisan 7,1,none,Sprint,Sauts continus,5.5176
+t5_a7_low,5,Artisan 7,1,none,Sprint,Hurlement de cheval,3.7835
+t5_a7_low,5,Artisan 7,1,none,Sprint,Prudence,3.7835
+t5_a7_low,5,Artisan 7,1,none,Sprint,Brève chevauchée,5.5176
+t5_a7_low,5,Artisan 7,1,none,Sprint,S : Ruade,3.9937
+t5_a7_low,5,Artisan 7,1,none,Sprint,S : Cabrade,3.9937
+t5_a7_low,5,Artisan 7,1,none,Sprint,S : Accél. Fulgurante,0.9248
+t5_a7_low,5,Artisan 7,1,none,Sprint,S : Pas latéraux,0.2364
+t7_a7,7,Artisan 7,1,none,Sprint,Compétence non apprise,22.865
+t7_a7,7,Artisan 7,1,none,Sprint,Ruade,9.6775
+t7_a7,7,Artisan 7,1,none,Sprint,Cabrade,9.6775
+t7_a7,7,Artisan 7,1,none,Sprint,Dérapage,3.3783
+t7_a7,7,Artisan 7,1,none,Sprint,Sprint,base
+t7_a7,7,Artisan 7,1,none,Sprint,Accélérer,4.3988
+t9_a7,9,Artisan 7,29,none,Sprint,Compétence non apprise,20.073
+t9_a7,9,Artisan 7,29,none,Sprint,Ruade,12.7667
+t9_a7,9,Artisan 7,29,none,Sprint,Cabrade,12.7667
+t9_a7,9,Artisan 7,29,none,Sprint,Dérapage,2.7099
+t9_a7,9,Artisan 7,29,none,Sprint,Sprint,base
+t9_a7,9,Artisan 7,29,none,Sprint,Accélérer,3.9143
+t19_a7,19,Artisan 7,28,none,Sprint,Compétence non apprise,15.7935
+t19_a7,19,Artisan 7,28,none,Sprint,Ruade,9.0111
+t19_a7,19,Artisan 7,28,none,Sprint,Cabrade,9.0111
+t19_a7,19,Artisan 7,28,none,Sprint,Dérapage,4.9186
+t19_a7,19,Artisan 7,28,none,Sprint,Sprint,base
+t19_a7,19,Artisan 7,28,none,Sprint,Accélérer,6.5705
+t20_a7,20,Artisan 7,29,none,Sprint,Compétence non apprise,15.8476
+t20_a7,20,Artisan 7,29,none,Sprint,Ruade,9.0241
+t20_a7,20,Artisan 7,29,none,Sprint,Cabrade,9.0241
+t20_a7,20,Artisan 7,29,none,Sprint,Dérapage,4.9256
+t20_a7,20,Artisan 7,29,none,Sprint,Sprint,base
+t20_a7,20,Artisan 7,29,none,Sprint,Accélérer,6.58
+t21_a7,21,Artisan 7,28,none,Sprint,Compétence non apprise,15.7935
+t21_a7,21,Artisan 7,28,none,Sprint,Ruade,9.0111
+t21_a7,21,Artisan 7,28,none,Sprint,Cabrade,9.0111
+t21_a7,21,Artisan 7,28,none,Sprint,Dérapage,4.9186
+t21_a7,21,Artisan 7,28,none,Sprint,Sprint,base
+t21_a7,21,Artisan 7,28,none,Sprint,Accélérer,6.5705
+t22_a7,22,Artisan 7,29,none,Sprint,Compétence non apprise,15.8611
+t22_a7,22,Artisan 7,29,none,Sprint,Ruade,9.0274
+t22_a7,22,Artisan 7,29,none,Sprint,Cabrade,9.0274
+t22_a7,22,Artisan 7,29,none,Sprint,Dérapage,4.9274
+t22_a7,22,Artisan 7,29,none,Sprint,Sprint,base
+t22_a7,22,Artisan 7,29,none,Sprint,Accélérer,6.5824
+t22_a7_low,22,Artisan 7,29,none,Sprint,cut (Pas latéraux),0.9873
+t22_a7_low,22,Artisan 7,29,none,Sprint,Recul rapide,6.6451
+t22_a7_low,22,Artisan 7,29,none,Sprint,Sauts continus,6.5824
+t22_a7_low,22,Artisan 7,29,none,Sprint,Hurlement de cheval,4.5137
+t22_a7_low,22,Artisan 7,29,none,Sprint,Prudence,4.5137
+t22_a7_low,22,Artisan 7,29,none,Sprint,Brève chevauchée,6.5824
+t22_a7_low,22,Artisan 7,29,none,Sprint,S : Ruade,4.7644
+t22_a7_low,22,Artisan 7,29,none,Sprint,S : Cabrade,4.7644
+t22_a7_low,22,Artisan 7,29,none,Sprint,S : Accél. Fulgurante,0.8838
+t22_a7_low,22,Artisan 7,29,none,Sprint,S : Pas latéraux,0.2821
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Compétence non apprise,30.0751
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Ruade,7.6838
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Cabrade,7.6838
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Dérapage,4.1941
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Sprint,base
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Accélérer,5.6027
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Saut haut,3.8419
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Arrêt d'urgence,3.8419
+special_t11_a7,11,Artisan 7,29,none,Sprint + Accél. Fulgurante,Accél. Fulgurante,base
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Compétence non apprise,17.1523
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Ruade,13.1
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Cabrade,13.1
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Dérapage,2.7806
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Sprint,base
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Accélérer,4.0165
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Saut haut,4.449
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Arrêt d'urgence,4.7703
+special_t4_a7,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Accél. Fulgurante,1.483
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,cut (Recul rapide),4.6962
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Sauts continus,4.6344
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Hurlement de cheval,4.3996
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Prudence,3.2132
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Brève chevauchée,4.0165
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,S : Ruade,5.6849
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,S : Cabrade,5.6849
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,S : Accél. Fulgurante,0.7415
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,S : Pas latéraux,base
+special_t4_a7_low,4,Artisan 7,1,none,Sprint + S : Pas latéraux,Deux places,1.1123
