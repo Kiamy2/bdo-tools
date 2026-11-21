@@ -56,7 +56,7 @@ coursier  30       18.8/19.3/19.6 12.9/13.0/13.0 93%/96%/98%   23/23/23      99%
 
 ## Best plan per budget (`--optimize N`)
 
-> **Being rechecked:** the Skill Change Points reset (see `--points`) is in the model since 2026-11-20, so every chance the tool prints includes it. The general rule and the cleanup's desired-skill choice have been redone with it; two findings quoted here come from studies done before it and are being redone: "the plan best for the full set is also the safest" and the Selection Coupon targeting gain (below).
+> **Being rechecked:** the Skill Change Points reset (see `--points`) is in the model since 2026-11-20, so every chance the tool prints includes it. The general rule, the cleanup's desired-skill choice and "the plan best for the full set is also the safest" have been redone with it; one finding quoted here comes from a study done before it and is being redone: the Selection Coupon targeting gain (below).
 
 `--optimize 30` searches, for every budget from 0 to 30 coupons, the best plan: the strategy, the level to start swapping, how many coupons to keep for level 30, and for `coursier_switch` the learned-skill count to switch at (9 to 16). It prints the plans tied with the best (within 1 point) for two goals, the full set and the most wanted skills on average, then the coupons needed for a 50 / 80 / 90 / 95% chance of the full set. Works from a horse's current state (`--level`, `--learned`, `--points`, `--tickets`).
 

@@ -1,0 +1,320 @@
+# C4r (points reset): full set % | missing <= 1 % | missing <= 2 % | average missing | 95% of horses miss at most (4000 fresh horses)
+
+## Mythical Diné | Beginner 1
+  10 rule   22.0  53.6  83.5  1.44  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   22.2  54.3  83.9  1.43  3  from lvl 18, V2 until lvl 30, keep 2
+  10 safe1  22.4  54.2  83.7  1.43  3  from lvl 16, V2 until lvl 30, keep 4
+  10 safe2  22.0  54.4  83.9  1.43  3  from lvl 18, V2 until lvl 30, keep 4
+  10 mean   22.2  54.3  83.9  1.43  3  from lvl 18, V2 until lvl 30, keep 2
+  15 rule   42.7  75.8  94.7  0.87  3  from lvl 10, V2 until lvl 30, keep 1
+  15 full   42.8  75.7  94.5  0.88  3  from lvl 11, V2 until lvl 30, keep 5
+  15 safe1  42.8  75.7  94.5  0.88  3  from lvl 11, V2 until lvl 30, keep 3
+  15 safe2  42.7  75.8  94.7  0.87  3  from lvl 10, V2 until lvl 30, keep 3
+  15 mean   42.8  75.7  94.5  0.88  3  from lvl 11, V2 until lvl 30, keep 3
+  20 rule   59.6  86.9  97.7  0.56  2  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   60.1  86.9  97.7  0.56  2  from lvl 11, V2 until lvl 30, keep 8
+  20 safe1  59.6  86.9  97.7  0.56  2  from lvl 11, V0 until 9 learned skills, then V2, keep 5
+  20 safe2  59.1  86.6  97.7  0.57  2  from lvl 13, V0 until 9 learned skills, then V2, keep 12
+  20 mean   59.6  86.9  97.7  0.56  2  from lvl 11, V0 until 9 learned skills, then V2, keep 5
+  25 rule   73.0  93.1  99.1  0.35  2  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   73.3  93.0  99.0  0.35  2  from lvl 7, V0 until 9 learned skills, then V2, keep 10
+  25 safe1  73.3  93.1  99.0  0.35  2  from lvl 5, V0 until 9 learned skills, then V2, keep 7
+  25 safe2  73.4  93.1  99.0  0.35  2  from lvl 3, V0 until 11 learned skills, then V2, keep 3
+  25 mean   73.3  93.1  99.0  0.35  2  from lvl 5, V0 until 9 learned skills, then V2, keep 7
+  30 rule   82.7  96.4  99.6  0.21  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   82.5  96.2  99.5  0.22  1  from lvl 7, V0 until 9 learned skills, then V2, keep 15
+  30 safe1  83.1  96.5  99.6  0.21  1  from lvl 8, V0 until 13 learned skills, then V2, keep 8
+  30 safe2  83.1  96.3  99.5  0.21  1  from lvl 3, V0 until 11 learned skills, then V2, keep 12
+  30 mean   83.1  96.5  99.6  0.21  1  from lvl 8, V0 until 13 learned skills, then V2, keep 8
+## Mythical Diné | Skilled 1
+  10 rule   32.2  65.3  90.3  1.14  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   32.8  65.9  90.5  1.12  3  from lvl 15, V2 until lvl 30, keep 0
+  10 safe1  32.3  65.8  90.5  1.13  3  from lvl 18, V2 until lvl 30, keep 2
+  10 safe2  32.1  65.7  90.5  1.13  3  from lvl 18, V2 until lvl 30, keep 4
+  10 mean   32.3  65.8  90.5  1.13  3  from lvl 18, V2 until lvl 30, keep 2
+  15 rule   55.3  84.6  97.4  0.63  2  from lvl 10, V2 until lvl 30, keep 1
+  15 full   55.3  84.6  97.4  0.63  2  from lvl 11, V2 until lvl 30, keep 5
+  15 safe1  55.3  84.6  97.4  0.63  2  from lvl 11, V2 until lvl 30, keep 3
+  15 safe2  55.0  84.5  97.4  0.63  2  from lvl 11, V2 until lvl 30, keep 7
+  15 mean   55.3  84.6  97.4  0.63  2  from lvl 11, V2 until lvl 30, keep 3
+  20 rule   71.0  92.3  99.0  0.38  2  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   71.8  92.7  99.1  0.36  2  from lvl 11, V2 until lvl 30, keep 8
+  20 safe1  71.0  92.4  99.0  0.38  2  from lvl 7, V0 until 9 learned skills, then V2, keep 5
+  20 safe2  71.0  92.4  99.0  0.38  2  from lvl 7, V0 until 9 learned skills, then V2, keep 5
+  20 mean   71.0  92.4  99.0  0.38  2  from lvl 7, V0 until 9 learned skills, then V2, keep 5
+  25 rule   82.4  96.5  99.7  0.21  1  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   82.8  96.5  99.6  0.21  1  from lvl 7, V0 until 9 learned skills, then V2, keep 10
+  25 safe1  82.8  96.5  99.6  0.21  1  from lvl 7, V0 until 9 learned skills, then V2, keep 10
+  25 safe2  82.7  96.5  99.7  0.21  1  from lvl 7, V0 until 10 learned skills, then V2, keep 7
+  25 mean   82.8  96.5  99.6  0.21  1  from lvl 7, V0 until 9 learned skills, then V2, keep 10
+  30 rule   89.8  98.4  99.9  0.12  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   89.9  98.4  99.9  0.12  1  from lvl 3, V0 until 9 learned skills, then V2, keep 12
+  30 safe1  90.2  98.5  99.9  0.11  1  from lvl 4, V0 until 13 learned skills, then V2, keep 8
+  30 safe2  90.2  98.4  99.8  0.12  1  from lvl 7, V0 until 12 learned skills, then V2, keep 8
+  30 mean   89.9  98.4  99.9  0.12  1  from lvl 3, V0 until 9 learned skills, then V2, keep 12
+## Mythical Diné | Artisan 7
+  10 rule   58.1  86.0  97.8  0.58  2  from lvl 14, V2 until lvl 30, keep 1
+  10 full   57.9  86.0  97.7  0.59  2  from lvl 12, V2 until lvl 30, keep 0
+  10 safe1  57.9  86.0  97.7  0.59  2  from lvl 12, V2 until lvl 30, keep 0
+  10 safe2  57.9  86.0  97.7  0.59  2  from lvl 12, V2 until lvl 30, keep 0
+  10 mean   57.9  86.0  97.7  0.59  2  from lvl 12, V2 until lvl 30, keep 0
+  15 rule   78.4  95.5  99.6  0.27  1  from lvl 10, V2 until lvl 30, keep 1
+  15 full   78.6  95.6  99.6  0.26  1  from lvl 12, V2 until lvl 30, keep 5
+  15 safe1  78.4  95.6  99.6  0.26  1  from lvl 9, V2 until lvl 30, keep 5
+  15 safe2  78.1  95.5  99.6  0.27  1  from lvl 12, V2 until lvl 30, keep 7
+  15 mean   78.6  95.6  99.6  0.26  1  from lvl 12, V2 until lvl 30, keep 5
+  20 rule   88.4  98.1  99.8  0.14  1  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   89.0  98.2  99.9  0.13  1  from lvl 2, V2 until lvl 30, keep 5
+  20 safe1  88.8  98.2  99.9  0.13  1  from lvl 8, V0 until 9 learned skills, then V2, keep 5
+  20 safe2  88.5  98.2  99.9  0.13  1  from lvl 7, V0 until 9 learned skills, then V2, keep 5
+  20 mean   89.0  98.2  99.9  0.13  1  from lvl 2, V2 until lvl 30, keep 5
+  25 rule   94.7  99.3  99.9  0.06  1  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   94.3  99.3  99.9  0.06  1  from lvl 3, V0 until 12 learned skills, then V2, keep 3
+  25 safe1  94.3  99.3  99.9  0.06  1  from lvl 3, V0 until 12 learned skills, then V2, keep 3
+  25 safe2  94.3  99.3 100.0  0.06  1  from lvl 2, V0 until 12 learned skills, then V2, keep 3
+  25 mean   94.3  99.3  99.9  0.06  1  from lvl 3, V0 until 12 learned skills, then V2, keep 3
+  30 rule   97.5  99.7 100.0  0.03  0  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   97.4  99.7 100.0  0.03  0  from lvl 3, V0 until 12 learned skills, then V2, keep 8
+  30 safe1  97.4  99.8 100.0  0.03  0  from lvl 2, V0 until 12 learned skills, then V2, keep 8
+  30 safe2  97.4  99.8 100.0  0.03  0  from lvl 2, V0 until 12 learned skills, then V2, keep 8
+  30 mean   97.4  99.7 100.0  0.03  0  from lvl 3, V0 until 12 learned skills, then V2, keep 8
+## Mythical Diné | Guru 20
+  10 rule  100.0 100.0 100.0  0.00  0  from lvl 14, V2 until lvl 30, keep 1
+  10 full  100.0 100.0 100.0  0.00  0  from lvl 14, V0 until 9 learned skills, then V2, keep 2
+  10 safe1  99.4 100.0 100.0  0.01  0  from lvl 10, V0 until 9 learned skills, then V2, keep 0
+  10 safe2  99.4 100.0 100.0  0.01  0  from lvl 10, V0 until 9 learned skills, then V2, keep 0
+  10 mean  100.0 100.0 100.0  0.00  0  from lvl 14, V0 until 9 learned skills, then V2, keep 2
+  15 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V2 until lvl 30, keep 1
+  15 full   99.9 100.0 100.0  0.00  0  from lvl 8, V0 until 9 learned skills, then V2, keep 3
+  15 safe1  99.8 100.0 100.0  0.00  0  from lvl 6, V0 until 9 learned skills, then V2, keep 0
+  15 safe2  99.4  99.9 100.0  0.01  0  from lvl 5, V0 until 9 learned skills, then V2, keep 0
+  15 mean   99.9 100.0 100.0  0.00  0  from lvl 8, V0 until 9 learned skills, then V2, keep 3
+  20 rule  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full  100.0 100.0 100.0  0.00  0  from lvl 2, V0 until 9 learned skills, then V2, keep 2
+  20 safe1  99.3  99.9 100.0  0.01  0  from lvl 14, V0 until lvl 30, keep 2
+  20 safe2  99.3  99.9 100.0  0.01  0  from lvl 14, V0 until lvl 30, keep 2
+  20 mean  100.0 100.0 100.0  0.00  0  from lvl 2, V0 until 9 learned skills, then V2, keep 2
+  25 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full  100.0 100.0 100.0  0.00  0  from lvl 14, V0 until lvl 30, keep 3
+  25 safe1  99.0 100.0 100.0  0.01  0  from lvl 7, V0 until lvl 30, keep 3
+  25 safe2  99.0 100.0 100.0  0.01  0  from lvl 7, V0 until lvl 30, keep 3
+  25 mean  100.0 100.0 100.0  0.00  0  from lvl 14, V0 until lvl 30, keep 3
+  30 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until lvl 30, keep 4
+  30 safe1  99.9 100.0 100.0  0.00  0  from lvl 2, V0 until lvl 30, keep 4
+  30 safe2  99.6 100.0 100.0  0.00  0  from lvl 2, V0 until lvl 30, keep 8
+  30 mean  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until lvl 30, keep 4
+## Doom | Beginner 1
+  10 rule   33.6  62.9  87.8  1.18  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   33.6  62.9  87.8  1.18  3  from lvl 14, V2 until lvl 30, keep 1
+  10 safe1  33.6  62.9  87.8  1.18  3  from lvl 14, V2 until lvl 30, keep 1
+  10 safe2  33.6  62.9  87.8  1.18  3  from lvl 14, V2 until lvl 30, keep 1
+  10 mean   33.6  62.9  87.8  1.18  3  from lvl 14, V2 until lvl 30, keep 1
+  15 rule   55.4  83.0  96.5  0.65  2  from lvl 10, V2 until lvl 30, keep 1
+  15 full   53.8  82.3  96.4  0.68  2  from lvl 14, V2 until lvl 30, keep 6
+  15 safe1  55.0  83.2  96.7  0.65  2  from lvl 7, V2 until lvl 30, keep 3
+  15 safe2  55.0  82.8  96.6  0.66  2  from lvl 9, V2 until lvl 30, keep 3
+  15 mean   53.8  82.3  96.4  0.68  2  from lvl 14, V2 until lvl 30, keep 6
+  20 rule   69.0  91.0  98.6  0.41  2  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   71.5  92.2  98.9  0.37  2  from lvl 7, V2 until lvl 30, keep 5
+  20 safe1  71.4  92.2  98.9  0.38  2  from lvl 7, V2 until lvl 30, keep 8
+  20 safe2  71.1  92.0  98.9  0.38  2  from lvl 2, V2 until lvl 30, keep 5
+  20 mean   71.3  92.1  98.9  0.38  2  from lvl 6, V2 until lvl 30, keep 5
+  25 rule   80.1  95.4  99.4  0.25  1  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   82.2  96.2  99.6  0.22  1  from lvl 7, V2 until lvl 30, keep 10
+  25 safe1  80.2  95.4  99.5  0.25  1  from lvl 12, V0 until 11 learned skills, then V2, keep 3
+  25 safe2  80.7  95.6  99.5  0.24  1  from lvl 2, V0 until 9 learned skills, then V2, keep 7
+  25 mean   79.7  95.1  99.4  0.26  1  from lvl 12, V0 until 12 learned skills, then V2, keep 3
+  30 rule   88.1  97.9  99.8  0.14  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   87.9  97.9  99.8  0.14  1  from lvl 2, V0 until 12 learned skills, then V2, keep 8
+  30 safe1  88.2  97.9  99.8  0.14  1  from lvl 5, V0 until 12 learned skills, then V2, keep 4
+  30 safe2  88.5  97.9  99.8  0.14  1  from lvl 2, V0 until 9 learned skills, then V2, keep 12
+  30 mean   87.9  97.9  99.8  0.14  1  from lvl 2, V0 until 12 learned skills, then V2, keep 8
+## Doom | Skilled 1
+  10 rule   49.8  77.9  94.3  0.79  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   49.3  77.4  94.4  0.80  3  from lvl 16, V2 until lvl 30, keep 0
+  10 safe1  49.3  77.4  94.4  0.80  3  from lvl 16, V2 until lvl 30, keep 0
+  10 safe2  48.9  77.5  94.4  0.80  3  from lvl 13, V2 until lvl 30, keep 0
+  10 mean   49.3  77.4  94.4  0.80  3  from lvl 16, V2 until lvl 30, keep 0
+  15 rule   71.5  91.7  98.7  0.38  2  from lvl 10, V2 until lvl 30, keep 1
+  15 full   71.5  91.7  98.7  0.38  2  from lvl 7, V2 until lvl 30, keep 0
+  15 safe1  71.2  91.6  98.7  0.38  2  from lvl 7, V2 until lvl 30, keep 3
+  15 safe2  71.4  91.5  98.6  0.39  2  from lvl 5, V2 until lvl 30, keep 0
+  15 mean   71.5  91.7  98.7  0.38  2  from lvl 7, V2 until lvl 30, keep 0
+  20 rule   82.4  96.1  99.5  0.22  1  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   83.8  96.6  99.6  0.20  1  from lvl 7, V2 until lvl 30, keep 8
+  20 safe1  83.9  96.5  99.6  0.20  1  from lvl 5, V2 until lvl 30, keep 5
+  20 safe2  83.7  96.5  99.6  0.20  1  from lvl 3, V2 until lvl 30, keep 5
+  20 mean   83.8  96.6  99.6  0.20  1  from lvl 7, V2 until lvl 30, keep 8
+  25 rule   89.5  98.1  99.8  0.13  1  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   89.9  98.2  99.8  0.12  1  from lvl 11, V0 until 12 learned skills, then V2, keep 7
+  25 safe1  89.7  98.2  99.8  0.12  1  from lvl 3, V0 until 11 learned skills, then V2, keep 3
+  25 safe2  89.5  98.1  99.8  0.13  1  from lvl 3, V0 until 12 learned skills, then V2, keep 3
+  25 mean   89.7  98.2  99.8  0.12  1  from lvl 3, V0 until 11 learned skills, then V2, keep 3
+  30 rule   94.3  99.2  99.9  0.07  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   94.6  99.3  99.9  0.06  1  from lvl 3, V0 until 11 learned skills, then V2, keep 8
+  30 safe1  94.6  99.2  99.9  0.06  1  from lvl 3, V0 until 12 learned skills, then V2, keep 8
+  30 safe2  94.6  99.2  99.9  0.06  1  from lvl 3, V0 until 12 learned skills, then V2, keep 8
+  30 mean   94.6  99.3  99.9  0.06  1  from lvl 3, V0 until 11 learned skills, then V2, keep 8
+## Doom | Artisan 7
+  10 rule   82.4  95.2  99.3  0.23  1  from lvl 14, V2 until lvl 30, keep 1
+  10 full   82.0  95.0  99.3  0.24  2  from lvl 15, V2 until lvl 30, keep 0
+  10 safe1  81.5  95.2  99.4  0.24  1  from lvl 13, V2 until lvl 30, keep 0
+  10 safe2  81.5  95.2  99.4  0.24  1  from lvl 13, V2 until lvl 30, keep 0
+  10 mean   82.0  95.0  99.3  0.24  2  from lvl 15, V2 until lvl 30, keep 0
+  15 rule   92.6  98.9  99.9  0.08  1  from lvl 10, V2 until lvl 30, keep 1
+  15 full   92.8  98.8  99.9  0.09  1  from lvl 5, V2 until lvl 30, keep 0
+  15 safe1  92.8  98.8  99.9  0.09  1  from lvl 5, V2 until lvl 30, keep 0
+  15 safe2  92.7  98.8  99.9  0.09  1  from lvl 8, V2 until lvl 30, keep 3
+  15 mean   92.8  98.8  99.9  0.09  1  from lvl 5, V2 until lvl 30, keep 0
+  20 rule   96.5  99.6 100.0  0.04  0  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   96.9  99.7 100.0  0.03  0  from lvl 4, V2 until lvl 30, keep 5
+  20 safe1  96.3  99.5 100.0  0.04  0  from lvl 4, V0 until 9 learned skills, then V2, keep 2
+  20 safe2  96.3  99.5 100.0  0.04  0  from lvl 4, V0 until 9 learned skills, then V2, keep 2
+  20 mean   96.9  99.7 100.0  0.03  0  from lvl 4, V2 until lvl 30, keep 5
+  25 rule   98.3  99.9 100.0  0.02  0  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   98.5  99.9 100.0  0.02  0  from lvl 8, V0 until 9 learned skills, then V2, keep 7
+  25 safe1  98.4  99.9 100.0  0.02  0  from lvl 4, V0 until 9 learned skills, then V2, keep 7
+  25 safe2  98.4  99.9 100.0  0.02  0  from lvl 4, V0 until 9 learned skills, then V2, keep 7
+  25 mean   98.5  99.9 100.0  0.02  0  from lvl 8, V0 until 9 learned skills, then V2, keep 7
+  30 rule   99.3 100.0 100.0  0.01  0  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   99.3 100.0 100.0  0.01  0  from lvl 8, V0 until 14 learned skills, then V2, keep 4
+  30 safe1  99.3 100.0 100.0  0.01  0  from lvl 6, V0 until 14 learned skills, then V2, keep 4
+  30 safe2  99.0  99.9 100.0  0.01  0  from lvl 11, V0 until 16 learned skills, then V2, keep 8
+  30 mean   99.3 100.0 100.0  0.01  0  from lvl 8, V0 until 14 learned skills, then V2, keep 4
+## Doom | Guru 20
+  10 rule  100.0 100.0 100.0  0.00  0  from lvl 14, V2 until lvl 30, keep 1
+  10 full  100.0 100.0 100.0  0.00  0  from lvl 12, V0 until 9 learned skills, then V2, keep 0
+  10 safe1  98.2 100.0 100.0  0.02  0  from lvl 22, V0 until lvl 30, keep 2
+  10 safe2  98.2 100.0 100.0  0.02  0  from lvl 22, V0 until lvl 30, keep 2
+  10 mean  100.0 100.0 100.0  0.00  0  from lvl 12, V0 until 9 learned skills, then V2, keep 0
+  15 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V2 until lvl 30, keep 1
+  15 full  100.0 100.0 100.0  0.00  0  from lvl 20, V0 until lvl 30, keep 3
+  15 safe1  99.0 100.0 100.0  0.01  0  from lvl 16, V0 until lvl 30, keep 0
+  15 safe2  99.0 100.0 100.0  0.01  0  from lvl 16, V0 until lvl 30, keep 0
+  15 mean  100.0 100.0 100.0  0.00  0  from lvl 20, V0 until lvl 30, keep 3
+  20 rule  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full  100.0 100.0 100.0  0.00  0  from lvl 13, V0 until lvl 30, keep 2
+  20 safe1  99.7 100.0 100.0  0.00  0  from lvl 12, V0 until lvl 30, keep 2
+  20 safe2  99.0 100.0 100.0  0.01  0  from lvl 11, V0 until lvl 30, keep 2
+  20 mean  100.0 100.0 100.0  0.00  0  from lvl 13, V0 until lvl 30, keep 2
+  25 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until lvl 30, keep 3
+  25 safe1  99.6 100.0 100.0  0.00  0  from lvl 8, V0 until lvl 30, keep 3
+  25 safe2  99.6 100.0 100.0  0.00  0  from lvl 8, V0 until lvl 30, keep 3
+  25 mean  100.0 100.0 100.0  0.00  0  from lvl 11, V0 until lvl 30, keep 3
+  30 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full  100.0 100.0 100.0  0.00  0  from lvl 4, V0 until lvl 30, keep 0
+  30 safe1  99.8 100.0 100.0  0.00  0  from lvl 2, V0 until lvl 30, keep 4
+  30 safe2  99.8 100.0 100.0  0.00  0  from lvl 2, V0 until lvl 30, keep 4
+  30 mean  100.0 100.0 100.0  0.00  0  from lvl 4, V0 until lvl 30, keep 0
+## T8 example | Beginner 1
+  10 rule   15.4  46.6  78.8  1.65  4  from lvl 14, V2 until lvl 30, keep 1
+  10 full   15.5  47.0  79.2  1.64  3  from lvl 18, V2 until lvl 30, keep 4
+  10 safe1  15.2  47.0  79.2  1.64  4  from lvl 20, V2 until lvl 30, keep 7
+  10 safe2  15.2  47.0  79.2  1.64  4  from lvl 20, V2 until lvl 30, keep 7
+  10 mean   15.6  47.1  79.3  1.64  3  from lvl 18, V2 until lvl 30, keep 6
+  15 rule   33.6  68.9  91.6  1.07  3  from lvl 10, V2 until lvl 30, keep 1
+  15 full   33.8  69.2  91.5  1.07  3  from lvl 11, V2 until lvl 30, keep 9
+  15 safe1  32.5  67.4  90.8  1.11  3  from lvl 12, V0 until 9 learned skills, then V2, keep 7
+  15 safe2  32.3  67.6  90.9  1.11  3  from lvl 12, V0 until 9 learned skills, then V2, keep 9
+  15 mean   33.3  68.7  91.6  1.08  3  from lvl 2, V2 until lvl 30, keep 5
+  20 rule   51.5  82.4  96.2  0.70  2  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   50.4  81.7  96.2  0.72  2  from lvl 2, V0 until 10 learned skills, then V2, keep 8
+  20 safe1  50.4  81.7  96.3  0.72  2  from lvl 4, V0 until 9 learned skills, then V2, keep 10
+  20 safe2  50.4  81.7  96.3  0.72  2  from lvl 4, V0 until 9 learned skills, then V2, keep 10
+  20 mean   50.4  81.7  96.3  0.72  2  from lvl 4, V0 until 9 learned skills, then V2, keep 10
+  25 rule   66.2  89.9  98.2  0.46  2  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   65.5  89.6  98.2  0.47  2  from lvl 2, V0 until 10 learned skills, then V2, keep 13
+  25 safe1  65.8  89.6  98.1  0.47  2  from lvl 4, V0 until 13 learned skills, then V2, keep 15
+  25 safe2  65.9  89.7  98.2  0.46  2  from lvl 5, V0 until 12 learned skills, then V2, keep 13
+  25 mean   65.5  89.6  98.2  0.47  2  from lvl 2, V0 until 10 learned skills, then V2, keep 13
+  30 rule   76.6  93.7  98.8  0.31  2  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   77.1  93.8  98.9  0.30  2  from lvl 2, V0 until 13 learned skills, then V2, keep 15
+  30 safe1  76.8  93.7  98.9  0.31  2  from lvl 3, V0 until 13 learned skills, then V2, keep 20
+  30 safe2  76.8  93.8  98.9  0.31  2  from lvl 5, V0 until 13 learned skills, then V2, keep 18
+  30 mean   77.0  93.6  98.8  0.31  2  from lvl 4, V0 until 13 learned skills, then V2, keep 8
+## T8 example | Skilled 1
+  10 rule   21.5  55.8  85.3  1.41  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   21.2  55.3  84.8  1.42  3  from lvl 13, V2 until lvl 30, keep 4
+  10 safe1  21.1  55.8  85.1  1.41  3  from lvl 21, V2 until lvl 30, keep 7
+  10 safe2  21.1  55.8  85.1  1.41  3  from lvl 21, V2 until lvl 30, keep 7
+  10 mean   21.2  55.3  84.8  1.42  3  from lvl 13, V2 until lvl 30, keep 4
+  15 rule   42.3  76.9  95.0  0.86  2  from lvl 10, V2 until lvl 30, keep 1
+  15 full   41.9  76.7  95.0  0.87  2  from lvl 9, V2 until lvl 30, keep 7
+  15 safe1  41.9  76.3  94.7  0.88  3  from lvl 13, V2 until lvl 30, keep 9
+  15 safe2  41.9  76.7  95.0  0.87  2  from lvl 9, V2 until lvl 30, keep 7
+  15 mean   41.9  76.7  95.0  0.87  2  from lvl 9, V2 until lvl 30, keep 7
+  20 rule   60.5  88.1  98.2  0.53  2  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   60.1  88.0  98.2  0.54  2  from lvl 10, V0 until 11 learned skills, then V2, keep 10
+  20 safe1  60.1  88.0  98.2  0.54  2  from lvl 10, V0 until 11 learned skills, then V2, keep 10
+  20 safe2  60.1  88.0  98.3  0.54  2  from lvl 9, V0 until 9 learned skills, then V2, keep 12
+  20 mean   60.1  88.0  98.2  0.54  2  from lvl 10, V0 until 11 learned skills, then V2, keep 10
+  25 rule   74.8  94.1  99.4  0.32  2  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   74.8  94.0  99.3  0.32  2  from lvl 4, V0 until 12 learned skills, then V2, keep 10
+  25 safe1  74.9  94.0  99.2  0.32  2  from lvl 6, V0 until 12 learned skills, then V2, keep 13
+  25 safe2  74.6  94.1  99.3  0.32  2  from lvl 9, V0 until 12 learned skills, then V2, keep 15
+  25 mean   74.9  94.0  99.2  0.32  2  from lvl 6, V0 until 12 learned skills, then V2, keep 13
+  30 rule   84.2  96.9  99.7  0.19  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   84.5  96.8  99.6  0.19  1  from lvl 6, V0 until 13 learned skills, then V2, keep 18
+  30 safe1  84.5  96.8  99.6  0.19  1  from lvl 6, V0 until 13 learned skills, then V2, keep 18
+  30 safe2  84.4  96.8  99.7  0.19  1  from lvl 5, V0 until 12 learned skills, then V2, keep 18
+  30 mean   84.5  96.8  99.6  0.19  1  from lvl 6, V0 until 13 learned skills, then V2, keep 18
+## T8 example | Artisan 7
+  10 rule   36.4  73.6  94.1  0.97  3  from lvl 14, V2 until lvl 30, keep 1
+  10 full   36.4  73.1  93.7  0.98  3  from lvl 11, V2 until lvl 30, keep 0
+  10 safe1  37.2  73.9  94.1  0.95  3  from lvl 17, V2 until lvl 30, keep 4
+  10 safe2  36.8  73.4  94.0  0.97  3  from lvl 18, V2 until lvl 30, keep 4
+  10 mean   37.2  73.9  94.1  0.95  3  from lvl 17, V2 until lvl 30, keep 4
+  15 rule   61.0  89.2  98.6  0.51  2  from lvl 10, V2 until lvl 30, keep 1
+  15 full   60.4  88.9  98.5  0.52  2  from lvl 7, V2 until lvl 30, keep 5
+  15 safe1  60.4  88.9  98.5  0.52  2  from lvl 7, V2 until lvl 30, keep 3
+  15 safe2  60.3  88.9  98.5  0.52  2  from lvl 6, V2 until lvl 30, keep 5
+  15 mean   60.4  88.9  98.5  0.52  2  from lvl 7, V2 until lvl 30, keep 5
+  20 rule   77.6  95.5  99.5  0.27  1  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   77.3  95.4  99.5  0.28  1  from lvl 6, V0 until 9 learned skills, then V2, keep 5
+  20 safe1  77.2  95.3  99.5  0.28  1  from lvl 6, V0 until 11 learned skills, then V2, keep 8
+  20 safe2  77.1  95.4  99.5  0.28  1  from lvl 11, V0 until 9 learned skills, then V2, keep 10
+  20 mean   77.3  95.4  99.5  0.28  1  from lvl 6, V0 until 9 learned skills, then V2, keep 5
+  25 rule   88.0  98.2  99.8  0.14  1  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   88.3  98.2  99.8  0.14  1  from lvl 6, V0 until 12 learned skills, then V2, keep 3
+  25 safe1  88.1  98.2  99.9  0.14  1  from lvl 3, V0 until 12 learned skills, then V2, keep 3
+  25 safe2  88.1  98.2  99.9  0.14  1  from lvl 3, V0 until 13 learned skills, then V2, keep 3
+  25 mean   88.3  98.2  99.8  0.14  1  from lvl 6, V0 until 12 learned skills, then V2, keep 3
+  30 rule   93.8  99.3  99.9  0.07  1  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   94.0  99.3  99.9  0.07  1  from lvl 6, V0 until 12 learned skills, then V2, keep 8
+  30 safe1  94.1  99.3  99.9  0.07  1  from lvl 3, V0 until 13 learned skills, then V2, keep 8
+  30 safe2  94.1  99.3  99.9  0.07  1  from lvl 3, V0 until 13 learned skills, then V2, keep 8
+  30 mean   94.3  99.3  99.9  0.06  1  from lvl 3, V0 until 14 learned skills, then V2, keep 8
+## T8 example | Guru 20
+  10 rule   96.9  99.7 100.0  0.03  0  from lvl 14, V2 until lvl 30, keep 1
+  10 full   96.9  99.8 100.0  0.03  0  from lvl 14, V0 until 10 learned skills, then V2, keep 2
+  10 safe1  96.7  99.7 100.0  0.04  0  from lvl 11, V0 until 9 learned skills, then V2, keep 2
+  10 safe2  96.5  99.7 100.0  0.04  0  from lvl 16, V0 until 11 learned skills, then V2, keep 4
+  10 mean   96.9  99.8 100.0  0.03  0  from lvl 11, V0 until 9 learned skills, then V2, keep 0
+  15 rule   99.3 100.0 100.0  0.01  0  from lvl 10, V2 until lvl 30, keep 1
+  15 full   99.3 100.0 100.0  0.01  0  from lvl 9, V0 until 10 learned skills, then V2, keep 0
+  15 safe1  99.0  99.8 100.0  0.01  0  from lvl 11, V0 until 13 learned skills, then V2, keep 0
+  15 safe2  98.3  99.8 100.0  0.02  0  from lvl 2, V0 until 9 learned skills, then V2, keep 3
+  15 mean   99.0  99.8 100.0  0.01  0  from lvl 11, V0 until 13 learned skills, then V2, keep 0
+  20 rule   99.8 100.0 100.0  0.00  0  from lvl 11, V0 until 10 learned skills, then V2, keep 1
+  20 full   99.7 100.0 100.0  0.00  0  from lvl 11, V0 until 13 learned skills, then V2, keep 5
+  20 safe1  99.7 100.0 100.0  0.00  0  from lvl 12, V0 until 15 learned skills, then V2, keep 2
+  20 safe2  99.0 100.0 100.0  0.01  0  from lvl 17, V0 until lvl 30, keep 8
+  20 mean   99.7 100.0 100.0  0.00  0  from lvl 11, V0 until 13 learned skills, then V2, keep 5
+  25 rule   99.9 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 1
+  25 full   99.9 100.0 100.0  0.00  0  from lvl 12, V0 until 15 learned skills, then V2, keep 7
+  25 safe1  99.5 100.0 100.0  0.01  0  from lvl 10, V0 until lvl 30, keep 3
+  25 safe2  99.3 100.0 100.0  0.01  0  from lvl 2, V0 until lvl 30, keep 7
+  25 mean   99.9 100.0 100.0  0.00  0  from lvl 12, V0 until 15 learned skills, then V2, keep 7
+  30 rule  100.0 100.0 100.0  0.00  0  from lvl 10, V0 until 12 learned skills, then V2, keep 6
+  30 full   99.6 100.0 100.0  0.00  0  from lvl 7, V0 until lvl 30, keep 0
+  30 safe1  99.3 100.0 100.0  0.01  0  from lvl 2, V0 until lvl 30, keep 0
+  30 safe2  99.9 100.0 100.0  0.00  0  from lvl 2, V0 until lvl 30, keep 12
+  30 mean   99.6 100.0 100.0  0.00  0  from lvl 7, V0 until lvl 30, keep 0
+
+# Against 'full' (best full-set plan), rechecked: full set / <=1 / <=2 points, average missing; lowest and highest over the 60 case-budgets, and where
+rule  full set -2.4..+1.7 | <=1 -1.2..+0.7 (largest at Doom Beginner 1 15) | <=2 -0.4..+0.5 | avg missing -0.025..+0.040
+safe1 full set -2.0..+1.3 | <=1 -1.8..+0.9 (largest at Doom Beginner 1 15) | <=2 -0.7..+0.4 | avg missing -0.025..+0.038
+safe2 full set -1.8..+1.2 | <=1 -1.7..+0.5 (largest at T8 example Skilled 1 10) | <=2 -0.6..+0.3 | avg missing -0.018..+0.038
+mean  full set -2.5..+0.8 | <=1 -1.1..+0.7 (largest at T8 example Artisan 7 10) | <=2 -0.2..+0.4 | avg missing -0.021..+0.039
