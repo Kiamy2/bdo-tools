@@ -1,0 +1,12 @@
+T8 example (bdolytics icon horse_71) | Professional 1 | target 85% | cap 40 coupons | 300 horses
+level-1 choice: ['coursier_switch', 12, 12, 9], budget 30: 85.4%, 17.29 coupons expected
+a fixed (level-1 plan and budget)      full set  85.7% (se 1.2) | coupons used 17.95 (se 0.32; median 18.6, 90th pct 25.0)
+b fixed plan, cleanup up to the cap    full set  94.1% (se 0.9) | coupons used 18.71 (se 0.37; median 19.2, 90th pct 27.0)
+c re-planned                           full set  82.4% (se 1.2) | coupons used 17.56 (se 0.36; median 17.3, 90th pct 25.9)
+c - a: full set -3.38 points (se 1.17), coupons -0.39 (se 0.30)
+c - b: full set -11.76 points (se 1.04), coupons -1.15 (se 0.33)
+c: last decision's predicted chance 83.9% over 300 horses (realized 82.4%)
+  level 10: 300 decisions, budget from now avg 29.9 (min 15, max 40), target missed 15 | coursier_switch 157, coursier_v2 141, coursier 2
+  level 15: 300 decisions, budget from now avg 27.5 (min 11, max 40), target missed 27 | coursier_switch 272, coursier_v2 26, at30 2
+  level 20: 300 decisions, budget from now avg 25.0 (min 7, max 40), target missed 31 | coursier_switch 294, at30 5, coursier 1
+  level 25: 300 decisions, budget from now avg 22.6 (min 2, max 40), target missed 30 | coursier_switch 250, at30 43, coursier 7
