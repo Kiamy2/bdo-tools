@@ -1,0 +1,39 @@
+
+## T8 Type 6, Artisan 9, gear, level 19, 15 learned (live test 1), courser: N = 5 coupons, 421 plans, wanted learnable 6
+# stage 1 (1000 horses): rank correlations over all plans: full vs -used +0.91, full vs -stuck -0.28, -used vs -stuck -0.07
+# stage 1 ranges: full 37.6-96.0%, used 2.77-4.99, stuck 0.0-0.0%
+# 34 near-frontier plans rechecked with 20,000 fresh horses; frontier 16 plans, 1 within noise (EPS) and after merging near-duplicates; 1s
+# rechecked, over those plans: full vs -used -0.31, full vs -stuck -0.32
+plan	full set within 5	stuck	ran out	used (avg)	median	at most 1	at most 2	at most 3	pick
+from lvl 20, V2 until lvl 30, spend <= 2 while leveling	95.5%	0.0%	4.5%	2.79	3	1.4%	34.2%	91.7%	chance,coupons,safe
+(at30, not on the frontier: 62.0% / stuck 0.0% / 3.54)
+
+## same, N = 10: N = 10 coupons, 761 plans, wanted learnable 6
+# stage 1 (1000 horses): rank correlations over all plans: full vs -used +0.91, full vs -stuck -0.31, -used vs -stuck -0.09
+# stage 1 ranges: full 81.2-99.4%, used 2.90-9.21, stuck 0.0-0.0%
+# 61 near-frontier plans rechecked with 20,000 fresh horses; frontier 8 plans, 1 within noise (EPS) and after merging near-duplicates; 2s
+# rechecked, over those plans: full vs -used +0.58, full vs -stuck +0.13
+plan	full set within 10	stuck	ran out	used (avg)	median	at most 1	at most 2	at most 3	at most 5	pick
+from lvl 20, V2 until lvl 30, spend <= 2 while leveling	99.4%	0.0%	0.6%	2.91	3	1.4%	34.2%	91.7%	95.5%	chance,coupons,safe
+(at30, not on the frontier: 90.7% / stuck 0.0% / 4.73)
+
+## T8 Type 2, Artisan 7, level 1, courser: N = 20 coupons, 3361 plans, wanted learnable 6
+# stage 1 (1000 horses): rank correlations over all plans: full vs -used +0.41, full vs -stuck -0.10, -used vs -stuck +0.32
+# stage 1 ranges: full 64.2-79.4%, used 13.06-17.51, stuck 0.0-0.0%
+# 61 near-frontier plans rechecked with 20,000 fresh horses; frontier 9 plans, 1 within noise (EPS) and after merging near-duplicates; 22s
+# rechecked, over those plans: full vs -used -0.09, full vs -stuck -0.27
+plan	full set within 20	stuck	ran out	used (avg)	median	at most 1	at most 2	at most 3	at most 5	at most 10	pick
+from lvl 9, V2 until lvl 30, spend <= 9 while leveling	77.6%	0.0%	22.4%	13.21	13	0.1%	0.3%	1.1%	6.6%	37.3%	chance,coupons,safe
+(at30, not on the frontier: 69.3% / stuck 0.0% / 13.91)
+
+## T8 example, Skilled 1, level 1, travel (hard): N = 20 coupons, 3361 plans, wanted learnable 12
+# stage 1 (1000 horses): rank correlations over all plans: full vs -used +0.10, full vs -stuck +0.82, -used vs -stuck -0.38
+# stage 1 ranges: full 46.3-62.8%, used 15.24-17.93, stuck 2.6-16.9%
+# 61 near-frontier plans rechecked with 20,000 fresh horses; frontier 19 plans, 5 within noise (EPS) and after merging near-duplicates; 28s
+# rechecked, over those plans: full vs -used +0.66, full vs -stuck -0.30
+plan	full set within 20	stuck	ran out	used (avg)	median	at most 1	at most 2	at most 3	at most 5	at most 10	pick
+from lvl 12, V0 until 11 learned skills, then V2, spend <= 12 while leveling	60.4%	4.7%	34.9%	15.85	18	0.0%	0.0%	0.1%	1.1%	16.4%	chance
+from lvl 12, V0 until 10 learned skills, then V2, spend <= 15 while leveling	60.4%	5.4%	34.2%	15.72	18	0.0%	0.0%	0.1%	1.4%	17.6%	
+from lvl 10, V0 until 12 learned skills, then V2, spend <= 15 while leveling	60.2%	4.0%	35.8%	16.09	18	0.0%	0.0%	0.1%	0.7%	14.1%	
+from lvl 3, V0 until 12 learned skills, then V2, spend <= 12 while leveling	59.5%	3.6%	36.8%	16.34	18	0.0%	0.0%	0.1%	0.6%	11.5%	safe
+no swaps while leveling, every coupon at level 30	48.7%	16.1%	35.3%	15.58	>20	0.3%	0.8%	1.6%	4.6%	17.5%	coupons
