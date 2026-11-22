@@ -16,7 +16,7 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,9
 
 ## Inputs
 
-- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below). T8s by type number: `T8 Type 1` to `T8 Type 22` for the default horses read so far (Sprint as the only innate skill; types sharing the same weights are aliases); a horse with other innate skills needs its own reading.
+- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below). T8s by type number: `T8 Type 1` to `T8 Type 22` for the default horses read so far (Sprint as the only innate skill; types sharing the same weights are aliases); a horse with other innate skills: `--innate` (below) or its own reading.
 - `--training`: your Training level, in English or French (`Artisan 7`, `Master 20`, `Gourou 57`), or the bonus itself (`21.7`).
 - `--learned`: skills the horse already has, besides its innate ones. Skill names in English or French, comma-separated (`"High Jump, Dérapage"`).
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
@@ -119,5 +119,7 @@ Ruade,15.1844
 ```
 
 `boosts` is `none`, `gear`, `brand` or `both` (`boxes` is also accepted); `learned` lists the skills shown as innate ("base skill") or toggled. Skill names in English or French.
+
+**Special horses** (extra innate skills, e.g. a T8 born with Instant Accel): `--innate "Instant Accel"` on a known horse takes those skills out of its draw and counts them as innate, keeping its 'no skill' weight. That matches most special T8s read so far (the T8 Type 11 reading is `T8 Type 5 --innate "Instant Accel"` to 0.0002 points), but not all: a special Type 4 born with S: Sideways also had Two-seater and another 'no skill' weight. So check it once with a simulator reading at level 1, no boosts: `--innate ... --check none=17.15 Ruade=13.1 ...` (exit 1 on a mismatch: then use `--horse-file`).
 
 Exit codes: `0` OK · `1` `--check` mismatch · `2` bad input (unknown horse, skill, strategy or Training level).

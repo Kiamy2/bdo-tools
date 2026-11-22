@@ -35,6 +35,8 @@ def main():
     ap.add_argument("horse", nargs="?", help="horse name from the data file (see --list)")
     ap.add_argument("--list", action="store_true", help="list the horses in the data file")
     ap.add_argument("--horse-file", metavar="CSV", help="use your own simulator reading instead (see docs/horse_skills.md)")
+    ap.add_argument("--innate", metavar="SKILLS", help="extra innate skills of a special horse, comma-separated: "
+                    "the horse's weights without them, same 'no skill' weight (check with --check and a reading)")
     ap.add_argument("--training", help="your Training level: 'Artisan 7', 'Master 20', 'Gourou 5'... or a bonus like 21.7")
     ap.add_argument("--gear", action="store_true", help="Pearl horse gear (4 pieces) worn (every computation: +0.10)")
     ap.add_argument("--brand", action="store_true", help="Mount Brand Spell Stone used (every computation: +0.10)")
@@ -108,6 +110,8 @@ def main():
             horse = H.get_horse(data, a.horse)
         else:
             ap.error("give a horse name (see --list) or --horse-file")
+        if a.innate:
+            horse = horse.with_innate(names_list(a.innate, resolve))
         if a.training is None:
             ap.error("--training is required, e.g. --training 'Artisan 7'")
         bonus = H.training_bonus(a.training)
@@ -149,7 +153,8 @@ def main():
     show = (lambda s: fr.get(s) or s) if a.lang == "fr" else (lambda s: s)
     M = horse.M(bonus, a.gear, a.brand)
     typed = H.typed_name(data, a.horse) if a.horse and not a.horse_file else horse.name
-    name = horse.name if typed == horse.name else f"{typed} (an alias of {horse.name}: the same data)"
+    base, plus, extra = horse.name.partition(" + innate ")
+    name = horse.name if typed == base else f"{typed} (an alias of {base}: the same data)" + (plus + extra if plus else "")
     head = f"# {name} (T{horse.tier})" if horse.tier and f"T{horse.tier}" not in name else f"# {name}"
     head += f" | Training bonus {bonus:g}%" + (" + gear" if a.gear else "") + (" + brand" if a.brand else "")
     head += f" | data {horse.date or 'undated'}: {horse.source}"

@@ -113,6 +113,17 @@ class Horse:
         if self.W < 0:
             raise DataError(f"{name}: negative no-skill weight")
 
+    def with_innate(self, skills):
+        """The same horse with these learnable skills innate instead (out of the draw, held from the start); the
+        'no skill' weight is kept (true for the special T8s read so far but one: check with a simulator reading)."""
+        bad = [s for s in skills if s not in self.weights and s not in self.born_with]
+        if bad:
+            raise DataError(f"{self.name}: can't learn {', '.join(bad)}")
+        extra = [s for s in dict.fromkeys(skills) if s in self.weights]
+        return Horse(f"{self.name} + innate {', '.join(extra)}" if extra else self.name,
+                     {s: w for s, w in self.weights.items() if s not in extra}, self.W, self.born_with + extra,
+                     self.tier, self.source, self.date, self.notes)
+
     def M(self, bonus, gear=False, brand=False):
         return 1 + bonus / 100 + GEAR * gear + BRAND * brand
 

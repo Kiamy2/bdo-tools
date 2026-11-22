@@ -405,5 +405,21 @@ check("horse_skills: bad Training level exits 2", code == 2 and "unknown Trainin
 code, out = run("horse_skills.py", "Pegasus", "--training", "Artisan 7")
 check("horse_skills: unknown horse exits 2", code == 2 and "unknown horse" in out, out)
 
+# --innate: a special horse = a known horse's weights without its extra innate skills, same 'no skill' weight
+# (the T8 Type 11 reading in tests/data/sim_t8_types_2026-11-21.csv = Type 5 with Instant Accel innate)
+code, out = run("horse_skills.py", "T8 Type 5", "--innate", "Accél. Fulgurante", "--training", "Artisan 7", "--check",
+                "none=30.0751", "Ruade=7.6838", "Dérapage=4.1941", "Accélérer=5.6027", "Saut haut=3.8419")
+check("horse_skills --innate: the T8 Type 11 reading = Type 5 with Instant Accel innate", code == 0 and "MISMATCH" not in out, out)
+code, out = run("horse_skills.py", "T8 Type 6", "--innate", "S: Sideways", "--training", "Artisan 7", "--check",
+                "none=17.1523", "Ruade=13.1")
+check("horse_skills --innate: --check flags a special horse whose weights differ (special Type 4: Two-seater, other "
+      "'no skill' weight)", code == 1 and "MISMATCH" in out, out)
+code, out = run("horse_skills.py", "T8 Type 6", "--innate", "Sprint,S: Sideways", "--training", "Artisan 7", "--odds")
+check("horse_skills --innate: header names the extra innate skills (an already innate one ignored), skill out of the draw",
+      code == 0 and "# T8 Type 6 (an alias of T8 Type 4: the same data) + innate S: Sideways |" in out
+      and "\nS: Sideways\t" not in out and "\nHind Kick\t" in out, out)
+code, out = run("horse_skills.py", "T8 Type 5", "--innate", "Dark Sprint", "--training", "Artisan 7", "--odds")
+check("horse_skills --innate: a skill the horse can't learn exits 2", code == 2 and "can't learn Dark Sprint" in out, out)
+
 print("ALL OK" if not failures else f"{failures} CHECK(S) FAILED")
 sys.exit(1 if failures else 0)
