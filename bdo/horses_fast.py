@@ -483,7 +483,7 @@ if nb is not None:
             self.low_memory = low_memory
 
         def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None,
-                  used=False, at_most=False):
+                  used=False, at_most=False, stuck=False):
             """{plan: result} for plans = [(strategy, swap_from, spend_cap, switch_at)], all simulated with the same
             seed (common random numbers). Same result as bdo.horses.simulate_plan: full[B], wanted[B] for
             B = 0..max_budget (None below spend_cap), skills (average skills at 30); with tails=True also
@@ -498,7 +498,10 @@ if nb is not None:
             at_most=True: also at_most[B] for every B = 0..max_budget, below spend_cap too: the chance of the full
             set with at most B coupons in total when the plan is followed as planned (its leveling as for its own
             budget, then the cleanup until the full set). It's full[B] from spend_cap on; below, only the horses
-            whose leveling spent at most B coupons can count."""
+            whose leveling spent at most B coupons can count.
+            Every result also has stuck: the share of horses reaching max_level with fewer learned skills than
+            wanted ones (no Change Coupon can then complete the set: a coupon never changes the skill count).
+            stuck=True with used=True: also used_ok[B], the expected coupons used by the horses that aren't stuck."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             C, out, batch, nW = self.C, {}, [], self.n_wanted
@@ -512,7 +515,8 @@ if nb is not None:
                 S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets,
                                        self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
                                        self.max_level, switch_at, coupon == "planned")
-                res = {"skills": float(_popcounts(S).mean()), "wanted_total": nW}
+                res = {"skills": float(_popcounts(S).mean()), "wanted_total": nW,
+                       "stuck": float((_popcounts(S) < nW).mean())}
                 out[p] = res
                 if st == 4:                                              # natural: no cleanup, no coupon
                     miss = nW - _popcounts(S & wmask)
@@ -521,6 +525,8 @@ if nb is not None:
                         res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
                     if used:
                         res["used"] = [0.0] * (C + 1)
+                        if stuck:
+                            res["used_ok"] = [0.0] * (C + 1)
                     if at_most:
                         res["at_most"] = list(res["full"])
                 else:
@@ -536,13 +542,26 @@ if nb is not None:
             hk, hb, hp, hc = map(np.concatenate, (hk, hb, hp, hc))
             nb_ = len(batch)
             T = TAILS if tails else 1
-            if not sel:
+            ok = _popcounts(hk >> PBITS) >= nW                             # not stuck (a spare skill)
+            n_ok = np.bincount(hp[ok], minlength=nb_)
+            ok_sum = np.bincount(hp[ok], weights=hb[ok], minlength=nb_)      # their coupons spent while leveling
+            split = stuck and used
+            if not sel and not split:
                 acc = cleanup_values(hk, hb, hp, hc, nb_, C, T, self.low_memory, w, n, wmask, order,
                                      rare, self.pb, used=used)
                 use = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0]
                 wanted = lambda j, B: acc[j, B, T]
                 tail = lambda j, B, t: acc[j, B, t]
+            elif not sel:
+                # the same values, the horses that aren't stuck in plan j, the stuck ones in j + nb_
+                acc = cleanup_values(hk, hb, np.where(ok, hp, hp + nb_), hc, 2 * nb_, C, T, self.low_memory, w, n,
+                                     wmask, order, rare, self.pb, used=used)
+                use = lambda j, B: acc[j, B, T + 1] + acc[j + nb_, B, T + 1]
+                use_ok = lambda j, B: acc[j, B, T + 1]
+                full = lambda j, B: acc[j, B, 0] + acc[j + nb_, B, 0]
+                wanted = lambda j, B: acc[j, B, T] + acc[j + nb_, B, T]
+                tail = lambda j, B, t: acc[j, B, t] + acc[j + nb_, B, t]
             else:
                 # horses with a spare skill (j) use the coupon on the last missing skill: their result is the cleanup's
                 # (which stops at one missing skill) shifted by one; the others (j + nb_) can't use it
@@ -551,6 +570,7 @@ if nb is not None:
                 acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, J,
                                      self.low_memory, w, n, wmask, order, rare, self.pb, 1, used=used)
                 use = lambda j, B: acc[j, B, J + 1] + acc[j + nb_, B, J + 1]
+                use_ok = lambda j, B: acc[j, B, J + 1]
                 n_sp = np.bincount(hp[spare], minlength=nb_)
                 full = lambda j, B: acc[j, B, 1] + acc[j + nb_, B, 0]
                 wanted = lambda j, B: acc[j, B, J] + n_sp[j] - acc[j, B, 0] + acc[j + nb_, B, J]
@@ -559,6 +579,9 @@ if nb is not None:
             for j, (p, cap) in enumerate(batch):
                 if used:
                     out[p]["used"] = [float((bsum[j] + use(j, B)) / runs) if B >= cap else None for B in range(C + 1)]
+                if split:
+                    out[p]["used_ok"] = [float((ok_sum[j] + use_ok(j, B)) / n_ok[j]) if B >= cap and n_ok[j] else None
+                                         for B in range(C + 1)]
                 out[p]["full"] = [float(full(j, B) / runs) if B >= cap else None for B in range(C + 1)]
                 if at_most:                          # below cap, the sums only hold horses that spent <= B leveling
                     out[p]["at_most"] = [float(full(j, B) / runs) for B in range(C + 1)]
@@ -603,38 +626,15 @@ def search_grid(start_level=1, max_cap=40, strategies=("coursier", "coursier_v2"
     return plans
 
 
-def fewest_search(horse, M, max_cap, C, runs=(1000, 20000), seed=1, top=8, margin=0.005, start_level=1,
-                  coupon=None, progress=None, **kw):
-    """Plans with the fewest coupons used on average when each plan is followed as planned while leveling and the
-    level-30 cleanup goes on until the full set, up to C coupons in total: every plan of search_grid(start_level,
-    max_cap) with runs[0] horses; then, among the plans within margin of the best chance of the full set with C
-    coupons, the top ones by average coupons used (and at30) again with runs[1] fresh horses.
-    Returns {plan: result} for the rechecked plans (with used, at_most and eligible), fewest on average first; at30
-    is always included, last with eligible=False when its chance of the full set isn't within margin."""
-    if not available():
-        raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
-    ev = Evaluator(horse, M, max_budget=C, start_level=start_level, **kw)
-    s1 = ev.plans(search_grid(start_level, max_cap), runs[0], seed, progress, "fewest", coupon=coupon, used=True)
-    n = len(set(kw.get("learned") or ()) & set(horse.weights))
-    return _fewest_recheck(ev, s1, C, runs[1], seed + 2000, top, margin, coupon, n, start_level)
-
-
-def _fewest_recheck(ev, s1, C, runs, seed, top, margin, coupon, learned_count=0, start_level=1):
-    picks, eligible = H.fewest_picks(s1, C, top, margin, learned_count, start_level)
-    r = ev.plans(picks, runs, seed, coupon=coupon, used=True, at_most=True)
-    for p in r:
-        r[p]["eligible"] = p in eligible
-    return dict(sorted(r.items(), key=lambda kv: (not kv[1]["eligible"], kv[1]["used"][C])))
-
-
 def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "coursier_switch"), runs=(1000, 4000),
-             top=6, max_close=25, seed=1, progress=None, start_level=1, coupon=None, **kw):
+             top=6, max_close=25, seed=1, progress=None, start_level=1, coupon=None, stage1=None, **kw):
     """Like bdo.horses.optimize, but tries every plan: at30, and each strategy with every start level (from the
     next level to 29) and every spending cap (1 to max_budget). coursier_switch, which also has a threshold
     (H.SWITCH_TS), first gets the caps of H.PLAN_CAPS only, then every cap between the grid neighbors of its best
     and close plans. Stage 2 reruns the top and close plans of each budget and goal with fresh horses, and the
     general rule's plan for every budget (H.rule_plan), with the chances of missing at most 0..4 wanted skills
-    and the expected coupons used.
+    and the expected coupons used. stage1: a dict to fill with the stage-1 results of every plan tried (then with the
+    expected coupons used and the stuck share too, for frontier_plans()).
     coupon: see Evaluator.plans (the search then aims at the full set with the Selection Coupon).
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
@@ -644,7 +644,8 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     s1 = {}
 
     def run(todo, label):
-        s1.update(ev.plans([p for p in todo if p not in s1], runs[0], seed, progress, label, coupon=coupon))
+        s1.update(ev.plans([p for p in todo if p not in s1], runs[0], seed, progress, label, coupon=coupon,
+                           used=stage1 is not None))
 
     def promising():
         keep = {("at30", 1, 0, 0)}
@@ -660,5 +661,7 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     near = {(st, lv, c2, T) for st, lv, cap, T in promising() if st == "coursier_switch"
             for c2 in H._neighbors(cap, H.PLAN_CAPS, 1, max_budget)}
     run(sorted(near), "refine")
+    if stage1 is not None:
+        stage1.update(s1)
     final = promising() | {H.rule_plan(B, start_level, kw.get("wanted")) for B in range(max_budget + 1)}
     return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon, used=True)

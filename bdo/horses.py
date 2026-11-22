@@ -190,8 +190,10 @@ def skill_resolver(data):
 def horse_from_sim_file(path, resolve):
     """A horse from an in-game simulator reading (CSV 'skill,percent' rows plus '# key: value' headers).
 
-    Headers: name, training (e.g. Artisan 7), boosts (none/gear/brand/both; 'boxes' also accepted), learned (skills marked learned or
-    'base skill', comma-separated). Needs a 'none' row (Compétence non apprise) above 0%.
+    Headers: name, tier (e.g. 8; sets the default target set), type (the in-game type, shown), training (e.g.
+    Artisan 7), boosts (none/gear/brand/both; 'boxes' also accepted), innate (the 'base skill' ones), learned (skills
+    marked learned or 'base skill' at the reading; both headers take them out of the draw), comma-separated. Needs a
+    'none' row (Compétence non apprise) above 0%.
     """
     meta, rows = {}, {}
     with open(path, encoding="utf-8") as f:
@@ -213,12 +215,16 @@ def horse_from_sim_file(path, resolve):
         raise DataError(f"boosts must be one of {', '.join(BOOSTS)}, not {boosts!r}")
     gear, brand = BOOSTS[boosts]
     M = 1 + training_bonus(meta.get("training", "")) / 100 + GEAR * gear + BRAND * brand
-    learned = [resolve(s) for s in meta.get("learned", "").split(",") if s.strip()]
+    learned = [resolve(s) for s in (meta.get("innate", "") + "," + meta.get("learned", "")).split(",") if s.strip()]
     w = {resolve(k): v / M for k, v in rows.items() if compact(k) not in (compact("none"), compact("Compétence non apprise"))}
     # normalise so that (sum of unlearned weights + W) = 100 at the reading
     W = 100 - sum(w.values())
-    return Horse(meta.get("name", os.path.basename(path)), w, W, learned, source=f"simulator reading ({path})",
-                 date=meta.get("date", ""))
+    tier = meta.get("tier", "").upper().lstrip("T")
+    if tier and not tier.isdigit():
+        raise DataError(f"tier must be a number like 8 or T8, not {meta['tier']!r}")
+    name = meta.get("name", os.path.basename(path)) + (f" (in-game type {meta['type']})" if meta.get("type") else "")
+    return Horse(name, w, W, list(dict.fromkeys(learned)), int(tier) if tier else None,
+                 source=f"simulator reading ({path})", date=meta.get("date", ""))
 
 
 # --- simulation ----------------------------------------------------------------------------------------------
@@ -395,7 +401,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     tails[B] (chances of missing at most 0..TAILS - 1 wanted skills), for B >= spend_cap (None below); skills (average skills at 30, budget-independent); needed (sorted coupons
     needed per run for the full set, inf when the horse has too few skills); at_most[B] for every B (the chance of
     the full set with at most B coupons in total, the plan followed as planned: see horses_fast.Evaluator.plans);
-    skill_counts (sorted, per run).
+    stuck (share of runs ending with fewer learned skills than wanted ones), used_ok[B] (average coupons used by
+    the other runs); skill_counts (sorted, per run).
     """
     rng = random.Random(seed)
     pool = list(horse.weights)
@@ -407,7 +414,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     if strategy == "at30":
         spend_cap = 0
     nb = max_budget + 1
-    full_n, wanted_sum, used_sum = [0] * nb, [0] * nb, [0] * nb
+    full_n, wanted_sum, used_sum, used_ok, n_ok = [0] * nb, [0] * nb, [0] * nb, [0] * nb, 0
     tail_n = [[0] * TAILS for _ in range(nb)]
     needed, counts = [], []
     for _ in range(runs):
@@ -469,6 +476,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                     while slot is not None and slot not in wanted and slot in have and spent < spend_cap:
                         slot = swap(slot, kp)
         counts.append(len(have))
+        ok = len(have) >= len(wanted)                # not stuck: enough skills for the full set
+        n_ok += ok
         base = spent
         sel = coupon is not None and strategy != "natural"
         spare = sel and len(have) >= len(wanted)     # an unwanted skill for the Selection Coupon to change
@@ -491,6 +500,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 j = 0
             wanted_sum[B] += traj[min(j, last)]
             used_sum[B] += base + min(j, last)
+            if ok:
+                used_ok[B] += base + min(j, last)
             full_n[B] += traj[min(j, last)] == len(wanted)
             miss = len(wanted) - traj[min(j, last)]
             for t in range(miss, TAILS):
@@ -502,6 +513,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             "tails": [[x / runs for x in tail_n[B]] if B >= spend_cap else None for B in range(nb)],
             "used": [used_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "at_most": [bisect.bisect_right(needed, B) / runs for B in range(nb)],
+            "stuck": 1 - n_ok / runs,
+            "used_ok": [used_ok[B] / n_ok if B >= spend_cap and n_ok else None for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
 
 
@@ -595,9 +608,9 @@ def _neighbors(value, grid, lo, hi):
 
 def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "coursier_switch", "once", "hard"),
              levels=None, caps=None, switch_ts=None, runs=(1000, 4000), top=6, max_close=15, refine=True, seed=1,
-             progress=None, **kw):
+             progress=None, stage1=None, **kw):
     """Search plans for every budget 0..max_budget, for two goals: 'full' (chance of every wanted skill) and
-    'wanted' (average wanted skills).
+    'wanted' (average wanted skills). stage1: a dict to fill with the results of every plan tried before stage 2.
     Stage 1: every plan of the grid with runs[0] (coursier_switch: thresholds switch_ts, default every other value of
     SWITCH_TS).
     Refine: around the best and close plans of stage 1, every start level and spending cap between their grid
@@ -642,46 +655,90 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "co
                 near.update((st, l2, c2, t2) for l2 in _neighbors(lv, levels, 1, max_level - 1)
                             for c2 in _neighbors(cap, caps, 1, max_budget) for t2 in t2s)
         run_all(sorted(near), "refine")
+    if stage1 is not None:
+        stage1.update(found)
     final = promising() | {rule_plan(B, kw.get("start_level", 1), kw.get("wanted")) for B in range(max_budget + 1)}
     return {p: simulate_plan(horse, M, p[0], p[1], p[2], max_budget, runs=runs[1], seed=seed + 1000,
                              switch_at=p[3], **kw)
             for p in sorted(final)}
 
 
-def suggested_plan(res, B, margin=0.01, start_level=1, always_best=False, wanted=None, safe_margin=0.0):
+def suggested_plan(res, B, margin=0.01, start_level=1, always_best=False, wanted=None, safe_margin=0.0,
+                   cheaper=None):
     """One plan to follow for budget B (full-set goal): the general rule's plan if it's within margin of the best
     plan in res, else the best (always the best with always_best). With safe_margin (and tails in res), 'the best'
     is, among the plans within safe_margin of the top full-set chance, the one most likely to miss at most 1 wanted
-    skill. Returns (plan, 'rule' or 'best', the rule plan's chance or None)."""
+    skill; among those also within safe_margin of that, the one using the fewest coupons (when used is in res). With cheaper (and used in res): not the rule's plan when another plan is at least as likely to give the
+    full set and uses at least `cheaper` fewer coupons on average ('cheaper': the best is suggested).
+    Returns (plan, 'rule', 'best' or 'cheaper', the rule plan's chance or None)."""
     top = tied_plans(res, B, "full", safe_margin)
     best = top[0]
     if safe_margin and all(res[p].get("tails") for p in top):
-        best = max(top, key=lambda p: (round(res[p]["tails"][B][1], 9), res[p]["full"][B]))
+        safest = max(res[p]["tails"][B][1] for p in top)
+        safe = [p for p in top if res[p]["tails"][B][1] >= safest - safe_margin]
+        if all(res[p].get("used") for p in safe):              # tied on both: the one using the fewest coupons
+            best = min(safe, key=lambda p: (round(res[p]["used"][B], 9), -res[p]["full"][B]))
+        else:
+            best = max(safe, key=lambda p: (round(res[p]["tails"][B][1], 9), res[p]["full"][B]))
     rp = rule_plan(B, start_level, wanted)
     rc = res[rp]["full"][B] if rp in res and res[rp]["full"][B] is not None else None
     if not always_best and rc is not None and rc >= res[top[0]]["full"][B] - margin:
-        return rp, "rule", rc
+        ru = res[rp].get("used") and res[rp]["used"][B]
+        if cheaper is None or ru is None or not any(
+                res[p]["full"][B] is not None and res[p]["full"][B] >= rc and res[p].get("used")
+                and res[p]["used"][B] <= ru - cheaper for p in res):
+            return rp, "rule", rc
+        return best, "cheaper", rc
     return best, "best", rc
 
 
 
-def fewest_picks(res, C, top=8, margin=0.005, learned_count=0, start_level=1):
-    """For the fewest-coupons view: among the plans of res within margin of the best chance of the full set with C
-    coupons, the top ones by expected coupons used with C, one per effective plan (effective_plan) and per identical
-    result. Returns (plans to recheck: those + at30, the set of eligible ones: at30 only if within margin)."""
-    best = max(r["full"][C] for r in res.values())
-    ok = sorted((p for p in res if res[p]["full"][C] >= best - margin), key=lambda p: (res[p]["used"][C], p))
-    seen, picks = set(), []
-    for p in ok:
-        key = (effective_plan(p, learned_count, start_level), round(res[p]["used"][C], 9), round(res[p]["full"][C], 9))
-        if key[0] not in seen and key[1:] not in seen:
-            seen.update((key[0], key[1:]))
-            picks.append(p)
-        if len(picks) == top:
-            break
-    a30 = ("at30", 1, 0, 0)
-    eligible = set(picks) | ({a30} if a30 in res and res[a30]["full"][C] >= best - margin else set())
-    return list(dict.fromkeys(picks + [a30])), eligible
+FRONTIER_TOL = (0.003, 0.03, 0.003)     # full set, coupons used, stuck: about the noise at 20,000 horses
+
+
+def _beats(b, a, tol):
+    """b beats a within noise: no worse than a by more than tol on any criterion (full set higher, coupons used and
+    stuck lower), and better by more than tol on at least one."""
+    if b[0] < a[0] - tol[0] or b[1] > a[1] + tol[1] or b[2] > a[2] + tol[2]:
+        return False
+    return b[0] > a[0] + tol[0] or b[1] < a[1] - tol[1] or b[2] < a[2] - tol[2]
+
+
+def frontier(res, N, tol=FRONTIER_TOL, learned_count=0, start_level=1):
+    """The plans of res that no other plan beats within noise (see _beats) on the three criteria with N coupons:
+    the full-set chance, the expected coupons used, the stuck share. One plan per effective plan (effective_plan)
+    and per near-identical result (within tol on all three), the higher full-set chance kept. Highest chance first.
+    res: results with full, used and stuck (horses_fast.Evaluator.plans(used=True) or simulate_plan)."""
+    pts = {p: (res[p]["full"][N], res[p]["used"][N], res[p]["stuck"]) for p in res
+           if res[p]["full"][N] is not None}
+    keep = [p for p in pts if not any(_beats(pts[q], pts[p], tol) for q in pts if q != p)]
+    out, seen = [], set()
+    for p in sorted(keep, key=lambda p: (-pts[p][0], pts[p][1], p)):
+        e = effective_plan(p, learned_count, start_level)
+        if e in seen or any(all(abs(pts[p][i] - pts[q][i]) <= tol[i] for i in range(3)) for q in out):
+            continue
+        seen.add(e)
+        out.append(p)
+    return out
+
+
+def frontier_candidates(stage1, N, tol=(0.01, 0.1, 0.01), most=30):
+    """Plans worth rechecking for the frontier, from noisier values (e.g. 1,000 horses): those that no other plan
+    clearly beats (at least as good on all three criteria, and better by more than tol on one), the `most` best of
+    them by each criterion (full set, coupons used, stuck), and at30."""
+    pts = {p: (r["full"][N], r["used"][N], r["stuck"]) for p, r in stage1.items()
+           if r.get("used") and r["full"][N] is not None}
+
+    def clearly(b, a):
+        return (b[0] >= a[0] and b[1] <= a[1] and b[2] <= a[2]
+                and (b[0] > a[0] + tol[0] or b[1] < a[1] - tol[1] or b[2] < a[2] - tol[2]))
+    order = sorted(pts, key=lambda p: (-pts[p][0], pts[p][1], p))
+    keep = [p for p in order if not any(clearly(pts[q], pts[p]) for q in order if q != p)]
+    picks = []
+    for k in ((lambda p: (-pts[p][0], pts[p][1])), (lambda p: (pts[p][1], -pts[p][0])),
+              (lambda p: (pts[p][2], -pts[p][0]))):
+        picks += sorted(keep, key=k)[:most]
+    return list(dict.fromkeys(picks + [("at30", 1, 0, 0)]))
 
 
 def tied_plans(res, B, goal, margin):

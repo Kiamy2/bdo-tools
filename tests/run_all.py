@@ -327,6 +327,13 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           sug is not None and (sug.group(7) is None or float(sug.group(2)) >= float(sug.group(7)) - 1.0)
           and float(sug.group(2)) <= float(m.get("20", 0)) + 0.5
           and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
+    fr = [l.split("\t") for l in out.split("# Plans compared on three criteria")[-1].split("# Average learned")[0].splitlines()
+          if re.match(r"^(from|no swaps)", l)]
+    check("horse_skills --optimize: three-criteria comparison by default (hard case: 2+ plans, stuck horses shown, "
+          "a pick per criterion, at30 beaten with about 16% stuck)",
+          "# Plans compared on three criteria, with up to 20 coupons" in out and len(fr) >= 2
+          and all(re.match(r"^[\d.]+%\*?$", x[2]) for x in fr) and {"chance", "coupons", "safe"} <= set(",".join(x[-1] for x in fr).split(","))
+          and re.search(r"# at30 .*beaten by a listed plan: full set 4\d\.\d%, stuck 1[4-8]\.\d%", out), out)
     sugrow = lambda o, B: next((l.split("\t") for l in o.splitlines() if l.startswith(f"{B}\tfrom lvl")), None)
     pct = lambda x: float(x.rstrip("%"))
     T8 = "T8 example (bdolytics icon horse_71)"
@@ -372,13 +379,49 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           and "learned: 15 + 1 innate (Sprint) = 16 in game: Ruade, Cabrade" in out
           and "every skill left to learn is wanted (" in out and "ignoring 'Sprint' in --learned: innate" in out, out)
     code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
-                    T6L, "--optimize", "5", "--fewest-coupons")
-    fw = [l.split("\t") for l in out.split("# Fewest coupons until")[-1].splitlines() if re.match(r"^(from|no swaps)", l)]
-    check("horse_skills --fewest-coupons: plans by average coupons until the full set, fewest first, at30 listed, "
-          "one row per effective plan; 2-coupon suggestion rechecked: from lvl 24 (the 4,000-horse pick was 25)",
-          code == 0 and len(fw) >= 3 and [float(x[1]) for x in fw] == sorted(float(x[1]) for x in fw)
-          and fw[-1][0].startswith("no swaps") and len({x[0] for x in fw}) == len(fw)
-          and "until 9 learned" not in out and re.search(r"^2\tfrom lvl 24, V0 until lvl 30, keep 1\t", out, re.M), out)
+                    T6L, "--optimize", "5")
+    fw = [l.split("\t") for l in out.split("# Plans compared on three criteria")[-1].split("# Average learned")[0].splitlines()
+          if re.match(r"^(from|no swaps)", l)]
+    check("horse_skills --optimize: one plan best on every criterion (live test 1: V2 from lvl 20), stuck 0% (15 learned "
+          ">= 6 wanted: impossible), at30 beaten; 2-coupon suggestion rechecked: from lvl 24 (the 4,000-horse pick was 25)",
+          code == 0 and "# One plan is the best on every criterion." in out and len(fw) == 1
+          and fw[0][0] == "from lvl 20, V2 until lvl 30, spend <= 2 while leveling" and fw[0][2] == "0%"
+          and fw[0][-1] == "chance,coupons,safe" and "# at30 (no swaps" in out
+          and re.search(r"^2\tfrom lvl 24, V0 until lvl 30, keep 1\t", out, re.M), out)
+    code2, out2 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
+                      T6L, "--optimize", "5", "--no-frontier")
+    code3, out3 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--level", "19", "--learned", T6L,
+                      "--optimize", "3", "--prefer", "coupons", "--frontier-tol", "0,0,0", "--frontier-rows", "2")
+    fw3 = [l.split("\t") for l in out3.split("# Plans compared on three criteria")[-1].split("# Average learned")[0].splitlines()
+           if re.match(r"^(from|no swaps)", l)]
+    check("horse_skills --no-frontier, --prefer coupons (sorted by coupons), --frontier-tol 0,0,0, --frontier-rows 2",
+          code2 == 0 and "Plans compared" not in out2 and code3 == 0 and "sorted by coupons" in out3
+          and 1 <= len(fw3) <= 3 and [float(x[4].rstrip("*")) for x in fw3] == sorted(float(x[4].rstrip("*")) for x in fw3)
+          and ("more plan(s) on the frontier not shown" in out3 or len(fw3) <= 2), out2[-300:] + out3)
+    code, out = run("horse_skills.py", "T8 Type 5", "--innate", "Instant Accel", "--training", "Artisan 7", "--level", "25",
+                    "--learned", "Hind Kick,Fore Chop,Drift,High Jump,Quick Stop,Charge,Roar", "--optimize", "3")
+    src = [l.split("\t")[-1] for l in out.splitlines() if re.match(r"^[1-3]\t(from|no swaps)", l)]
+    check("R2: with --innate the general rule isn't used (the best plan is suggested, with a note)",
+          code == 0 and "isn't used here (--innate)" in out and src == ["best"] * 3, out)
+    code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(H.training_bonus("Skilled 1"))
+ps = [("at30", 1, 0, 0), ("coursier_switch", 12, 12, 11)]
+ev = F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET)
+a = ev.plans(ps, 20000, 3, used=True, stuck=True)
+b = ev.plans(ps, 20000, 3, used=True)
+c = ev.plans(ps, 20000, 3, used=True, stuck=True, coupon="fallback")
+ok = True
+for p in ps:
+    py = H.simulate_plan(h, M, *p[:3], 20, runs=4000, seed=4, switch_at=p[3], wanted=H.TRAVEL_SET)
+    ok &= a[p]["full"] == b[p]["full"] and all(abs(x - y) < 1e-6 for x, y in zip(a[p]["used"][12:], b[p]["used"][12:]))
+    ok &= a[p]["stuck"] == c[p]["stuck"] and abs(a[p]["stuck"] - py["stuck"]) < 0.025
+    ok &= abs(a[p]["used_ok"][20] - py["used_ok"][20]) < 0.4 and 0 < a[p]["stuck"] < 0.3
+print(ok, [round(a[p]["stuck"], 3) for p in ps], [round(a[p]["used_ok"][20], 2) for p in ps])
+""")
+    check("horses_fast stuck share and used_ok (horses not stuck): split doesn't change full / used, agrees with "
+          "bdo.horses simulate_plan within noise, same stuck share with a Selection Coupon", code == 0 and out.startswith("True"), out)
     code, out = run("-c", """
 import sys; sys.path.insert(0, ".")
 from bdo import horses as H
@@ -418,8 +461,44 @@ check("effective_plan: a reached switch threshold is V2, a passed start level is
       "from lvl 10, V2 until lvl 30, keep 1", out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons-used")
 check("horse_skills: --coupons-used without --optimize exits 2", code == 2 and "--optimize" in out, out)
-code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--fewest-coupons")
-check("horse_skills: --fewest-coupons without --optimize exits 2", code == 2 and "--optimize" in out, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--prefer", "safe")
+check("horse_skills: --prefer without --optimize exits 2", code == 2 and "--optimize" in out, out)
+code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+rp = H.rule_plan(5)
+other = ("at30", 1, 0, 0)
+mk = lambda f, u: {"full": [None] * 5 + [f], "used": [None] * 5 + [u], "tails": [None] * 5 + [[f, 0.9]]}
+r = {rp: mk(0.500, 4.0), other: mk(0.505, 3.5)}
+r2 = {rp: mk(0.500, 4.0), other: mk(0.505, 3.9)}
+print(H.suggested_plan(r, 5, 0.01, cheaper=0.2)[1], H.suggested_plan(r2, 5, 0.01, cheaper=0.2)[1],
+      H.suggested_plan(r, 5, 0.01)[1])
+""")
+check("R1: the rule's plan isn't suggested when a plan at least as good uses 0.2+ fewer coupons",
+      code == 0 and out.split() == ["cheaper", "rule", "rule"], out)
+code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+mk = lambda f, t, u: {"full": [None, f], "used": [None, u], "tails": [None, [f, t]]}
+r = {("a", 1, 1, 0): mk(0.9876, 0.999, 2.34), ("b", 1, 1, 0): mk(0.9875, 0.999, 0.80), ("c", 1, 1, 0): mk(0.9874, 0.990, 0.5)}
+print(H.suggested_plan(r, 1, 0.01, always_best=True, safe_margin=0.003)[0])
+""")
+check("suggested_plan: among plans tied on the full set and on <= 1 missing, the one using the fewest coupons",
+      code == 0 and out.strip() == "('b', 1, 1, 0)", out)
+code, out = run("horse_skills.py", "T8 Type 2", "--training", "Artisan 7", "--level", "2", "--learned",
+                "Ruade,Cabrade,Charge", "--odds")
+check("horse_skills: more learned skills than level - 1 -> warning (special horse or typo)",
+      code == 0 and "3 learned skills at level 2" in out and "--innate" in out, out)
+import tempfile
+with tempfile.TemporaryDirectory() as tmp:
+    src = open(os.path.join(ROOT, "tests", "data", "sim_t8_choky_artisan8.csv"), encoding="utf-8").read()
+    hf = os.path.join(tmp, "t8.csv")
+    with open(hf, "w", encoding="utf-8") as f:
+        f.write(src.replace("# learned:", "# tier: T8\n# type: 1\n# innate: Sprint\n# learned:"))
+    code, out = run("horse_skills.py", "--horse-file", hf, "--training", "Artisan 8", "--odds")
+check("horse_skills --horse-file headers: tier (default target set courser), type (shown), innate (out of the draw)",
+      code == 0 and "(in-game type 1)" in out and "# wanted: courser set" in out and "\nSprint\t" not in out
+      and "\nHind Kick\t" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")
