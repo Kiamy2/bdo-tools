@@ -648,16 +648,40 @@ def optimize(horse, M, max_budget=50, strategies=("coursier", "coursier_v2", "co
             for p in sorted(final)}
 
 
-def suggested_plan(res, B, margin=0.01, start_level=1, always_best=False, wanted=None):
+def suggested_plan(res, B, margin=0.01, start_level=1, always_best=False, wanted=None, safe_margin=0.0):
     """One plan to follow for budget B (full-set goal): the general rule's plan if it's within margin of the best
-    plan in res, else the best (always the best with always_best). Returns (plan, 'rule' or 'best', the rule plan's
-    chance or None)."""
-    best = tied_plans(res, B, "full", 0)[0]
+    plan in res, else the best (always the best with always_best). With safe_margin (and tails in res), 'the best'
+    is, among the plans within safe_margin of the top full-set chance, the one most likely to miss at most 1 wanted
+    skill. Returns (plan, 'rule' or 'best', the rule plan's chance or None)."""
+    top = tied_plans(res, B, "full", safe_margin)
+    best = top[0]
+    if safe_margin and all(res[p].get("tails") for p in top):
+        best = max(top, key=lambda p: (round(res[p]["tails"][B][1], 9), res[p]["full"][B]))
     rp = rule_plan(B, start_level, wanted)
     rc = res[rp]["full"][B] if rp in res and res[rp]["full"][B] is not None else None
-    if not always_best and rc is not None and rc >= res[best]["full"][B] - margin:
+    if not always_best and rc is not None and rc >= res[top[0]]["full"][B] - margin:
         return rp, "rule", rc
     return best, "best", rc
+
+
+
+def fewest_picks(res, C, top=8, margin=0.005, learned_count=0, start_level=1):
+    """For the fewest-coupons view: among the plans of res within margin of the best chance of the full set with C
+    coupons, the top ones by expected coupons used with C, one per effective plan (effective_plan) and per identical
+    result. Returns (plans to recheck: those + at30, the set of eligible ones: at30 only if within margin)."""
+    best = max(r["full"][C] for r in res.values())
+    ok = sorted((p for p in res if res[p]["full"][C] >= best - margin), key=lambda p: (res[p]["used"][C], p))
+    seen, picks = set(), []
+    for p in ok:
+        key = (effective_plan(p, learned_count, start_level), round(res[p]["used"][C], 9), round(res[p]["full"][C], 9))
+        if key[0] not in seen and key[1:] not in seen:
+            seen.update((key[0], key[1:]))
+            picks.append(p)
+        if len(picks) == top:
+            break
+    a30 = ("at30", 1, 0, 0)
+    eligible = set(picks) | ({a30} if a30 in res and res[a30]["full"][C] >= best - margin else set())
+    return list(dict.fromkeys(picks + [a30])), eligible
 
 
 def tied_plans(res, B, goal, margin):

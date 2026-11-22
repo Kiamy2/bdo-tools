@@ -589,6 +589,44 @@ if nb is not None:
             return self.plans([p], runs, seed, coupon=coupon)[p]
 
 
+def search_grid(start_level=1, max_cap=40, strategies=("coursier", "coursier_v2", "coursier_switch")):
+    """The plans optimize() tries first: at30, and each strategy with every start level (from the next level to 29)
+    and every spending cap 1..max_cap (coursier_switch: the caps of H.PLAN_CAPS, every threshold of H.SWITCH_TS)."""
+    levels = range(start_level + 1, 30)
+    plans = [("at30", 1, 0, 0)]
+    for st in strategies:
+        if st == "coursier_switch":
+            plans += [(st, lv, cap, T) for lv in levels for cap in H.PLAN_CAPS if cap <= max_cap
+                      for T in H.SWITCH_TS]
+        else:
+            plans += [(st, lv, cap, 0) for lv in levels for cap in range(1, max_cap + 1)]
+    return plans
+
+
+def fewest_search(horse, M, max_cap, C, runs=(1000, 20000), seed=1, top=8, margin=0.005, start_level=1,
+                  coupon=None, progress=None, **kw):
+    """Plans with the fewest coupons used on average when each plan is followed as planned while leveling and the
+    level-30 cleanup goes on until the full set, up to C coupons in total: every plan of search_grid(start_level,
+    max_cap) with runs[0] horses; then, among the plans within margin of the best chance of the full set with C
+    coupons, the top ones by average coupons used (and at30) again with runs[1] fresh horses.
+    Returns {plan: result} for the rechecked plans (with used, at_most and eligible), fewest on average first; at30
+    is always included, last with eligible=False when its chance of the full set isn't within margin."""
+    if not available():
+        raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
+    ev = Evaluator(horse, M, max_budget=C, start_level=start_level, **kw)
+    s1 = ev.plans(search_grid(start_level, max_cap), runs[0], seed, progress, "fewest", coupon=coupon, used=True)
+    n = len(set(kw.get("learned") or ()) & set(horse.weights))
+    return _fewest_recheck(ev, s1, C, runs[1], seed + 2000, top, margin, coupon, n, start_level)
+
+
+def _fewest_recheck(ev, s1, C, runs, seed, top, margin, coupon, learned_count=0, start_level=1):
+    picks, eligible = H.fewest_picks(s1, C, top, margin, learned_count, start_level)
+    r = ev.plans(picks, runs, seed, coupon=coupon, used=True, at_most=True)
+    for p in r:
+        r[p]["eligible"] = p in eligible
+    return dict(sorted(r.items(), key=lambda kv: (not kv[1]["eligible"], kv[1]["used"][C])))
+
+
 def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "coursier_switch"), runs=(1000, 4000),
              top=6, max_close=25, seed=1, progress=None, start_level=1, coupon=None, **kw):
     """Like bdo.horses.optimize, but tries every plan: at30, and each strategy with every start level (from the
@@ -602,14 +640,7 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
     ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **kw)
-    levels = range(start_level + 1, 30)
-    plans = [("at30", 1, 0, 0)]
-    for st in strategies:
-        if st == "coursier_switch":
-            plans += [(st, lv, cap, T) for lv in levels for cap in H.PLAN_CAPS if cap <= max_budget
-                      for T in H.SWITCH_TS]
-        else:
-            plans += [(st, lv, cap, 0) for lv in levels for cap in range(1, max_budget + 1)]
+    plans = search_grid(start_level, max_budget, strategies)
     s1 = {}
 
     def run(todo, label):

@@ -90,6 +90,9 @@ def main():
     ap.add_argument("--coupons-used", nargs="?", const="all", metavar="N,N,..",
                     help="with --optimize: for the suggested plans of these budgets (default all), the chance of the "
                          "full set with at most B coupons in total for each B, and the spread of coupons used")
+    ap.add_argument("--fewest-coupons", action="store_true",
+                    help="with --optimize: the plans using the fewest coupons on average when the level-30 cleanup "
+                         "goes on until the full set, with their chance of the full set within 1, 2, 3, 5... coupons")
     ap.add_argument("--lang", default="en", choices=["en", "fr"], help="skill names in output")
     a = ap.parse_args()
 
@@ -202,9 +205,9 @@ def main():
 
     if a.optimize is not None:
         return optimize_report(a, horse, bonus, learned, wanted, fodder, head, show)
-    if a.selection_coupon or a.always_best:
-        print(f"ERROR: {'--selection-coupon' if a.selection_coupon else '--always-best'} works with --optimize",
-              file=sys.stderr)
+    if a.selection_coupon or a.always_best or a.fewest_coupons:
+        opt = "--selection-coupon" if a.selection_coupon else "--always-best" if a.always_best else "--fewest-coupons"
+        print(f"ERROR: {opt} works with --optimize", file=sys.stderr)
         return 2
     budgets = [int(x) for x in a.sweep.split(",")] if a.sweep else [a.coupons]
     W = set(H.TRAVEL_SET if wanted is None else wanted) & set(horse.weights)
@@ -271,13 +274,16 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     t0 = time.time()
     planned = "planned" if a.selection_coupon == "planned" else None
 
+    recheck = RECHECK_RUNS if engine == "numba" else 4000
+
     def evaluate(plans, coupon=None, **override):
-        """The given plans again, on the same horses as the final check (for the extra columns)."""
+        """The given plans on fresh horses (the recheck of the suggested plans; the same horses for the extra
+        columns and --coupons-used)."""
         k = dict(kw, **override)
         if engine == "numba":
             ev = HF.Evaluator(horse, M, max_budget=a.optimize, low_memory=a.low_memory, **k)
-            return ev.plans(sorted(set(plans)), 4000, a.seed + 1000, tails=True, coupon=coupon)
-        return {p: H.simulate_plan(horse, M, p[0], p[1], p[2], a.optimize, runs=4000, seed=a.seed + 1000,
+            return ev.plans(sorted(set(plans)), recheck, a.seed + 2000, tails=True, coupon=coupon, used=True)
+        return {p: H.simulate_plan(horse, M, p[0], p[1], p[2], a.optimize, runs=recheck, seed=a.seed + 2000,
                                    switch_at=p[3], coupon=coupon, **k) for p in set(plans)}
 
     if engine == "numba":
@@ -321,18 +327,26 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
         b30 = next((B for B, x in enumerate(at30["full"]) if x >= t), None)
         print(f"# coupons for a {t:.0%} chance of the full set: {b if b is not None else '> max'} with the best plan, "
               f"{b30 if b30 is not None else '> max'} with at30")
+    # the recheck: for each budget the tied plans (up to 12), the rule's plan and at30, on fresh horses (more of them
+    # with the fast engine)
+    cand = {("at30", 1, 0, 0)}
+    for B in range(1, a.optimize + 1):
+        cand.update(H.tied_plans(res, B, "full", 0.01)[:12 if engine == "numba" else 5])
+        cand.add(H.rule_plan(B, a.level, wanted))
+    r3 = evaluate([p for p in cand if p in res], coupon=planned)
     print()
-    if a.always_best:
-        print("# Suggested plan per budget (full set): the best plan found (--always-best).")
-    else:
-        print("# Suggested plan per budget (full set): the general rule's plan when it's within 1 point of the best")
-        print("# plan found, else the best (--always-best: always the best).")
+    print(f"# Suggested plan per budget (full set), rechecked with {recheck:,} fresh horses (not the ones the plans were")
+    print("# picked on): the plans tied above, the rule's plan and at30. Among the plans within 0.3 points of the best")
+    print("# full-set chance, the best is the one most likely to miss at most 1 wanted skill. Suggested: "
+          + ("that best plan (--always-best)." if a.always_best else "the general rule's"))
+    if not a.always_best:
+        print("# plan when it's within 1 point of the best, else the best (--always-best: always the best).")
     print("# V0 = coursier swaps (once per level: Fore Chop, then Hind Kick, if held), V2 = coursier_v2 swaps (once")
     print("# per level: Hind Kick only); learned skills don't count innate ones; keep = coupons kept for level 30.")
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more); used: coupons used on average (a horse that doesn't get the")
     print("# full set counts every coupon it used); per full set: used / full set (more failures make it higher).")
-    sug = {B: H.suggested_plan(res, B, 0.01, a.level, a.always_best, wanted) for B in range(1, a.optimize + 1)}
+    sug = {B: H.suggested_plan(r3, B, 0.01, a.level, a.always_best, wanted, SAFE_MARGIN) for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
     if a.selection_coupon == "fallback":
         print("# with Selection Coupon: the full-set chance if, at level 30, you decide to use your Selection Coupon")
@@ -349,13 +363,13 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
           + "\tsource")
     for B in range(1, a.optimize + 1):
         plan, src, rc = sug[B]
-        best = res[H.tied_plans(res, B, "full", 0)[0]]["full"][B]
+        best = r3[H.tied_plans(r3, B, "full", 0)[0]]["full"][B]
         note = (f"rule (best {100 * best:.1f}%)" if src == "rule"
                 else f"best (rule: {'not checked' if rc is None else f'{100 * rc:.1f}%'})")
-        tl = res[plan]["tails"][B]
+        tl = r3[plan]["tails"][B]
         w5 = H.worst5(tl)
         ex = "".join(f"\t{100 * e[plan]['full'][B]:.1f}%" for e in extras)
-        u, f = res[plan]["used"][B], res[plan]["full"][B]
+        u, f = r3[plan]["used"][B], r3[plan]["full"][B]
         print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{100 * f:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
               f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{u:.2f}\t{f'{u / f:.2f}' if f else '-'}{ex}\t{note}")
     # average learned skills per level, one column per suggested plan (the budgets it's suggested for)
@@ -363,8 +377,10 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     for B in range(1, a.optimize + 1):
         groups.setdefault(sug[B][0], []).append(B)
     span = lambda bs: ",".join(f"{x[0]}" if x[0] == x[-1] else f"{x[0]}-{x[-1]}" for x in _runs(bs))
+    if a.fewest_coupons:
+        fewest_report(a, horse, M, kw, engine, planned, res, n, recheck)
     if a.coupons_used is not None:
-        coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n)
+        coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck)
     k = {k2: v for k2, v in kw.items() if k2 != "start_level"}
     if engine == "numba":
         ev = HF.Evaluator(horse, M, max_budget=a.optimize, **kw)
@@ -389,7 +405,51 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     return 0
 
 
-def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n):
+def fewest_report(a, horse, M, kw, engine, planned, res, n, recheck):
+    """--fewest-coupons: the plans using the fewest coupons on average when the level-30 cleanup goes on until the
+    full set (every plan of the search with spending caps up to the --optimize maximum; the plain-Python engine
+    only checks the plans of its final stage)."""
+    from bdo import horses_fast as HF
+    C = max(20, a.optimize + 10)
+    if engine == "numba":
+        r = HF.fewest_search(horse, M, a.optimize, C, (1000, recheck), a.seed, coupon=planned,
+                             low_memory=a.low_memory, **kw)
+        what = f"every plan of the search (spending caps up to {a.optimize})"
+    else:
+        s1 = {p: H.simulate_plan(horse, M, p[0], p[1], p[2], C, runs=1000, seed=a.seed, switch_at=p[3],
+                                 coupon=planned, **kw) for p in res}           # the final stage's plans
+        picks, eligible = H.fewest_picks(s1, C, 8, 0.005, n, a.level)
+        r = {p: H.simulate_plan(horse, M, p[0], p[1], p[2], C, runs=recheck, seed=a.seed + 2000, switch_at=p[3],
+                                coupon=planned, **kw) for p in picks}
+        for p in r:
+            r[p]["eligible"] = p in eligible
+        r = dict(sorted(r.items(), key=lambda kv: (not kv[1]["eligible"], kv[1]["used"][C])))
+        what = "the plans of the search's final stage (plain-Python engine)"
+    cols = [B for B in (1, 2, 3, 5, 10, 15) if B <= C]
+    print()
+    print(f"# Fewest coupons until the full set (--fewest-coupons): {what}, each followed as planned while")
+    print(f"# leveling, then the level-30 cleanup until the full set, up to {C} coupons in total. The plans with the")
+    print(f"# fewest coupons on average, among those within 0.5 points of the best chance of the full set with {C},")
+    print(f"# rechecked with {recheck:,} fresh horses, fewest first; at30 = no swaps while leveling, every coupon at 30.")
+    print(f"# average (a horse still missing a skill at {C} counts every coupon it used); median / 90%: coupons that give")
+    print("# the full set to half / 90% of horses; at most B: chance of the full set with at most B coupons in total.")
+    print("plan\taverage\tmedian\t90%\t" + "\t".join(f"at most {B}" for B in cols) + f"\tfull set with {C}")
+    q = lambda am, x: next((str(B) for B, v in enumerate(am) if v >= x - 1e-9), f">{C}")
+    for p, x in r.items():
+        am = x["at_most"]
+        ref = "" if x["eligible"] else " (for reference: well below the best chance of the full set)"
+        print(f"{H.plan_name(p, None, n, a.level)}{ref}\t{x['used'][C]:.2f}\t{q(am, 0.5)}\t{q(am, 0.9)}\t"
+              + "\t".join(f"{100 * am[B]:.1f}%" for B in cols) + f"\t{100 * am[C]:.1f}%")
+    first, a30 = next(iter(r)), r[("at30", 1, 0, 0)]
+    if a30["eligible"] and a30["used"][C] <= r[first]["used"][C] + 0.02:
+        print("# No swaps while leveling (at30) uses the fewest coupons on average (within 0.02).")
+    top = max(x["at_most"][C] for x in r.values())
+    if top < 0.99:
+        print(f"# Only {100 * top:.1f}% of horses get the full set within {C} coupons: the averages also count the others, at")
+        print(f"# the coupons they used ({C}, or fewer if no unwanted skill was left to swap); compare the 'at most' columns.")
+
+
+def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck=4000):
     """--coupons-used: for the suggested plans of the chosen budgets, the chance of the full set with at most B
     coupons in total (each plan followed as planned while leveling, then the level-30 cleanup until the full set),
     and the spread of coupons used. Same horses as the suggested-plan table (its full-set column at the plan's own
@@ -402,9 +462,9 @@ def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n):
     plans = list(groups)
     if engine == "numba":
         ev = HF.Evaluator(horse, M, max_budget=C, low_memory=a.low_memory, **kw)
-        r = ev.plans(sorted(set(plans)), 4000, a.seed + 1000, coupon=planned, used=True, at_most=True)
+        r = ev.plans(sorted(set(plans)), recheck, a.seed + 2000, coupon=planned, used=True, at_most=True)
     else:
-        r = {p: H.simulate_plan(horse, M, p[0], p[1], p[2], C, runs=4000, seed=a.seed + 1000, switch_at=p[3],
+        r = {p: H.simulate_plan(horse, M, p[0], p[1], p[2], C, runs=recheck, seed=a.seed + 2000, switch_at=p[3],
                                 coupon=planned, **kw) for p in plans}
     lab = {p: f"{span(bs)} coupon{'s' if bs != [1] else ''}" for p, bs in groups.items()}
     print()
@@ -429,6 +489,10 @@ def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n):
     print(f"plan\taverage\tmedian\t90%\t99%\tfull set with {C}")
     for p in plans:
         print(f"plan for {lab[p]}\t{r[p]['used'][C]:.2f}\t{q(p, 0.5)}\t{q(p, 0.9)}\t{q(p, 0.99)}\t{100 * am[p][C]:.1f}%")
+
+
+RECHECK_RUNS = 20000      # fresh horses for the suggested plans' recheck (fast engine; plain Python: 4000)
+SAFE_MARGIN = 0.003       # plans within 0.3 points of the best full set count as tied for the safer-plan choice
 
 
 def _runs(values):

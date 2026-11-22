@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-11-22
+- `--optimize`: the suggested plans are rechecked with 20,000 fresh horses (plain Python: 4,000): the tied plans of each budget, the rule's plan and at30; the suggestion is made on these numbers (the best of the search can be up to about 1 point too high on the horses it was picked on). Among plans within 0.3 points of the best full-set chance, the best is the one most likely to miss at most 1 wanted skill (`suggested_plan(..., safe_margin)`). `--coupons-used` and the extra columns use the same horses.
+- `--fewest-coupons` (with `--optimize`): the plans using the fewest coupons on average when the level-30 cleanup goes on until the full set, among the plans close to the best chance of the full set; at30 always listed; says when no swaps while leveling wins. `horses_fast.fewest_search()`, `search_grid()`; `bdo.horses.fewest_picks()`.
 - `docs/horse_skills_guide.md`: for AI assistants guiding a player through a horse's leveling (setup, what to ask, the commands, the per-level-up rules, being reliable with the numbers); linked from `AGENTS.md`, the README and the tool doc.
 - `--innate SKILLS`: a special horse = a known horse with extra innate skills (out of its draw, same 'no skill' weight; `Horse.with_innate()`). Check it with `--check` and a reading.
 - `--optimize --coupons-used [N,N,..]`: for the suggested plans of these budgets (default all), the chance of the full set with at most B coupons in total for every B (the plan followed as planned while leveling, then the level-30 cleanup until the full set), and the coupons used on average, median, 90% and 99%. `Evaluator.plans(at_most=True)` and `simulate_plan()` return `at_most[B]` (exact cleanup in the fast engine).

@@ -320,10 +320,12 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
     check("horse_skills --optimize: average learned skills per level (levels 1-30, rising, ~13-16 at 30 on the T8 Skilled 1)",
           sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
           and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
-    sug = re.search(r"^20\t(from lvl \d+, V0 until \d+ learned skills, then V2, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
-                    r"([\d.]+)%\t(\d)\t[\d.]+\t[\d.]+\t(rule|best)", out, re.M)
-    check("horse_skills --optimize: suggested plan per budget (20 coupons: one switch plan, within 1 point of the best; "
-          "full set <= missing 1 <= missing 2)", sug is not None and float(sug.group(2)) >= float(m.get("20", 0)) - 1.0
+    sug = re.search(r"^20\t(from lvl \d+, V[02] until [^\t]+, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
+                    r"([\d.]+)%\t(\d)\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
+    check("horse_skills --optimize: suggested plan per budget (20 coupons, rechecked with fresh horses: within 1 point "
+          "of the best, and below the search's lucky best + 0.5; full set <= missing 1 <= missing 2)",
+          sug is not None and (sug.group(7) is None or float(sug.group(2)) >= float(sug.group(7)) - 1.0)
+          and float(sug.group(2)) <= float(m.get("20", 0)) + 0.5
           and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
     sugrow = lambda o, B: next((l.split("\t") for l in o.splitlines() if l.startswith(f"{B}\tfrom lvl")), None)
     pct = lambda x: float(x.rstrip("%"))
@@ -369,6 +371,24 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           "V0 until 9 learned" not in out and "T8 Type 6 (an alias of T8 Type 4" in out
           and "learned: 15 + 1 innate (Sprint) = 16 in game: Ruade, Cabrade" in out
           and "every skill left to learn is wanted (" in out and "ignoring 'Sprint' in --learned: innate" in out, out)
+    code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
+                    T6L, "--optimize", "5", "--fewest-coupons")
+    fw = [l.split("\t") for l in out.split("# Fewest coupons until")[-1].splitlines() if re.match(r"^(from|no swaps)", l)]
+    check("horse_skills --fewest-coupons: plans by average coupons until the full set, fewest first, at30 listed, "
+          "one row per effective plan; 2-coupon suggestion rechecked: from lvl 24 (the 4,000-horse pick was 25)",
+          code == 0 and len(fw) >= 3 and [float(x[1]) for x in fw] == sorted(float(x[1]) for x in fw)
+          and fw[-1][0].startswith("no swaps") and len({x[0] for x in fw}) == len(fw)
+          and "until 9 learned" not in out and re.search(r"^2\tfrom lvl 24, V0 until lvl 30, keep 1\t", out, re.M), out)
+    code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+r = {("a", 1, 1, 0): {"full": [0, 0.500], "tails": [None, [0.500, 0.90]]},
+     ("b", 1, 1, 0): {"full": [0, 0.498], "tails": [None, [0.498, 0.95]]},
+     ("c", 1, 1, 0): {"full": [0, 0.490], "tails": [None, [0.490, 0.99]]}}
+print(H.suggested_plan(r, 1, 0.01, always_best=True)[0], H.suggested_plan(r, 1, 0.01, always_best=True, safe_margin=0.003)[0])
+""")
+    check("suggested_plan safe_margin: among plans within 0.3 points of the best full set, the safest (<= 1 missing)",
+          code == 0 and out.strip() == "('a', 1, 1, 0) ('b', 1, 1, 0)", out)
     code, out = run("-c", """
 import sys; sys.path.insert(0, ".")
 from bdo import horses as H, horses_fast as F
@@ -398,6 +418,8 @@ check("effective_plan: a reached switch threshold is V2, a passed start level is
       "from lvl 10, V2 until lvl 30, keep 1", out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons-used")
 check("horse_skills: --coupons-used without --optimize exits 2", code == 2 and "--optimize" in out, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--fewest-coupons")
+check("horse_skills: --fewest-coupons without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--odds", "--lang", "fr")
 check("horse_skills --odds --lang fr", code == 0 and "Ruade\t15.18" in out and "none\t10.7" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Expert 3")
