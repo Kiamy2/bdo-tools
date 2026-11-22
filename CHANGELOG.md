@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-22
+- `docs/horse_skills_guide.md`: for AI assistants guiding a player through a horse's leveling (setup, what to ask, the commands, the per-level-up rules, being reliable with the numbers); linked from `AGENTS.md`, the README and the tool doc.
 - `--innate SKILLS`: a special horse = a known horse with extra innate skills (out of its draw, same 'no skill' weight; `Horse.with_innate()`). Check it with `--check` and a reading.
 - `--optimize --coupons-used [N,N,..]`: for the suggested plans of these budgets (default all), the chance of the full set with at most B coupons in total for every B (the plan followed as planned while leveling, then the level-30 cleanup until the full set), and the coupons used on average, median, 90% and 99%. `Evaluator.plans(at_most=True)` and `simulate_plan()` return `at_most[B]` (exact cleanup in the fast engine).
 - The `--optimize` suggested plans show `used` (expected coupons used with that budget) and `per full set` (used / full-set chance); the fast `optimize()` returns `used`.

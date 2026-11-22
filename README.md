@@ -23,6 +23,7 @@ Every tool supports `--help`.
 - [docs/data-sources.md](docs/data-sources.md): the APIs used, their quirks, other sources researched.
 - [CONTRIBUTING.md](CONTRIBUTING.md): code structure, tests, rules for changes.
 - [AGENTS.md](AGENTS.md): short instructions for AI agents.
+- [docs/horse_skills_guide.md](docs/horse_skills_guide.md): for AI assistants guiding a player through a horse's leveling with `horse_skills.py`.
 - [CHANGELOG.md](CHANGELOG.md)
 - License: [MIT](LICENSE)
 

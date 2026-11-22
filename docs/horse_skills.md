@@ -2,6 +2,8 @@
 
 Offline (no network). It answers "what are my odds on the next level-up?" and "how many skills will my horse end up with, and should I use the gear, the brand stone or my coupons this way or that way?". The model, the data and the conclusions are in [horse-skills-report.md](horse-skills-report.md).
 
+For AI assistants guiding a player step by step through a horse's leveling: [horse_skills_guide.md](horse_skills_guide.md).
+
 ```
 python3 -I horse_skills.py --list                                                   # horses in the data file
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7"                   # all strategies, 30 coupons
