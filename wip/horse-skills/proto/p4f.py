@@ -122,15 +122,25 @@ def run_case(label, horse, M, N, start_level=1, learned=(), wanted=None, seed=1)
     best = {"chance": max(fr, key=lambda p: r[p]["full"][N]), "coupons": min(fr, key=lambda p: r[p]["used"][N]),
             "safe": min(fr, key=lambda p: (r[p]["stuck"], -r[p]["full"][N]))}
     cols = [B for B in (1, 2, 3, 5, 10) if B < N]
-    print(f"plan\tfull set within {N}\tstuck\tran out\tused (avg)\tmedian\t" + "\t".join(f"at most {B}" for B in cols)
-          + "\tpick")
+    # average coupons of the horses that get the full set within N: from P(total <= B), B = 0..N
+    succ = lambda am: sum(B * (am[B] - (am[B - 1] if B else 0)) for B in range(N + 1)) / am[N] if am[N] else float("nan")
+    impossible = nl >= ev.n_wanted                      # already holds enough skills: stuck can't happen
+    stk = lambda x: "0%" if impossible else (f"<{300 / 20000:.2f}%" if x == 0 else f"{100 * x:.1f}%")
+    # '*' on the best value of each criterion column (within EPS of the best)
+    bf, bu, bs = (max(r[p]["full"][N] for p in fr), min(r[p]["used"][N] for p in fr), min(r[p]["stuck"] for p in fr))
+    star = lambda ok: "*" if ok and len(fr) > 1 else ""
+    if len(fr) == 1:
+        print("# One plan is the best on every criterion.")
+    print(f"plan\tfull set within {N}\tstuck\tran out\tcoupons: avg (all)\tavg (successes)\tmedian\t"
+          + "\t".join(f"at most {B}" for B in cols) + "\tpick")
     q = lambda am, x: next((str(B) for B, v in enumerate(am) if v >= x - 1e-9), f">{N}")
     for p in fr:
         x = r[p]
         am = x["at_most"]
         tags = ",".join(k for k, v in best.items() if v == p)
-        print(f"{H.plan_name(p, None, nl, start_level)}\t{100*x['full'][N]:.1f}%\t{100*x['stuck']:.1f}%\t"
-              f"{100*(1 - x['full'][N] - x['stuck']):.1f}%\t{x['used'][N]:.2f}\t{q(am, 0.5)}\t"
+        print(f"{H.plan_name(p, None, nl, start_level)}\t{100*x['full'][N]:.1f}%{star(x['full'][N] >= bf - EPS[0])}\t"
+              f"{stk(x['stuck'])}{star(x['stuck'] <= bs + EPS[2])}\t{100*(1 - x['full'][N] - x['stuck']):.1f}%\t"
+              f"{x['used'][N]:.2f}{star(x['used'][N] <= bu + EPS[1])}\t{succ(am):.2f}\t{q(am, 0.5)}\t"
               + "\t".join(f"{100*am[B]:.1f}%" for B in cols) + f"\t{tags}")
     a = r[("at30", 1, 0, 0)]
     if ("at30", 1, 0, 0) not in fr:
