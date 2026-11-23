@@ -168,9 +168,8 @@ def main():
         if a.replan_check is not None:
             if not a.level < a.replan_check < 30:
                 raise H.DataError(f"--replan-check: the level must be between the current level ({a.level}) and 30")
-            if a.tickets or a.boosts:
-                raise H.DataError("--replan-check: not with --tickets (the tickets left per horse aren't tracked yet) "
-                                  "or --boosts")
+            if a.boosts:
+                raise H.DataError("--replan-check: not with --boosts")
         a.boost_list = [x.strip().lower() for x in (a.boosts or "").split(",") if x.strip()]
         if a.boosts:
             if not a.boost_list or any(x not in BOOSTS for x in a.boost_list) or len(set(a.boost_list)) != len(a.boost_list):
@@ -741,9 +740,9 @@ def replan_report(a, horse, M, kw, planned, plan, n, recheck, wanted):
     pick = random.Random(a.seed).sample(low, min(REPLAN_HORSES, len(low)))
     st, lv, cap, T = plan
     rows, gains, used_k, used_r, differ = [], [], [], [], 0
-    for i, (learned, spent, pts) in enumerate(pick):
+    for i, (learned, spent, pts, tl) in enumerate(pick):
         left = N - spent
-        k2 = dict(kw, start_level=L, learned=learned, points=pts)
+        k2 = dict(kw, start_level=L, learned=learned, points=pts, tickets=tl)       # this horse's state at L
         kept = ("at30", 1, 0, 0) if st == "at30" or cap - spent <= 0 else (st, max(lv, L + 1), cap - spent, T)
         if left <= 0:
             best = kept
@@ -758,7 +757,7 @@ def replan_report(a, horse, M, kw, planned, plan, n, recheck, wanted):
         gains.append(fb - fk)
         used_k.append(r[kept]["used"][left])
         used_r.append(r[best]["used"][left])
-        rows.append((nl, len(set(learned) & set(wanted)), left, fk, fb, best, nl))
+        rows.append((nl, len(set(learned) & set(wanted)), left, tl, fk, fb, best))
     g = statistics.mean(gains)
     se = statistics.stdev(gains) / len(gains) ** 0.5 if len(gains) > 1 else 0.0
     print()
@@ -770,12 +769,14 @@ def replan_report(a, horse, M, kw, planned, plan, n, recheck, wanted):
     print("# and coupons) vs the best plan of a new search from that horse's state, both on the same "
           f"{recheck:,} fresh horses from")
     print("# there (the search's pick as it is, even when it does worse on them). Over all horses of that state.")
-    print(f"learned at {L}\twanted held\tcoupons left\tkept: full set\tre-planned: full set\tgain\tre-planned plan")
+    tk = "\ttickets left" if a.tickets else ""
+    print(f"learned at {L}\twanted held\tcoupons left{tk}\tkept: full set\tre-planned: full set\tgain\tre-planned plan")
     nW = ev.n_wanted
-    for nl, wh, left, fk, fb, best, _ in sorted(rows):
+    for nl, wh, left, tl, fk, fb, best in sorted(rows):
         sure0 = nl + 30 - L < nW                   # certainly stuck: the full set is impossible
         fmt = lambda x: "0%" if sure0 else _p(x, recheck)
-        print(f"{nl}\t{wh}\t{left}\t{fmt(fk)}\t{fmt(fb)}\t{100 * (fb - fk):+.1f}\t"
+        tcol = f"\t{tl}" if a.tickets else ""
+        print(f"{nl}\t{wh}\t{left}{tcol}\t{fmt(fk)}\t{fmt(fb)}\t{100 * (fb - fk):+.1f}\t"
               f"{'- (certainly stuck)' if sure0 else H.plan_name(best, left, nl, L)}")
     print(f"# average gain: {100 * g:+.1f} points on the full set (standard error {100 * se:.1f} over these horses; "
           "the first stage of")

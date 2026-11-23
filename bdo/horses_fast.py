@@ -108,8 +108,8 @@ if nb is not None:
         return new, have, state, (0 if new == target else pts + 1)
 
     @nb.njit(cache=True)
-    def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                 rare, pb, points, max_level, switch_at, keep, stop=False, end_level=30):
+    def _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
+                   rare, pb, points, max_level, switch_at, keep, stop=False, end_level=30):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
@@ -117,7 +117,7 @@ if nb is not None:
         stop: no more swaps once the horse is certainly stuck: its learned skills + the level-ups left until
         end_level are fewer than the wanted skills (a level-up teaches at most one skill, a coupon none).
         Skill Change Points: + 1 per coupon, back to 0 when it gives the desired skill.
-        Returns (held skills, coupons spent while leveling, Skill Change Points)."""
+        Returns (held skills, coupons spent while leveling, Skill Change Points, Level Down Tickets left)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
         state = np.uint64(a) ^ (np.uint64(b) * np.uint64(0xE7037ED1A0B428DB))
@@ -197,21 +197,42 @@ if nb is not None:
                         slot, have, state, pts = _swap_r(slot, have, pts, state, w, n, rare, pb, keep)
                         if slot >= 0:
                             spent += 1
+        return have, spent, pts, t
+
+    @nb.njit(cache=True)
+    def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
+                 rare, pb, points, max_level, switch_at, keep, stop=False, end_level=30):
+        """_level30_t without the tickets left (the 3 values older scripts expect)."""
+        have, spent, pts, _ = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask,
+                                         wmask, fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
+                                         end_level)
         return have, spent, pts
 
     @nb.njit(cache=True, parallel=True)
-    def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
-                order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1):
+    def _many30_t(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
+                  order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1):
+        """Many horses (_level30_t): arrays of held skills, coupons spent, Skill Change Points, tickets left."""
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
+        tl = np.empty(runs, np.int64)
         for r in nb.prange(runs):
-            a, b, c = _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
-                               fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
-                               max_level if end_level < 0 else end_level)
+            a, b, c, d = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
+                                    fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
+                                    max_level if end_level < 0 else end_level)
             S[r] = a
             base[r] = b
             pts[r] = c
+            tl[r] = d
+        return S, base, pts, tl
+
+    @nb.njit(cache=True)
+    def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
+                order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1):
+        """_many30_t without the tickets left (the 3 arrays older scripts expect)."""
+        S, base, pts, _ = _many30_t(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask,
+                                    wmask, fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
+                                    end_level)
         return S, base, pts
 
     # --- exact level-30 cleanup --------------------------------------------------------------------------------
@@ -618,16 +639,18 @@ if nb is not None:
 
         def states_at(self, plan, level, runs=4000, seed=1, coupon=None):
             """The horses of one plan when they reach `level` (same horses as plans() with the same seed, up to that
-            level): a list of (learned skills, coupons spent so far, Skill Change Points), one per horse."""
+            level): a list of (learned skills, coupons spent so far, Skill Change Points, Level Down Tickets left),
+            one per horse."""
             w, n, W, M = self.args
             lmask, wmask, fod, cyc, order, rare = self.masks
             strategy, swap_from, spend_cap, switch_at = plan
             st = CODES[strategy]
-            S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
-                                   self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, level,
-                                   switch_at, coupon == "planned", self.stop, self.max_level)
+            S, base, pts, tl = _many30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap,
+                                         self.tickets, self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb,
+                                         self.points, level, switch_at, coupon == "planned", self.stop, self.max_level)
             pool = self.pool
-            return [([pool[i] for i in range(n) if (int(S[r]) >> i) & 1], int(base[r]), int(pts[r])) for r in range(runs)]
+            return [([pool[i] for i in range(n) if (int(S[r]) >> i) & 1], int(base[r]), int(pts[r]), int(tl[r]))
+                    for r in range(runs)]
 
         def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0, coupon=None):
             """One plan (see plans())."""

@@ -406,13 +406,30 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           and rows5[1][1] == "from lvl 23, S1 until lvl 30, keep 1"
           and all(pct(x[3].split("/")[0]) <= pct(x[3].split("/")[1]) <= pct(x[3].split("/")[2]) for x in rows5)
           and out5.count("# Compared on three criteria, ") == 3 and out5.count("# Plans compared on three criteria") == 1, out5)
+    code7, out7 = run("-c", """
+import sys; sys.path.insert(0, ".")
+import numpy as np
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(H.training_bonus("Skilled 1"))
+ev = F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET, tickets=4)
+w, n, W, MM = ev.args; lmask, wmask, fod, cyc, order, rare = ev.masks
+args = (2000, 7, w, n, W, MM, 6, 10, 19, 4, 1, lmask, wmask, fod, cyc, order, rare, ev.pb, 0, 10, 0, False, True, 30)
+a, b = F._many30(*args), F._many30_t(*args)
+st = ev.states_at(("coursier_v2", 10, 19, 0), 10, 2000, 7)
+c = np.array([len(x[0]) for x in st]); t = np.array([x[3] for x in st]); low = c <= np.percentile(c, 10)
+print(all((x == y).all() for x, y in zip(a, b[:3])), list(b[3]) == list(t), 0 <= t.min() <= t.max() <= 4,
+      t[low].mean() <= t[~low].mean(), t.mean() > 0)
+""")
+    check("_many30 (3 values, kept for older scripts) = _many30_t's first 3; states_at has the tickets left (0-4, the "
+          "unlucky horses no more than the others)", code7 == 0 and out7.split() == ["True"] * 5, out7)
     code6, out6 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted",
-                      "travel", "--optimize", "6", "--no-frontier", "--replan-check", "26")
-    rows6 = [l.split("\t") for l in out6.split("re-planned plan\n")[-1].splitlines() if re.match(r"^\d+\t\d+\t\d+\t", l)]
+                      "travel", "--optimize", "6", "--no-frontier", "--replan-check", "26", "--tickets", "2")
+    rows6 = [l.split("\t") for l in out6.split("re-planned plan\n")[-1].splitlines() if re.match(r"^\d+\t\d+\t\d+\t\d\t", l)]
     gain6 = re.search(r"# average gain: ([+-][\d.]+) points", out6)
-    check("horse_skills --replan-check 26: 30 unlucky horses (fewest learned skills at 26), kept vs re-planned on the "
-          "same fresh horses, average gain printed",
-          code6 == 0 and len(rows6) == 30 and gain6 is not None and -5 < float(gain6.group(1)) < 10
+    check("horse_skills --replan-check 26 --tickets 2: 30 unlucky horses (fewest learned skills at 26) with their "
+          "tickets left, kept vs re-planned on the same fresh horses, average gain printed",
+          code6 == 0 and "\tcoupons left\ttickets left\t" in out6 and len(rows6) == 30
+          and all(0 <= int(x[3]) <= 2 for x in rows6) and gain6 is not None and -5 < float(gain6.group(1)) < 10
           and all(int(x[0]) <= int(rows6[-1][0]) for x in rows6), out6[-2500:])
     code2, out2 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
                       T6L, "--optimize", "5", "--no-frontier")
@@ -539,7 +556,6 @@ check("parse_plan / plan_code: s1, s2, s1-s2 (L, C, T in any order, any case), a
       code == 0 and out.strip() == "[('coursier_v2', 20, 2, 0), ('coursier_switch', 10, 24, 12), ('at30', 1, 0, 0), "
       "('coursier', 5, 3, 0)] ['s2:L20:C2', 's1-s2:L10:C24:T12', 'at30', 's1:L5:C3'] 6", out)
 for args, what in ((["--optimize", "3", "--replan-check", "30"], "--replan-check 30"),
-                   (["--optimize", "3", "--replan-check", "20", "--tickets", "2"], "--replan-check with --tickets"),
                    (["--replan-check", "20"], "--replan-check without --optimize")):
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", *args)
     check(f"horse_skills {what} exits 2", code == 2, out)

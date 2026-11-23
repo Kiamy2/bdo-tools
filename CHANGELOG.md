@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-23
+- `--replan-check` works with `--tickets`: each unlucky horse keeps the tickets it has left at that level. Library: `horses_fast._level30_t` / `_many30_t` also return the tickets left; `_level30` / `_many30` are now wrappers returning the same 3 values as before; `Evaluator.states_at()` gives (learned, coupons spent, points, tickets left).
 - `--replan-check L` (with `--optimize`, fast engine): for 30 of the 10% unluckiest horses at level L (fewest learned skills) under the suggested plan, the plan kept vs a new search from their state, on the same fresh horses: the average gain, coupons used, how often the plan changes. `Evaluator.states_at()`.
 - `--boosts none,gear,both` (with `--optimize`): the search per boost setting, every plan found rechecked under every boost on the same horses; one plan per budget for every boost where it's within 1 point of that boost's best (the most boosts first), else its own row; values a/b/c; the three-criteria comparison per boost (explained once).
 - Strategies renamed in plan texts: S1 (`coursier`, was V0) and S2 (`coursier_v2`, was V2); the tied-plans table no longer prints internal names (`S1-S2` plans read "from lvl .., S1 until .. learned skills, then S2"). `bdo.horses.PLAN_LABEL`.
