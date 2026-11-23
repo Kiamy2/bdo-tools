@@ -113,7 +113,7 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
                 "print(H.rule_plan(1), H.rule_plan(6), H.rule_plan(6, wanted=c), H.rule_plan(2, wanted=c), "
                 "H.rule_plan(9), H.rule_plan(15), H.rule_plan(24), H.rule_plan(25), H.rule_plan(30, wanted=c), "
                 "H.rule_plan(20, start_level=15))")
-check("rule_plan: the compact rules (1 / 2-24 V2 / 25+ switch; courser starts 2-6), halves rounded up, partway horse",
+check("rule_plan: the compact rules (1 / 2-24 S2 / 25+ switch; courser starts 2-6), halves rounded up, partway horse",
       code == 0 and out.strip() == "('at30', 1, 0, 0) ('coursier_v2', 21, 5, 0) ('coursier_v2', 18, 5, 0) "
       "('coursier_v2', 26, 1, 0) ('coursier_v2', 15, 8, 0) ('coursier_v2', 10, 14, 0) ('coursier_v2', 10, 23, 0) "
       "('coursier_switch', 10, 24, 12) ('coursier_switch', 10, 24, 12) ('coursier_v2', 16, 19, 0)", out)
@@ -122,7 +122,7 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
                 "d = H.get_horse(H.load_data(), 'Mythical Diné'); "
                 "print(H.CLASSIC_FODDER, H._cycle_skill(H.CLASSIC_FODDER, h.weights), "
                 "H._cycle_skill(H.CLASSIC_FODDER, d.weights))")
-check("V0 swaps Fore Chop first; V2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
+check("S1 swaps Fore Chop first; S2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
       "['Fore Chop', 'Hind Kick'] Hind Kick Hind Kick", out)
 # T8 types: every value of the in-game simulator readings (tests/data/sim_t8_types_2026-11-21.csv, default horses)
 code, out = run("-c", """
@@ -314,13 +314,13 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
     check("horse_skills --optimize: coursier_switch best at 20 coupons on a hard case (T8 Skilled 1, about 61%)",
           code == 0 and 56 <= float(m.get("20", 0)) <= 66
-          and re.search(r"^20\t[\d.]+%\tcoursier_switch: from lvl \d+(-\d+)?, V0 until", out, re.M), out)
+          and re.search(r"^20\t[\d.]+%\tfrom lvl \d+(-\d+)?, S1 until", out, re.M), out)
     lv = {int(l.split("\t")[0]): [float(x) for x in l.split("\t")[1:]] for l in out.split("# Average learned")[-1].splitlines()
           if re.match(r"^\d+\t[\d.]+", l)}
     check("horse_skills --optimize: average learned skills per level (levels 1-30, rising, ~13-16 at 30 on the T8 Skilled 1)",
           sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
           and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
-    sug = re.search(r"^20\t(from lvl \d+, V[02] until [^\t]+, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
+    sug = re.search(r"^20\t(from lvl \d+, S[12] until [^\t]+, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
                     r"([\d.]+)%\t(\d\+?)\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
     check("horse_skills --optimize: suggested plan per budget (20 coupons, rechecked with fresh horses: within 1 point "
           "of the best, and below the search's lucky best + 0.5; full set <= missing 1 <= missing 2)",
@@ -356,9 +356,9 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
     m2 = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out2, re.M))
     check("horse_skills --optimize --low-memory: same best chances (16-bit values)", code2 == 0 and len(m2) == 11
           and all(abs(float(m2[b]) - float(m.get(b, -9))) <= 0.11 for b in m2), out2)
-    check("horse_skills --optimize --engine numba (coursier_v2 best at 10 coupons, about 62%)",
+    check("horse_skills --optimize --engine numba (S2 best at 10 coupons, about 62%)",
           code == 0 and "fast engine" in out and 55 <= float(m.get("10", 0)) <= 70
-          and re.search(r"^10\t[\d.]+%\tcoursier_v2", out, re.M), out)
+          and re.search(r"^10\t[\d.]+%\tS2: from lvl", out, re.M), out)
     # --coupons-used and the effective plan, on the state of the 2026-11-21 live chat (T8 Type 6, 15 learned skills,
     # every skill left to learn wanted)
     T6L = ("Hind Kick,Fore Chop,Drift,Start Accel,High Jump,Quick Stop,Charge,Quick Back,Streak Leap,Roar,Caution,"
@@ -375,21 +375,27 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
     check("horse_skills --coupons-used: spread table (average, median, 90% / 99%), used and per full set columns",
           re.search(r"^plan for 2 coupons\t[\d.]+\t\d+\t\d+\t\d+\t[<>]?[\d.]+%$", out, re.M)
           and all(abs(float(sug[B][6]) / float(sug[B][7]) - pct(sug[B][2]) / 100) < 0.01 for B in sug), out)
-    check("horse_skills: effective plan (a switch threshold already reached prints as V2), alias as typed, in-game "
+    check("horse_skills: effective plan (a switch threshold already reached prints as S2), alias as typed, in-game "
           "count, French names in learned:, sure-hit note, innate skill in --learned ignored with a note",
-          "V0 until 9 learned" not in out and "T8 Type 6 (an alias of T8 Type 4" in out
+          "S1 until 9 learned" not in out and "T8 Type 6 (an alias of T8 Type 4" in out
           and "learned: 15 + 1 innate (Sprint) = 16 in game: Ruade, Cabrade" in out
           and "every skill left to learn is wanted (" in out and "ignoring 'Sprint' in --learned: innate" in out, out)
     code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
                     T6L, "--optimize", "5")
     fw = [l.split("\t") for l in out.split("# Plans compared on three criteria")[-1].split("# Average learned")[0].splitlines()
           if re.match(r"^(from|no swaps)", l)]
-    check("horse_skills --optimize: one plan best on every criterion (live test 1: V2 from lvl 20), stuck 0% (15 learned "
+    check("horse_skills --optimize: one plan best on every criterion (live test 1: S2 from lvl 20), stuck 0% (15 learned "
           ">= 6 wanted: impossible), at30 beaten; 2-coupon suggestion rechecked: from lvl 24 (the 4,000-horse pick was 25)",
           code == 0 and "# One plan is the best on every criterion." in out and len(fw) == 1
-          and fw[0][0] == "from lvl 20, V2 until lvl 30, spend <= 2 while leveling" and fw[0][2] == "0%"
+          and fw[0][0] == "from lvl 20, S2 until lvl 30, spend <= 2 while leveling [s2:L20:C2]" and fw[0][2] == "0%"
           and fw[0][-1] == "chance,coupons,safe" and "# at30 (no swaps" in out
-          and re.search(r"^2\tfrom lvl 24, V0 until lvl 30, keep 1\t", out, re.M), out)
+          and re.search(r"^2\tfrom lvl 24, S1 until lvl 30, keep 1\t", out, re.M), out)
+    code4, out4 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
+                      T6L, "--optimize", "5", "--plan", "s2:L23:C1", "--plan", "at30", "--coupons-used", "3")
+    check("horse_skills --plan: your plans listed in the comparison (marked, with their code) and in --coupons-used",
+          code4 == 0 and "from lvl 23, S2 until lvl 30, spend <= 1 while leveling [s2:L23:C1] (yours)\t" in out4
+          and "[at30] (yours)\t" in out4 and "\tyour plan s2:L23:C1\tyour plan at30" in out4
+          and "# at30 (no swaps" not in out4, out4)
     code2, out2 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
                       T6L, "--optimize", "5", "--no-frontier")
     code3, out3 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--level", "19", "--learned", T6L,
@@ -484,9 +490,9 @@ from bdo import horses as H
 print(H.effective_plan(("coursier_switch", 20, 2, 9), 15, 19), H.effective_plan(("coursier_switch", 1, 2, 16), 15, 19),
       H.effective_plan(("at30", 1, 0, 0), 15, 19), H.plan_name(("coursier_switch", 10, 4, 12), 5, 12, 0))
 """)
-check("effective_plan: a reached switch threshold is V2, a passed start level is the next level",
+check("effective_plan: a reached switch threshold is S2, a passed start level is the next level",
       code == 0 and out.strip() == "('coursier_v2', 20, 2, 0) ('coursier_switch', 20, 2, 16) ('at30', 1, 0, 0) "
-      "from lvl 10, V2 until lvl 30, keep 1", out)
+      "from lvl 10, S2 until lvl 30, keep 1", out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons-used")
 check("horse_skills: --coupons-used without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "10", "--strategy", "at30", "--runs", "200",
@@ -499,6 +505,23 @@ code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--le
 check("horse_skills --coupons-used 0 (no swaps), and no '100.0%' for chances that aren't certain (>99.98% / >99.9%)",
       code == 0 and "# plan for 0-1 coupons: no swaps while leveling" in out and "100.0%" not in out
       and re.search(r"\t>99\.9[0-9]*%", out), out)
+code, out = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+ok = [H.parse_plan(t) for t in ("s2:L20:C2", "S1-S2:c24:L10:T12", "at30", "s1:L5:C3")]
+bad = 0
+for t in ("s2:L20", "s2:L20:C2:T5", "v2:L20:C2", "s1:L20:X2", "at30:C2", "s1:L0:C2"):
+    try:
+        H.parse_plan(t)
+    except H.DataError:
+        bad += 1
+print(ok, [H.plan_code(p) for p in ok], bad)
+""")
+check("parse_plan / plan_code: s1, s2, s1-s2 (L, C, T in any order, any case), at30; 6 bad plans refused",
+      code == 0 and out.strip() == "[('coursier_v2', 20, 2, 0), ('coursier_switch', 10, 24, 12), ('at30', 1, 0, 0), "
+      "('coursier', 5, 3, 0)] ['s2:L20:C2', 's1-s2:L10:C24:T12', 'at30', 's1:L5:C3'] 6", out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--plan", "s2:L20:C2")
+check("horse_skills: --plan without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--prefer", "safe")
 check("horse_skills: --prefer without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("-c", """

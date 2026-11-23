@@ -61,7 +61,7 @@ def default_wanted_set(horse):
     return "courser" if horse.tier == 8 else "travel"
 
 
-CLASSIC_FODDER = ["Fore Chop", "Hind Kick"]       # in the order V0 swaps them (C42: Fore Chop first is a bit better)
+CLASSIC_FODDER = ["Fore Chop", "Hind Kick"]       # in the order S1 swaps them (C42: Fore Chop first is a bit better)
 STRATEGIES = ["natural", "at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard", "ideal"]
 SWITCH_TS = list(range(9, 17))
 TAILS = 5                                       # bad-outcome chances: missing at most 0..4 wanted skills                  # thresholds the optimizer tries for coursier_switch
@@ -69,10 +69,10 @@ DEFAULT_SWITCH_AT = 12
 STRATEGY_HELP = {
     "natural": "no coupons used",
     "at30": "level naturally, spend all coupons at level 30 on unwanted skills",
-    "coursier": "once per level: swap Fore Chop, then Hind Kick, if held (keeping a reserve), rest at 30",
-    "coursier_v2": "swap only Hind Kick (the heavier of the two) each time it's learned and keep Fore Chop: no "
+    "coursier": "S1: once per level: swap Fore Chop, then Hind Kick, if held (keeping a reserve), rest at 30",
+    "coursier_v2": "S2: swap only Hind Kick (the heavier of the two) each time it's learned and keep Fore Chop: no "
                    "Hind Kick <-> Fore Chop loop (keeping a reserve), rest at 30. Best with few coupons",
-    "coursier_switch": "coursier until the horse has --switch-at learned skills (default 12; innate skills don't "
+    "coursier_switch": "S1-S2: coursier until the horse has --switch-at learned skills (default 12; innate skills don't "
                        "count), then coursier_v2 (keeping a reserve), rest at 30. Best with many coupons",
     "once": "swap every unwanted skill once when it's learned (keeping a reserve), rest at 30",
     "hard": "swap every unwanted skill until a wanted one comes (keeping a reserve), rest at 30",
@@ -246,7 +246,7 @@ def _halt(when_stuck):
 
 
 def _cycle_skill(fodder, wt):
-    """V2 cycles exactly one fodder skill, the heaviest, and keeps the others: a swap of it can then never draw
+    """S2 cycles exactly one fodder skill, the heaviest, and keeps the others: a swap of it can then never draw
     another fodder skill back, so coupons don't churn between them. On ties: Hind Kick if it's one of them, else the
     first in the list (the T8 weighs both the same)."""
     return max(fodder, key=lambda s: (wt[s], s == "Hind Kick")) if fodder else None
@@ -295,7 +295,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
         have = set(s for s in learned if s in wt)
         c = 0 if strategy == "natural" else coupons
         t, pts = tickets, points
-        latched = False                              # coursier_switch: switched to the V2 swaps
+        latched = False                              # coursier_switch: switched to the S2 swaps
 
         def swap(out):
             nonlocal c, pts
@@ -328,7 +328,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
             if got:
                 have.add(got)
             if strategy == "coursier_switch" and _lvl + 1 >= swap_from and len(have) >= switch_at:
-                latched = True                       # from now on, V2 swaps only
+                latched = True                       # from now on, S2 swaps only
             if strategy == "ideal":
                 have = set(rare[:len(have)])
             elif _lvl + 1 < swap_from:                 # level just reached is below swap_from: no swaps yet
@@ -482,7 +482,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             if halt and len(have) + end - (_lvl + 1) < len(wanted):
                 continue                             # certainly stuck: no swap can help any more
             if strategy == "coursier_switch" and len(have) >= switch_at:
-                latched = True                       # from now on, V2 swaps only
+                latched = True                       # from now on, S2 swaps only
             kp = coupon == "planned"
             if strategy == "coursier" or (strategy == "coursier_switch" and not latched):
                 for s in fodder:
@@ -583,9 +583,9 @@ def rule_target(wanted=None):
 def rule_plan(budget, start_level=1, wanted=None):
     """The general rule's plan for a coupon budget (N), for the target set of `wanted` (see rule_target):
     N = 1: no swaps while leveling, the coupon at level 30;
-    N = 2-24: V2 until level 30, keep 1 coupon, from level max(10, 31 - 1.75 x N) rounded (halves up); for the
+    N = 2-24: S2 until level 30, keep 1 coupon, from level max(10, 31 - 1.75 x N) rounded (halves up); for the
               courser set with 2-6 coupons, from level 30 - 2 x N instead (26, 24, 22, 20, 18);
-    N >= 25: from level 10, V0 until 12 learned skills, then V2 until level 30, spending at most 24 while leveling.
+    N >= 25: from level 10, S1 until 12 learned skills, then S2 until level 30, spending at most 24 while leveling.
     A horse already past the start level starts at its next level."""
     if budget <= 1:
         return ("at30", 1, 0, 0)
@@ -610,18 +610,61 @@ def effective_plan(plan, learned_count=0, start_level=0):
     return (st, max(lv, start_level + 1), cap, T)
 
 
+# The swapping strategies' names in plan texts: S1 = coursier (once per level: Fore Chop, then Hind Kick, if held),
+# S2 = coursier_v2 (once per level: Hind Kick if held, never Fore Chop). Called S1 / S2 before 2026-11-23.
+PLAN_LABEL = {"coursier": "S1", "coursier_v2": "S2", "coursier_switch": "S1-S2", "at30": "at30"}
+PLAN_CODE = {"s1": "coursier", "s2": "coursier_v2", "s1-s2": "coursier_switch", "at30": "at30"}
+
+
+def plan_code(plan):
+    """A plan in the compact syntax of parse_plan: 's2:L20:C2', 's1-s2:L10:C24:T12', 'at30'."""
+    st, lv, cap, T = plan
+    if st == "at30":
+        return "at30"
+    code = {v: k for k, v in PLAN_CODE.items()}.get(st, st)
+    return f"{code}:L{lv}:C{cap}" + (f":T{T}" if st == "coursier_switch" else "")
+
+
+def parse_plan(text):
+    """A plan from the compact syntax: strategy (s1, s2, s1-s2 or at30), then the start level L, the spending cap C
+    (coupons spent at most while leveling) and for s1-s2 the threshold T (learned skills at which S1 switches to S2),
+    separated by ':' in any order: 's2:L20:C2', 's1-s2:L10:C24:T12', 'at30'. Returns (strategy, L, C, T)."""
+    parts = [x.strip().lower() for x in text.split(":") if x.strip()]
+    st = PLAN_CODE.get(parts[0]) if parts else None
+    if st is None:
+        raise DataError(f"plan {text!r}: start with s1, s2, s1-s2 or at30 (e.g. s2:L20:C2)")
+    if st == "at30":
+        if len(parts) > 1:
+            raise DataError(f"plan {text!r}: at30 takes nothing else")
+        return ("at30", 1, 0, 0)
+    f = {}
+    for x in parts[1:]:
+        if len(x) < 2 or x[0] not in "lct" or not x[1:].isdigit() or x[0] in f:
+            raise DataError(f"plan {text!r}: {x!r} isn't L<level>, C<coupons> or T<skills> (e.g. s2:L20:C2)")
+        f[x[0]] = int(x[1:])
+    need = "lct" if st == "coursier_switch" else "lc"
+    name = {"l": "L (start level)", "c": "C (coupons spent at most while leveling)", "t": "T (learned skills to switch at)"}
+    if set(f) - set(need):
+        raise DataError(f"plan {text!r}: {parts[0]} takes no {', '.join(name[k] for k in set(f) - set(need))}")
+    if set(need) - set(f):
+        raise DataError(f"plan {text!r}: {parts[0]} also needs " + ", ".join(name[k] for k in need if k not in f))
+    if not 1 <= f["l"] <= 30 or f["c"] < 1:
+        raise DataError(f"plan {text!r}: L must be 1-30 and C at least 1")
+    return (st, f["l"], f["c"], f.get("t", 0))
+
+
 def plan_name(plan, budget=None, learned_count=0, start_level=0):
-    """A plan in words: 'from lvl 10, V0 until 11 learned skills, then V2, keep 5' (V0 = coursier swaps, V2 =
-    coursier_v2 swaps; keep = coupons kept for the level-30 cleanup, shown when the budget is given). In its
-    effective form for a horse at start_level with learned_count learned skills (see effective_plan)."""
+    """A plan in words: 'from lvl 10, S1 until 11 learned skills, then S2, keep 5' (S1 = coursier swaps, S2 =
+    coursier_v2 swaps: see PLAN_LABEL; keep = coupons kept for the level-30 cleanup, shown when the budget is
+    given). In its effective form for a horse at start_level with learned_count learned skills (effective_plan)."""
     st, lv, cap, T = effective_plan(plan, learned_count, start_level)
     if st == "natural":
         return "no coupons"
     if st == "at30":
         return "no swaps while leveling, every coupon at level 30"
     keep = f", keep {budget - cap}" if budget is not None else f", spend <= {cap} while leveling"
-    how = {"coursier": "V0 until lvl 30", "coursier_v2": "V2 until lvl 30",
-           "coursier_switch": f"V0 until {T} learned skills, then V2"}.get(st, f"{st} until lvl 30")
+    how = {"coursier": "S1 until lvl 30", "coursier_v2": "S2 until lvl 30",
+           "coursier_switch": f"S1 until {T} learned skills, then S2"}.get(st, f"{st} until lvl 30")
     return f"from lvl {lv}, {how}{keep}"
 
 
@@ -792,7 +835,7 @@ def describe_plans(plans, budget, learned_count=0, start_level=0):
         span = lambda v: f"{v[0]}" if v[0] == v[-1] else f"{v[0]}-{v[-1]}"
         if st == "coursier_switch":
             Ts = sorted({p[3] for p in ps})
-            parts.append(f"{st}: from lvl {span(lv)}, V0 until {span(Ts)} learned skills, then V2, keep {span(kp)}")
+            parts.append(f"from lvl {span(lv)}, S1 until {span(Ts)} learned skills, then S2, keep {span(kp)}")
         else:
-            parts.append(f"{st}: from lvl {span(lv)}, keep {span(kp)}")
+            parts.append(f"{PLAN_LABEL.get(st, st)}: from lvl {span(lv)}, keep {span(kp)}")
     return " | ".join(parts)

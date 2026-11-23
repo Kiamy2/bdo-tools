@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-11-23
+- Strategies renamed in plan texts: S1 (`coursier`, was V0) and S2 (`coursier_v2`, was V2); the tied-plans table no longer prints internal names (`S1-S2` plans read "from lvl .., S1 until .. learned skills, then S2"). `bdo.horses.PLAN_LABEL`.
+- `--plan` (with `--optimize`, repeatable): your own plans, e.g. `s2:L20:C2`, `s1-s2:L10:C24:T12`, `at30`, in the three-criteria comparison (marked `(yours)`) and in `--coupons-used`; the comparison prints every plan's code. `bdo.horses.parse_plan()`, `plan_code()`.
 - Every table prints shares without claiming more than the simulation shows: '>99.9%' / '<0.1%' instead of a rounded 100.0% / 0.0%, and '>99.98%' / '<0.02%' (3 / runs) when every / none of the simulated horses got there.
 - `--coupons-used` accepts 0 (no swaps while leveling, every coupon at level 30).
 - `--when-stuck stop|continue` (default `stop`; library: `when_stuck` in `Evaluator`, `simulate_plan()`, `simulate()`; `bdo.horses.WHEN_STUCK`): a horse with fewer learned skills than wanted ones can't get the full set. `stop`: every plan stops spending once the horse is certainly stuck (while leveling: learned skills + level-ups left < wanted skills; at level 30: no cleanup). `continue` = the previous behavior (results identical). With `stop`, the full-set chance and the stuck share are unchanged, coupons used are lower, and the partial-goal columns count what stuck horses held when they stopped. The header states the rule.
