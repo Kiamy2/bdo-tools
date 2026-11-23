@@ -106,7 +106,7 @@ code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--runs", "300"
 rows = {l.split("\t")[0]: l.split("\t") for l in out.splitlines() if not l.startswith("#")}
 ok = code == 0 and set(rows) >= {"natural", "at30", "coursier", "coursier_v2", "coursier_switch", "hard", "ideal"}
 if ok:
-    first = lambda r, i: float(r[i].split("/")[0].rstrip("%"))
+    first = lambda r, i: float(r[i].split("/")[0].strip("%<>"))
     ok = first(rows["ideal"], 2) >= first(rows["coursier"], 2) >= first(rows["natural"], 2)
 check("horse_skills simulation table", ok, out)
 code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import horses as H; c = H.COURSER_SET; "
@@ -337,7 +337,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           and "unless its name ends with '| not stuck' or '| successes'" in out and "# when stuck (fewer learned" in out
           and len(a30) == 1 and re.match(r"^1[4-8]\.\d%$", a30[0][2]) and "coupons" in a30[0][-1], out)
     sugrow = lambda o, B: next((l.split("\t") for l in o.splitlines() if l.startswith(f"{B}\tfrom lvl")), None)
-    pct = lambda x: float(x.rstrip("%"))
+    pct = lambda x: float(x.strip("%*<>"))         # "<0.02%" / ">99.98%": the bound
     T8 = "T8 example (bdolytics icon horse_71)"
     code, out = run("horse_skills.py", T8, "--training", "Skilled 1", "--optimize", "12", "--selection-coupon", "planned")
     code0, out0 = run("horse_skills.py", T8, "--training", "Skilled 1", "--optimize", "12")
@@ -373,7 +373,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           code == 0 and len(sug) == 5 and am and am[2][0] == pct(sug["2"][2]) and am[3][1] == pct(sug["3"][2])
           and all(am[B][j] <= am[B + 1][j] for B in range(len(am) - 1) for j in (0, 1)), out)
     check("horse_skills --coupons-used: spread table (average, median, 90% / 99%), used and per full set columns",
-          re.search(r"^plan for 2 coupons\t[\d.]+\t\d+\t\d+\t\d+\t[\d.]+%$", out, re.M)
+          re.search(r"^plan for 2 coupons\t[\d.]+\t\d+\t\d+\t\d+\t[<>]?[\d.]+%$", out, re.M)
           and all(abs(float(sug[B][6]) / float(sug[B][7]) - pct(sug[B][2]) / 100) < 0.01 for B in sug), out)
     check("horse_skills: effective plan (a switch threshold already reached prints as V2), alias as typed, in-game "
           "count, French names in learned:, sure-hit note, innate skill in --learned ignored with a note",
@@ -493,6 +493,12 @@ code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "1
                 "--when-stuck", "continue")
 check("horse_skills --when-stuck continue: stated in the header", code == 0 and "# when stuck (fewer learned skills than "
       "wanted ones: the full set can't be reached any more): continue" in out, out)
+code, out = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--level", "29", "--learned", "Hind Kick,Fore Chop,"
+                "Drift,Start Accel,High Jump,Quick Stop,Charge,Quick Back,Streak Leap,Roar,Caution,Quick Ride,S: Hind Kick,"
+                "S: Fore Chop,S: Sideways,Instant Accel,Sideways", "--optimize", "3", "--coupons-used", "0,1", "--no-frontier")
+check("horse_skills --coupons-used 0 (no swaps), and no '100.0%' for chances that aren't certain (>99.98% / >99.9%)",
+      code == 0 and "# plan for 0-1 coupons: no swaps while leveling" in out and "100.0%" not in out
+      and re.search(r"\t>99\.9[0-9]*%", out), out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--prefer", "safe")
 check("horse_skills: --prefer without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("-c", """

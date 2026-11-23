@@ -176,8 +176,8 @@ def main():
                                 else sorted({int(x) for x in a.coupons_used.split(",")}))
             except ValueError:
                 raise H.DataError(f"--coupons-used takes coupon budgets like 2,3,4, not {a.coupons_used!r}")
-            if any(not 1 <= x <= a.optimize for x in used_budgets):
-                raise H.DataError(f"--coupons-used budgets must be from 1 to the --optimize maximum ({a.optimize})")
+            if any(not 0 <= x <= a.optimize for x in used_budgets):
+                raise H.DataError(f"--coupons-used budgets must be from 0 to the --optimize maximum ({a.optimize})")
             a.used_budgets = used_budgets
     except H.DataError as e:
         print(f"ERROR: {e}", file=sys.stderr)
@@ -287,8 +287,8 @@ def main():
             cell = lambda k, f: "/".join(f.format(r[k]) for r in res)
             cp = "-" if strat == "natural" else ("unlimited" if strat == "ideal" else str(budget))
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")
-            allw = "/".join(f"{100 * r['all_wanted']:.0f}%" for r in res)
-            le1 = "/".join(f"{100 * r['missing_le1']:.0f}%" for r in res)
+            allw = "/".join(_p(r["all_wanted"], a.runs, 0) for r in res)
+            le1 = "/".join(_p(r["missing_le1"], a.runs, 0) for r in res)
             print(f"{strat}\t{cp}\t{cell('skills', '{:.1f}')}\t{cell('wanted', '{:.1f}')}\t{allw}\t{used}\t{le1}\t"
                   f"{cell('worst5_missing', '{}')}")
     return 0
@@ -359,9 +359,9 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
         tf = H.tied_plans(res, B, "full", 0.01)
         tw = H.tied_plans(res, B, "wanted", 0.05)
         best_full.append(res[tf[0]]["full"][B])
-        print(f"{B}\t{100 * res[tf[0]]['full'][B]:.1f}%\t{H.describe_plans(tf, B, n, a.level)}\t"
+        print(f"{B}\t{_p(res[tf[0]]['full'][B], 4000)}\t{H.describe_plans(tf, B, n, a.level)}\t"
               f"{res[tw[0]]['wanted'][B]:.2f}\t{H.describe_plans(tw, B, n, a.level)}\t"
-              f"{100 * at30['full'][B]:.1f}%, {at30['wanted'][B]:.2f}")
+              f"{_p(at30['full'][B], 4000)}, {at30['wanted'][B]:.2f}")
     for t in (0.5, 0.8, 0.9, 0.95):
         b = next((B for B, x in enumerate(best_full) if x >= t), None)
         b30 = next((B for B, x in enumerate(at30["full"]) if x >= t), None)
@@ -413,15 +413,15 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     for B in range(1, a.optimize + 1):
         plan, src, rc = sug[B]
         best = r3[H.tied_plans(r3, B, "full", 0)[0]]["full"][B]
-        rtxt = "not checked" if rc is None else f"{100 * rc:.1f}%"
-        note = (f"rule (best {100 * best:.1f}%)" if src == "rule" else
+        rtxt = "not checked" if rc is None else _p(rc, recheck)
+        note = (f"rule (best {_p(best, recheck)})" if src == "rule" else
                 f"best (rule: {rtxt}, but a plan at least as good uses fewer coupons)" if src == "cheaper" else
                 f"best (rule: {rtxt})" if not a.no_rule or a.always_best else "best")
         tl = r3[plan]["tails"][B]
         w5 = H.worst5(tl)
-        ex = "".join(f"\t{100 * e[plan]['full'][B]:.1f}%" for e in extras)
+        ex = "".join(f"\t{_p(e[plan]['full'][B], recheck)}" for e in extras)
         u, f = r3[plan]["used"][B], r3[plan]["full"][B]
-        print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{100 * f:.1f}%\t{100 * tl[1]:.1f}%\t{100 * tl[2]:.1f}%\t"
+        print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{_p(f, recheck)}\t{_p(tl[1], recheck)}\t{_p(tl[2], recheck)}\t"
               f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{u:.2f}\t{f'{u / f:.2f}' if f else '-'}{ex}\t{note}")
     # average learned skills per level, one column per suggested plan (the budgets it's suggested for)
     groups = {}
@@ -454,6 +454,22 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     for L in range(a.level, 31):
         print(f"{L}\t" + "\t".join(f"{curves[p][L]:.1f}" for p, _ in cols))
     return 0
+
+
+def _p(x, runs, d=1):
+    """A share with d decimals, without claiming more than the simulation shows: none of `runs` horses -> '<u%' and
+    all of them -> '>100-u%' (u = 3 / runs, the usual 95% bound); a value that would round to 0 or 100 -> '<0.1%' /
+    '>99.9%' (with d = 1)."""
+    if x >= 1 - 1e-12:
+        return f">{100 - math.ceil(300 / runs * 100) / 100:g}%"
+    if x <= 1e-12:
+        return f"<{math.ceil(300 / runs * 100) / 100:g}%"
+    v = round(100 * x, d)
+    if v >= 100:
+        return f">{100 - 10 ** -d:.{d}f}%"
+    if v <= 0:
+        return f"<{10 ** -d:.{d}f}%"
+    return f"{100 * x:.{d}f}%"
 
 
 def _pct(x, runs, impossible=False):
@@ -552,8 +568,8 @@ def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck=
     from bdo import horses_fast as HF
     C = max(20, a.optimize + 10)
     groups = {}
-    for B in a.used_budgets:
-        groups.setdefault(sug[B][0], []).append(B)
+    for B in a.used_budgets:                     # 0 coupons: no swaps while leveling, nothing kept (at30)
+        groups.setdefault(sug[B][0] if B else ("at30", 1, 0, 0), []).append(B)
     plans = list(groups)
     if engine == "numba":
         ev = HF.Evaluator(horse, M, max_budget=C, low_memory=a.low_memory, **kw)
@@ -576,14 +592,14 @@ def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck=
     last = min(C, max(last, max(a.used_budgets) + 2))
     print("at most B coupons\t" + "\t".join(f"plan for {lab[p]}" for p in plans))
     for B in range(last + 1):
-        print(f"{B}\t" + "\t".join(f"{100 * am[p][B]:.1f}%" for p in plans))
+        print(f"{B}\t" + "\t".join(_p(am[p][B], recheck) for p in plans))
     q = lambda p, x: next((str(B) for B, v in enumerate(am[p]) if v >= x - 1e-9), f">{C}")
     print(f"# average: coupons used on average, with up to {C} (a horse still missing a skill counts every coupon it")
     print(f"# used); median / 90% / 99%: coupons that give the full set to half / 90% / 99% of horses (>{C}: more).")
     print(f"# full set with {C}: chance of the full set with up to {C} coupons in total.")
     print(f"plan\taverage\tmedian\t90%\t99%\tfull set with {C}")
     for p in plans:
-        print(f"plan for {lab[p]}\t{r[p]['used'][C]:.2f}\t{q(p, 0.5)}\t{q(p, 0.9)}\t{q(p, 0.99)}\t{100 * am[p][C]:.1f}%")
+        print(f"plan for {lab[p]}\t{r[p]['used'][C]:.2f}\t{q(p, 0.5)}\t{q(p, 0.9)}\t{q(p, 0.99)}\t{_p(am[p][C], recheck)}")
 
 
 RECHECK_RUNS = 20000      # fresh horses for the suggested plans' recheck (fast engine; plain Python: 4000)

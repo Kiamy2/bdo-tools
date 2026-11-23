@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-11-23
+- Every table prints shares without claiming more than the simulation shows: '>99.9%' / '<0.1%' instead of a rounded 100.0% / 0.0%, and '>99.98%' / '<0.02%' (3 / runs) when every / none of the simulated horses got there.
+- `--coupons-used` accepts 0 (no swaps while leveling, every coupon at level 30).
 - `--when-stuck stop|continue` (default `stop`; library: `when_stuck` in `Evaluator`, `simulate_plan()`, `simulate()`; `bdo.horses.WHEN_STUCK`): a horse with fewer learned skills than wanted ones can't get the full set. `stop`: every plan stops spending once the horse is certainly stuck (while leveling: learned skills + level-ups left < wanted skills; at level 30: no cleanup). `continue` = the previous behavior (results identical). With `stop`, the full-set chance and the stuck share are unchanged, coupons used are lower, and the partial-goal columns count what stuck horses held when they stopped. The header states the rule.
 - The three-criteria comparison: `ran out` renamed `unfinished`; every column is over all horses unless its name ends with `| not stuck` or `| successes` (said in the header; those two columns now come last).
 
