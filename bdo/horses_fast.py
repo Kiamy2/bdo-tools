@@ -474,6 +474,7 @@ if nb is not None:
         def __init__(self, horse, M, max_budget=40, tickets=0, start_level=1, learned=(), wanted=None,
                      fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False, when_stuck="stop"):
             pool = list(horse.weights)
+            self.pool = pool
             idx = {s: i for i, s in enumerate(pool)}
             w = [float(horse.weights[s]) for s in pool]
             wanted = set(H.TRAVEL_SET if wanted is None else wanted) & set(pool)
@@ -614,6 +615,19 @@ if nb is not None:
                                   switch_at, coupon == "planned", self.stop, self.max_level)
                 out[L] = float(_popcounts(S).mean())
             return out
+
+        def states_at(self, plan, level, runs=4000, seed=1, coupon=None):
+            """The horses of one plan when they reach `level` (same horses as plans() with the same seed, up to that
+            level): a list of (learned skills, coupons spent so far, Skill Change Points), one per horse."""
+            w, n, W, M = self.args
+            lmask, wmask, fod, cyc, order, rare = self.masks
+            strategy, swap_from, spend_cap, switch_at = plan
+            st = CODES[strategy]
+            S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
+                                   self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, level,
+                                   switch_at, coupon == "planned", self.stop, self.max_level)
+            pool = self.pool
+            return [([pool[i] for i in range(n) if (int(S[r]) >> i) & 1], int(base[r]), int(pts[r])) for r in range(runs)]
 
         def plan(self, strategy, swap_from=1, spend_cap=0, runs=4000, seed=1, switch_at=0, coupon=None):
             """One plan (see plans())."""

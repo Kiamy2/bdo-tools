@@ -57,7 +57,8 @@ The player reports the level-up's result: a skill, or nothing.
      ```
      With a Selection Coupon `planned`: the second rarest missing one, keeping the rarest for the Selection Coupon.
 4. **Skill Change Points:** +1 per coupon, back to 0 when the coupon gives the desired skill. Use the value shown in game as a check.
-5. **Re-plan** after this level's swaps (the tool's `--level L` means the swaps of level L are done), every few levels or when something unusual happens. Re-planning from the real state was measured to be as good as keeping the plan, so small differences are fine; don't swing between plans for a few tenths of a point.
+5. **If leveling goes badly** (well below the average learned skills per level of the `--optimize` table): `--replan-check L` shows, for horses as unlucky as that at level L, how much a new plan gains over keeping the plan (often about a point, by spending more coupons while leveling). Then re-plan from the real state.
+6. **Re-plan** after this level's swaps (the tool's `--level L` means the swaps of level L are done), every few levels or when something unusual happens. Re-planning from the real state was measured to be as good as keeping the plan, so small differences are fine; don't swing between plans for a few tenths of a point.
 
 ## 5. Level 30
 

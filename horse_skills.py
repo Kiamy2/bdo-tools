@@ -95,6 +95,10 @@ def main():
                     help="a horse that can't get the full set any more (too few learned skills for the wanted ones): "
                          "stop spending coupons on it (default), or continue swapping its unwanted skills (more "
                          "wanted skills, never the full set)")
+    ap.add_argument("--replan-check", type=int, metavar="LEVEL",
+                    help="with --optimize (fast engine): would re-planning help the unlucky horses? The suggested plan "
+                         "for the maximum budget played to LEVEL; for 30 of the 10%% with the fewest learned skills, the "
+                         "plan kept vs a new search from their state (takes a minute or two)")
     ap.add_argument("--boosts", metavar="LIST",
                     help="with --optimize: several boost settings side by side, e.g. none,gear,both (none, gear, brand, "
                          "both): one plan per budget for every boost where it's tied with the best")
@@ -161,6 +165,12 @@ def main():
         if len(a.tol) != 3 or min(a.tol) < 0:
             raise H.DataError(f"--frontier-tol takes 3 numbers like 0.3,0.03,0.3, not {a.frontier_tol!r}")
         a.user_plans = list(dict.fromkeys(H.parse_plan(x) for x in (a.plan or [])))
+        if a.replan_check is not None:
+            if not a.level < a.replan_check < 30:
+                raise H.DataError(f"--replan-check: the level must be between the current level ({a.level}) and 30")
+            if a.tickets or a.boosts:
+                raise H.DataError("--replan-check: not with --tickets (the tickets left per horse aren't tracked yet) "
+                                  "or --boosts")
         a.boost_list = [x.strip().lower() for x in (a.boosts or "").split(",") if x.strip()]
         if a.boosts:
             if not a.boost_list or any(x not in BOOSTS for x in a.boost_list) or len(set(a.boost_list)) != len(a.boost_list):
@@ -263,7 +273,8 @@ def main():
     opt = next((o for o, v in (("--selection-coupon", a.selection_coupon), ("--always-best", a.always_best),
                                ("--no-frontier", a.no_frontier), ("--prefer", a.prefer),
                                ("--frontier-tol", a.frontier_tol), ("--recheck-runs", a.recheck_runs),
-                               ("--plan", a.plan), ("--boosts", a.boosts)) if v), None)
+                               ("--plan", a.plan), ("--boosts", a.boosts), ("--replan-check", a.replan_check))
+                if v), None)
     if opt:
         print(f"ERROR: {opt} works with --optimize", file=sys.stderr)
         return 2
@@ -453,6 +464,11 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
         frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learned, wanted)
     if a.coupons_used is not None:
         coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck)
+    if a.replan_check is not None:
+        if engine != "numba":
+            print("# --replan-check needs the fast engine (numba): skipped", file=sys.stderr)
+        else:
+            replan_report(a, horse, M, kw, planned, sug[a.optimize][0], n, recheck, wanted)
     k = {k2: v for k2, v in kw.items() if k2 != "start_level"}
     if engine == "numba":
         ev = HF.Evaluator(horse, M, max_budget=a.optimize, **kw)
@@ -703,6 +719,69 @@ def _frontier_rows(a, r, N, shown, pick, mine, n, recheck, impossible, cols, suc
         x = r[a30]
         print(f"# at30 (no swaps while leveling, every coupon at level 30), beaten by a listed plan: full set "
               f"{_pct(x['full'][N], recheck)}, stuck {_pct(x['stuck'], recheck, impossible)}, coupons {x['used'][N]:.2f}.")
+
+
+REPLAN_HORSES = 30          # --replan-check: unlucky horses re-planned
+
+
+def replan_report(a, horse, M, kw, planned, plan, n, recheck, wanted):
+    """--replan-check L: the suggested plan for N coupons played to level L (4,000 horses); among the 10% with the
+    fewest learned skills there, REPLAN_HORSES at random: the plan kept (its remaining swaps, spending cap and
+    coupons) vs the best plan of a new search from that horse's state, both evaluated on the same fresh horses from
+    that state (`recheck` of them). The gain is the average difference (its standard error over the horses)."""
+    import random
+    import statistics
+    from bdo import horses_fast as HF
+    N, L = a.optimize, a.replan_check
+    ev = HF.Evaluator(horse, M, max_budget=N, **kw)
+    states = ev.states_at(plan, L, 4000, a.seed + 3000, planned)
+    counts = sorted(len(x[0]) for x in states)
+    cut = counts[int(0.1 * len(counts))]
+    low = [x for x in states if len(x[0]) <= cut]
+    pick = random.Random(a.seed).sample(low, min(REPLAN_HORSES, len(low)))
+    st, lv, cap, T = plan
+    rows, gains, used_k, used_r, differ = [], [], [], [], 0
+    for i, (learned, spent, pts) in enumerate(pick):
+        left = N - spent
+        k2 = dict(kw, start_level=L, learned=learned, points=pts)
+        kept = ("at30", 1, 0, 0) if st == "at30" or cap - spent <= 0 else (st, max(lv, L + 1), cap - spent, T)
+        if left <= 0:
+            best = kept
+        else:
+            res = HF.optimize(horse, M, left, seed=a.seed + 5000 + i, coupon=planned, **k2)
+            best = H.suggested_plan(res, left, 0.0, L, True, wanted, SAFE_MARGIN)[0]
+        e2 = HF.Evaluator(horse, M, max_budget=max(left, 0), **k2)
+        r = e2.plans(list(dict.fromkeys([kept, best])), recheck, a.seed + 4000 + i, coupon=planned, used=True)
+        fk, fb = r[kept]["full"][left], r[best]["full"][left]        # fresh horses: the search's pick as it is
+        nl = len(learned)
+        differ += H.effective_plan(best, nl, L) != H.effective_plan(kept, nl, L)
+        gains.append(fb - fk)
+        used_k.append(r[kept]["used"][left])
+        used_r.append(r[best]["used"][left])
+        rows.append((nl, len(set(learned) & set(wanted)), left, fk, fb, best, nl))
+    g = statistics.mean(gains)
+    se = statistics.stdev(gains) / len(gains) ** 0.5 if len(gains) > 1 else 0.0
+    print()
+    print(f"# Would re-planning help the unlucky horses? (--replan-check {L}) The suggested plan for {N} coupons")
+    print(f"# ({H.plan_name(plan, N, n, a.level)}) played to level {L} by 4,000 horses; the unlucky ones: the "
+          f"{100 * len(low) / len(states):.0f}% with")
+    print(f"# {cut} learned skills or fewer at level {L}. For {len(pick)} of them, chosen at random: the plan kept (its"
+          " remaining swaps")
+    print("# and coupons) vs the best plan of a new search from that horse's state, both on the same "
+          f"{recheck:,} fresh horses from")
+    print("# there (the search's pick as it is, even when it does worse on them). Over all horses of that state.")
+    print(f"learned at {L}\twanted held\tcoupons left\tkept: full set\tre-planned: full set\tgain\tre-planned plan")
+    nW = ev.n_wanted
+    for nl, wh, left, fk, fb, best, _ in sorted(rows):
+        sure0 = nl + 30 - L < nW                   # certainly stuck: the full set is impossible
+        fmt = lambda x: "0%" if sure0 else _p(x, recheck)
+        print(f"{nl}\t{wh}\t{left}\t{fmt(fk)}\t{fmt(fb)}\t{100 * (fb - fk):+.1f}\t"
+              f"{'- (certainly stuck)' if sure0 else H.plan_name(best, left, nl, L)}")
+    print(f"# average gain: {100 * g:+.1f} points on the full set (standard error {100 * se:.1f} over these horses; "
+          "the first stage of")
+    print(f"# each search can miss small gains); coupons used on average: kept {statistics.mean(used_k):.2f},")
+    print(f"# re-planned {statistics.mean(used_r):.2f}; the re-planned plan differs from the kept one for {differ} of "
+          f"{len(pick)} horses.")
 
 
 def coupons_used_report(a, horse, M, kw, engine, planned, sug, span, n, recheck=4000):

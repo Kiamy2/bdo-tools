@@ -406,6 +406,14 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           and rows5[1][1] == "from lvl 23, S1 until lvl 30, keep 1"
           and all(pct(x[3].split("/")[0]) <= pct(x[3].split("/")[1]) <= pct(x[3].split("/")[2]) for x in rows5)
           and out5.count("# Compared on three criteria, ") == 3 and out5.count("# Plans compared on three criteria") == 1, out5)
+    code6, out6 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted",
+                      "travel", "--optimize", "6", "--no-frontier", "--replan-check", "26")
+    rows6 = [l.split("\t") for l in out6.split("re-planned plan\n")[-1].splitlines() if re.match(r"^\d+\t\d+\t\d+\t", l)]
+    gain6 = re.search(r"# average gain: ([+-][\d.]+) points", out6)
+    check("horse_skills --replan-check 26: 30 unlucky horses (fewest learned skills at 26), kept vs re-planned on the "
+          "same fresh horses, average gain printed",
+          code6 == 0 and len(rows6) == 30 and gain6 is not None and -5 < float(gain6.group(1)) < 10
+          and all(int(x[0]) <= int(rows6[-1][0]) for x in rows6), out6[-2500:])
     code2, out2 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--gear", "--level", "19", "--learned",
                       T6L, "--optimize", "5", "--no-frontier")
     code3, out3 = run("horse_skills.py", "T8 Type 6", "--training", "Artisan 9", "--level", "19", "--learned", T6L,
@@ -530,6 +538,11 @@ print(ok, [H.plan_code(p) for p in ok], bad)
 check("parse_plan / plan_code: s1, s2, s1-s2 (L, C, T in any order, any case), at30; 6 bad plans refused",
       code == 0 and out.strip() == "[('coursier_v2', 20, 2, 0), ('coursier_switch', 10, 24, 12), ('at30', 1, 0, 0), "
       "('coursier', 5, 3, 0)] ['s2:L20:C2', 's1-s2:L10:C24:T12', 'at30', 's1:L5:C3'] 6", out)
+for args, what in ((["--optimize", "3", "--replan-check", "30"], "--replan-check 30"),
+                   (["--optimize", "3", "--replan-check", "20", "--tickets", "2"], "--replan-check with --tickets"),
+                   (["--replan-check", "20"], "--replan-check without --optimize")):
+    code, out = run("horse_skills.py", D, "--training", "Artisan 7", *args)
+    check(f"horse_skills {what} exits 2", code == 2, out)
 for args, what in ((["--optimize", "3", "--boosts", "none,gear", "--gear"], "with --gear"),
                    (["--optimize", "3", "--boosts", "none,wings"], "an unknown boost"), (["--boosts", "none,gear"], "without --optimize")):
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", *args)
