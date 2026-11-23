@@ -95,6 +95,9 @@ def main():
                     help="a horse that can't get the full set any more (too few learned skills for the wanted ones): "
                          "stop spending coupons on it (default), or continue swapping its unwanted skills (more "
                          "wanted skills, never the full set)")
+    ap.add_argument("--boosts", metavar="LIST",
+                    help="with --optimize: several boost settings side by side, e.g. none,gear,both (none, gear, brand, "
+                         "both): one plan per budget for every boost where it's tied with the best")
     ap.add_argument("--plan", action="append", metavar="PLAN",
                     help="with --optimize: a plan of yours to compare too (repeatable): s1, s2 or s1-s2, then L<start "
                          "level>, C<coupons spent at most while leveling>, and for s1-s2 T<learned skills to switch at>, "
@@ -158,6 +161,12 @@ def main():
         if len(a.tol) != 3 or min(a.tol) < 0:
             raise H.DataError(f"--frontier-tol takes 3 numbers like 0.3,0.03,0.3, not {a.frontier_tol!r}")
         a.user_plans = list(dict.fromkeys(H.parse_plan(x) for x in (a.plan or [])))
+        a.boost_list = [x.strip().lower() for x in (a.boosts or "").split(",") if x.strip()]
+        if a.boosts:
+            if not a.boost_list or any(x not in BOOSTS for x in a.boost_list) or len(set(a.boost_list)) != len(a.boost_list):
+                raise H.DataError(f"--boosts takes a list of none, gear, brand, both (e.g. none,gear,both), not {a.boosts!r}")
+            if a.gear or a.brand or a.coupons_used is not None:
+                raise H.DataError("--boosts sets the boosts itself: not with --gear, --brand or --coupons-used")
         if a.optimize is not None and any(p[2] > a.optimize for p in a.user_plans):
             raise H.DataError(f"--plan: C (coupons spent while leveling) must be at most the --optimize maximum "
                               f"({a.optimize})")
@@ -248,11 +257,13 @@ def main():
         return 0
 
     if a.optimize is not None:
+        if a.boosts:
+            return boosts_report(a, horse, bonus, learned, wanted, fodder, head)
         return optimize_report(a, horse, bonus, learned, wanted, fodder, head, show)
     opt = next((o for o, v in (("--selection-coupon", a.selection_coupon), ("--always-best", a.always_best),
                                ("--no-frontier", a.no_frontier), ("--prefer", a.prefer),
                                ("--frontier-tol", a.frontier_tol), ("--recheck-runs", a.recheck_runs),
-                               ("--plan", a.plan)) if v), None)
+                               ("--plan", a.plan), ("--boosts", a.boosts)) if v), None)
     if opt:
         print(f"ERROR: {opt} works with --optimize", file=sys.stderr)
         return 2
@@ -466,6 +477,115 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     return 0
 
 
+BOOSTS = {"none": (False, False), "gear": (True, False), "brand": (False, True), "both": (True, True)}
+
+
+def _engine(a):
+    from bdo import horses_fast as HF
+    engine = a.engine
+    if engine == "auto":
+        engine = "numba" if HF.available() else "python"
+        if engine == "python":
+            print("# numba not installed: plain-Python search (slower, noisier); "
+                  "pip install -r requirements-optional.txt for the fast engine", file=sys.stderr)
+    if engine == "numba" and not HF.available():
+        print("ERROR: --engine numba needs numba (pip install -r requirements-optional.txt)", file=sys.stderr)
+        return None
+    return engine
+
+
+def boosts_report(a, horse, bonus, learned, wanted, fodder, head):
+    """--boosts: the search for every boost setting, all their candidate plans rechecked under every boost on the
+    same fresh horses; per budget one plan for every boost where it's within 1 point of that boost's best (the most
+    boosts first), the rule / safest / cheapest choice made on the average over those boosts; then the three-criteria
+    comparison per boost."""
+    import time
+    from bdo import horses_fast as HF
+    kw = dict(tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted, fodder=fodder,
+              point_bonus=a.point_bonus, points=a.points, when_stuck=a.when_stuck)
+    engine = _engine(a)
+    if engine is None:
+        return 2
+    planned = "planned" if a.selection_coupon == "planned" else None
+    recheck = a.recheck_runs or (RECHECK_RUNS if engine == "numba" else 4000)
+    names, N, n, t0 = a.boost_list, a.optimize, len(learned), time.time()
+    letter = {b: "abcd"[i] for i, b in enumerate(names)}
+    Ms = {b: horse.M(bonus, *BOOSTS[b]) for b in names}
+    res, st1 = {}, {}
+    for b in names:
+        st1[b] = None if a.no_frontier else {}
+        if engine == "numba":
+            res[b] = HF.optimize(horse, Ms[b], N, seed=a.seed, low_memory=a.low_memory, coupon=planned,
+                                 stage1=st1[b], **kw)
+        else:
+            res[b] = H.optimize(horse, Ms[b], N, seed=a.seed, coupon=planned, stage1=st1[b], **kw)
+    cand = {("at30", 1, 0, 0)} | set(a.user_plans)
+    for b in names:
+        for B in range(1, N + 1):
+            cand.update(H.tied_plans(res[b], B, "full", 0.01)[:12 if engine == "numba" else 5])
+            cand.add(H.rule_plan(B, a.level, wanted))
+    cand = sorted(cand)
+    R = {}
+    for b in names:
+        if engine == "numba":
+            ev = HF.Evaluator(horse, Ms[b], max_budget=N, low_memory=a.low_memory, **kw)
+            R[b] = ev.plans(cand, recheck, a.seed + 2000, tails=True, coupon=planned, used=True)
+        else:
+            R[b] = {p: H.simulate_plan(horse, Ms[b], p[0], p[1], p[2], N, runs=recheck, seed=a.seed + 2000,
+                                       switch_at=p[3], coupon=planned, **kw) for p in cand}
+    best_only = a.always_best or a.no_rule
+    print(head)
+    print(f"# level {a.level} -> 30 | tickets {a.tickets} | boosts: "
+          + ", ".join(f"{letter[b]} = {b} (x{Ms[b]:.3f})" for b in names) + f" | {time.time() - t0:.0f}s")
+    print(f"# {a.learned_text}")
+    print(f"# Boosts side by side: the search for each boost; every plan found (the tied ones, the rule's plan, at30)")
+    print(f"# rechecked under every boost with the same {recheck:,} fresh horses. Per budget, one plan for every boost")
+    print("# where it's within 1 point of that boost's best full-set chance ('for': the boosts it's suggested for, the")
+    print("# most boosts first). Among those plans: " + (
+        "the best on their average (--always-best)." if a.always_best else
+        "the best on their average (the general rule isn't used for this horse)." if a.no_rule else
+        "the general rule's plan when it's within 1 point and no plan\n# at least as good uses 0.2+ fewer coupons, "
+        "else the best on their average."))
+    print("# The best: the safest, then the fewest coupons, among near-ties. A boost where the plan isn't tied gets its")
+    print("# own row. Values a/b/c: for every boost, over all horses. S1 = coursier swaps, S2 = coursier_v2 swaps (see")
+    print("# --help); keep = coupons kept for level 30.")
+    print("coupons\tsuggested plan\tfor\tfull set\t<=1 missing\tused\tsource")
+
+    def avg(plans, bs):
+        out = {}
+        for p in plans:
+            x = {}
+            for key in ("full", "used"):
+                x[key] = [None if any(R[b][p][key][i] is None for b in bs) else sum(R[b][p][key][i] for b in bs) / len(bs)
+                          for i in range(N + 1)]
+            x["tails"] = [None if any(R[b][p]["tails"][i] is None for b in bs) else
+                          [sum(R[b][p]["tails"][i][t] for b in bs) / len(bs) for t in range(H.TAILS)] for i in range(N + 1)]
+            out[p] = x
+        return out
+    for B in range(1, N + 1):
+        best = {b: max(R[b][p]["full"][B] for p in cand if R[b][p]["full"][B] is not None) for b in names}
+        tied = {p: {b for b in names if R[b][p]["full"][B] is not None and R[b][p]["full"][B] >= best[b] - 0.01}
+                for p in cand}
+        left = set(names)
+        while left:
+            top = max(cand, key=lambda p: (len(tied[p] & left), sum(R[b][p]["full"][B] or 0 for b in left)))
+            cover = tied[top] & left
+            plans = [p for p in cand if cover <= tied[p]]
+            plan, src, rc = H.suggested_plan(avg(plans, cover), B, 0.01, a.level, best_only, wanted, SAFE_MARGIN,
+                                             CHEAPER)
+            full = "/".join(_p(R[b][plan]["full"][B], recheck) for b in names)
+            le1 = "/".join(_p(R[b][plan]["tails"][B][1], recheck) for b in names)
+            used = "/".join(f"{R[b][plan]['used'][B]:.2f}" for b in names)
+            cov = ",".join(letter[b] for b in names if b in cover)
+            print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{cov}\t{full}\t{le1}\t{used}\t{src}")
+            left -= cover
+    if not a.no_frontier:
+        for i, b in enumerate(names):
+            frontier_report(a, horse, Ms[b], kw, engine, planned, st1[b], n, recheck, learned, wanted,
+                            label=f"{letter[b]} = {b}", explain=i == 0)
+    return 0
+
+
 def _p(x, runs, d=1):
     """A share with d decimals, without claiming more than the simulation shows: none of `runs` horses -> '<u%' and
     all of them -> '>100-u%' (u = 3 / runs, the usual 95% bound); a value that would round to 0 or 100 -> '<0.1%' /
@@ -500,7 +620,7 @@ def _pct(x, runs, impossible=False):
     return f"{100 * x:.1f}%"
 
 
-def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learned, wanted):
+def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learned, wanted, label=None, explain=True):
     """The plans compared on three criteria with up to N = --optimize coupons in total: the full-set chance within
     N, the coupons used on average, the stuck share; the plans no other plan beats on all three within noise
     (H.frontier), from the search's stage 1, rechecked on fresh horses."""
@@ -541,6 +661,18 @@ def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learne
         2: [r[p]["stuck"] <= bs + tol[2] for p in shown]}.items()}
     star = lambda ok, i: "*" if ok and not ties[i] else ""
     print()
+    if label:
+        print(f"# Compared on three criteria, {label}:")
+    if explain:
+        _frontier_explain(N, recheck, prefer)
+    if len(set(pick.values())) == 1:
+        print("# One plan is the best on every criterion.")
+    print(f"plan\tfull set within {N}\tstuck\tunfinished\tcoupons avg\tmedian\t"
+          + "\t".join(f"at most {B}" for B in cols) + "\tcoupons avg | not stuck\tcoupons avg | successes\tpick")
+    _frontier_rows(a, r, N, shown, pick, mine, n, recheck, impossible, cols, succ, q, star, bf, bu, bs, tol, fr)
+
+
+def _frontier_explain(N, recheck, prefer):
     print(f"# Plans compared on three criteria, with up to {N} coupons in total (the --optimize maximum; if you can get")
     print("# more later, rerun with a larger one): each plan followed as planned while leveling, then the level-30")
     print(f"# cleanup until the full set or the {N} coupons are spent. stuck: horses reaching level 30 with fewer learned")
@@ -549,10 +681,9 @@ def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learne
     print("# total. Every column is over all horses, unless its name ends with '| not stuck' or '| successes'. Listed:")
     print(f"# the plans no other plan beats on all three within noise (--frontier-tol), rechecked with {recheck:,} fresh")
     print(f"# horses; * = best of its column; pick = the best plan for each criterion; sorted by {prefer} (--prefer).")
-    if len(set(pick.values())) == 1:
-        print("# One plan is the best on every criterion.")
-    print(f"plan\tfull set within {N}\tstuck\tunfinished\tcoupons avg\tmedian\t"
-          + "\t".join(f"at most {B}" for B in cols) + "\tcoupons avg | not stuck\tcoupons avg | successes\tpick")
+
+
+def _frontier_rows(a, r, N, shown, pick, mine, n, recheck, impossible, cols, succ, q, star, bf, bu, bs, tol, fr):
     for p in shown:
         x = r[p]
         am, f, st, u = x["at_most"], x["full"][N], x["stuck"], x["used"][N]
