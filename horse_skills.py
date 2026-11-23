@@ -91,6 +91,10 @@ def main():
     ap.add_argument("--coupons-used", nargs="?", const="all", metavar="N,N,..",
                     help="with --optimize: for the suggested plans of these budgets (default all), the chance of the "
                          "full set with at most B coupons in total for each B, and the spread of coupons used")
+    ap.add_argument("--when-stuck", choices=["stop", "continue"], default="stop",
+                    help="a horse that can't get the full set any more (too few learned skills for the wanted ones): "
+                         "stop spending coupons on it (default), or continue swapping its unwanted skills (more "
+                         "wanted skills, never the full set)")
     ap.add_argument("--no-frontier", action="store_true",
                     help="with --optimize: don't print the plans compared on three criteria (full set within the "
                          "maximum, coupons used, stuck horses)")
@@ -191,6 +195,11 @@ def main():
     head += f"\n# wanted: {wset + ' set' if wset in H.WANTED_SETS else 'your list'}"
     if not a.wanted:
         head += f" (the default for a T{horse.tier or '?'}; --wanted courser / travel / your own list)"
+    head += ("\n# when stuck (fewer learned skills than wanted ones: the full set can't be reached any more): "
+             + ("stop: no more coupons on it,\n# while leveling as soon as it's certain, and none at level 30 "
+                "(--when-stuck continue: keep swapping)" if a.when_stuck == "stop" else
+                "continue: its swaps go on,\n# and at level 30 it swaps unwanted skills until none is left or the "
+                "coupons run out (--when-stuck stop: no more coupons)"))
     sure = H.sure_hits(horse, learned, wanted)
     if sure:
         head += (f"\n# every skill left to learn is wanted ({', '.join(map(show, sure))}): any swap is a sure hit; what"
@@ -273,7 +282,8 @@ def main():
             for gear, brand in [(0, 0), (1, 0), (1, 1)]:
                 res.append(H.simulate(horse, horse.M(bonus, gear, brand), strat, budget, a.tickets, a.level, learned,
                                       wanted, fodder, a.point_bonus, a.points, a.runs, a.seed,
-                                      reserve=a.reserve, swap_from=a.swap_from, switch_at=a.switch_at))
+                                      reserve=a.reserve, swap_from=a.swap_from, switch_at=a.switch_at,
+                                      when_stuck=a.when_stuck))
             cell = lambda k, f: "/".join(f.format(r[k]) for r in res)
             cp = "-" if strat == "natural" else ("unlimited" if strat == "ideal" else str(budget))
             used = "-" if strat in ("natural", "ideal") else cell("coupons_used", "{:.0f}")
@@ -289,7 +299,7 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     from bdo import horses_fast as HF
     M = horse.M(bonus, a.gear, a.brand)
     kw = dict(tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted, fodder=fodder,
-              point_bonus=a.point_bonus, points=a.points)
+              point_bonus=a.point_bonus, points=a.points, when_stuck=a.when_stuck)
     engine = a.engine
     if engine == "auto":
         engine = "numba" if HF.available() else "python"
@@ -383,6 +393,7 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     print("# <=1 / <=2 missing: chance of missing at most 1 / 2 wanted skills; worst 5%: wanted skills the worst 5% of")
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more); used: coupons used on average (a horse that doesn't get the")
     print("# full set counts every coupon it used); per full set: used / full set (more failures make it higher).")
+    print("# Every column is over all horses (stuck ones included, as played under --when-stuck).")
     sug = {B: H.suggested_plan(r3, B, 0.01, a.level, best_only, wanted, SAFE_MARGIN, CHEAPER)
            for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
@@ -504,15 +515,15 @@ def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learne
     print(f"# Plans compared on three criteria, with up to {N} coupons in total (the --optimize maximum; if you can get")
     print("# more later, rerun with a larger one): each plan followed as planned while leveling, then the level-30")
     print(f"# cleanup until the full set or the {N} coupons are spent. stuck: horses reaching level 30 with fewer learned")
-    print("# skills than wanted ones (no coupon can complete those); ran out: the other failures (more coupons would")
-    print("# help); coupons: average over all horses / the horses not stuck / the horses that get the full set; at most")
-    print("# B: chance of the full set with at most B coupons in total. Listed: the plans no other plan beats on all")
-    print(f"# three within noise (--frontier-tol), rechecked with {recheck:,} fresh horses; * = best of its column;")
-    print(f"# pick = the best plan for each criterion; sorted by {prefer} (--prefer chance|coupons|safe).")
+    print("# skills than wanted ones (no coupon can complete those); unfinished: the other failures (more coupons would")
+    print("# help); coupons avg: coupons used on average; at most B: chance of the full set with at most B coupons in")
+    print("# total. Every column is over all horses, unless its name ends with '| not stuck' or '| successes'. Listed:")
+    print(f"# the plans no other plan beats on all three within noise (--frontier-tol), rechecked with {recheck:,} fresh")
+    print(f"# horses; * = best of its column; pick = the best plan for each criterion; sorted by {prefer} (--prefer).")
     if len(set(pick.values())) == 1:
         print("# One plan is the best on every criterion.")
-    print(f"plan\tfull set within {N}\tstuck\tran out\tcoupons: avg (all)\tavg (not stuck)\tavg (successes)\t"
-          "median\t" + "\t".join(f"at most {B}" for B in cols) + "\tpick")
+    print(f"plan\tfull set within {N}\tstuck\tunfinished\tcoupons avg\tmedian\t"
+          + "\t".join(f"at most {B}" for B in cols) + "\tcoupons avg | not stuck\tcoupons avg | successes\tpick")
     for p in shown:
         x = r[p]
         am, f, st, u = x["at_most"], x["full"][N], x["stuck"], x["used"][N]
@@ -521,9 +532,9 @@ def frontier_report(a, horse, M, kw, engine, planned, stage1, n, recheck, learne
         tags = ",".join(k for k, v in pick.items() if v == p)
         print(f"{H.plan_name(p, None, n, a.level)}\t{_pct(f, recheck)}{star(f >= bf - tol[0], 0)}\t"
               f"{_pct(st, recheck, impossible)}{star(st <= bs + tol[2], 2)}\t{_pct(max(0.0, 1 - f - st), recheck)}\t"
-              f"{u:.2f}{star(u <= bu + tol[1], 1)}\t{'-' if uo is None else f'{uo:.2f}'}\t"
-              f"{'-' if sc is None else f'{sc:.2f}'}\t{q(am, 0.5)}\t"
-              + "\t".join(_pct(am[B], recheck) for B in cols) + f"\t{tags}")
+              f"{u:.2f}{star(u <= bu + tol[1], 1)}\t{q(am, 0.5)}\t"
+              + "\t".join(_pct(am[B], recheck) for B in cols)
+              + f"\t{'-' if uo is None else f'{uo:.2f}'}\t{'-' if sc is None else f'{sc:.2f}'}\t{tags}")
     if len(shown) < len(fr):
         print(f"# {len(fr) - len(shown)} more plan(s) on the frontier not shown (--frontier-rows).")
     a30 = ("at30", 1, 0, 0)

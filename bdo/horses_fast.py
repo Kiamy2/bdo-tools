@@ -109,11 +109,13 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                 rare, pb, points, max_level, switch_at, keep):
+                 rare, pb, points, max_level, switch_at, keep, stop=False, end_level=30):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
         coursier_v2 for good). keep: coupons keep the rarest missing skill for a Selection Coupon (see _target).
+        stop: no more swaps once the horse is certainly stuck: its learned skills + the level-ups left until
+        end_level are fewer than the wanted skills (a level-up teaches at most one skill, a coupon none).
         Skill Change Points: + 1 per coupon, back to 0 when it gives the desired skill.
         Returns (held skills, coupons spent while leveling, Skill Change Points)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
@@ -149,6 +151,8 @@ if nb is not None:
                 have |= np.int64(1) << got
             if lvl + 1 < swap_from or spent >= spend_cap:
                 continue
+            if stop and _pop(have) + end_level - (lvl + 1) < _pop(wmask):
+                continue                                  # certainly stuck: no swap can help any more
             if st == 7 and _pop(have) >= switch_at:
                 latched = True
             if st == 1 or (st == 7 and not latched):
@@ -197,13 +201,14 @@ if nb is not None:
 
     @nb.njit(cache=True, parallel=True)
     def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
-                order, rare, pb, points, max_level, switch_at=0, keep=False):
+                order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1):
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
         for r in nb.prange(runs):
             a, b, c = _level30(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
-                               fod, cyc, order, rare, pb, points, max_level, switch_at, keep)
+                               fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
+                               max_level if end_level < 0 else end_level)
             S[r] = a
             base[r] = b
             pts[r] = c
@@ -271,10 +276,13 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _moves(k, wmask, nW, sel, order):
-        """Skill a cleanup coupon swaps out in state k, or -1 when the cleanup is over (sel = 1: a Selection Coupon
-        is kept for the end, so the cleanup stops at one missing skill and keeps the rarest for it)."""
+        """Skill a cleanup coupon swaps out in state k, or -1 when the cleanup is over. sel bit 1: a Selection
+        Coupon is kept for the end, so the cleanup stops at one missing skill and keeps the rarest for it; sel bit 2
+        (when stuck = stop): a horse with fewer learned skills than wanted ones (stuck) spends nothing."""
         S = k >> PBITS
-        if nW - _pop(S & wmask) <= sel:
+        if nW - _pop(S & wmask) <= (sel & 1):
+            return -1
+        if (sel & 2) and _pop(S) < nW:
             return -1
         return _slot(S, wmask, order)
 
@@ -288,7 +296,7 @@ if nb is not None:
             prb = np.empty(n, np.float64)
             o = _moves(keys[j], wmask, nW, sel, order)
             if o >= 0:
-                m = _trans_r(keys[j], o, w, n, rare, pb, nxt, prb, sel > 0)
+                m = _trans_r(keys[j], o, w, n, rare, pb, nxt, prb, (sel & 1) > 0)
                 out[j * n:j * n + m] = nxt[:m]
         return out
 
@@ -340,7 +348,7 @@ if nb is not None:
                 if cm[r] > 0:
                     o = _moves(k, wmask, nW, sel, order)
                     if o >= 0:
-                        m = _trans_r(k, o, w, n, rare, pb, nxt, prb, sel > 0)
+                        m = _trans_r(k, o, w, n, rare, pb, nxt, prb, (sel & 1) > 0)
                 for i in range(m):
                     if _pop((nxt[i] >> PBITS) & wmask) == hw:
                         blk[i] = 0
@@ -464,7 +472,7 @@ if nb is not None:
         as 16-bit numbers (less memory, results within about 0.001 points)."""
 
         def __init__(self, horse, M, max_budget=40, tickets=0, start_level=1, learned=(), wanted=None,
-                     fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False):
+                     fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False, when_stuck="stop"):
             pool = list(horse.weights)
             idx = {s: i for i, s in enumerate(pool)}
             w = [float(horse.weights[s]) for s in pool]
@@ -481,6 +489,7 @@ if nb is not None:
             self.C, self.tickets, self.start_level, self.points = max_budget, tickets, start_level, points
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
             self.low_memory = low_memory
+            self.stop = H._halt(when_stuck)          # see bdo.horses.WHEN_STUCK
 
         def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None,
                   used=False, at_most=False, stuck=False):
@@ -514,7 +523,7 @@ if nb is not None:
                     spend_cap = 0
                 S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets,
                                        self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
-                                       self.max_level, switch_at, coupon == "planned")
+                                       self.max_level, switch_at, coupon == "planned", self.stop)
                 res = {"skills": float(_popcounts(S).mean()), "wanted_total": nW,
                        "stuck": float((_popcounts(S) < nW).mean())}
                 out[p] = res
@@ -548,7 +557,7 @@ if nb is not None:
             split = stuck and used
             if not sel and not split:
                 acc = cleanup_values(hk, hb, hp, hc, nb_, C, T, self.low_memory, w, n, wmask, order,
-                                     rare, self.pb, used=used)
+                                     rare, self.pb, 2 * self.stop, used=used)
                 use = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0]
                 wanted = lambda j, B: acc[j, B, T]
@@ -556,7 +565,7 @@ if nb is not None:
             elif not sel:
                 # the same values, the horses that aren't stuck in plan j, the stuck ones in j + nb_
                 acc = cleanup_values(hk, hb, np.where(ok, hp, hp + nb_), hc, 2 * nb_, C, T, self.low_memory, w, n,
-                                     wmask, order, rare, self.pb, used=used)
+                                     wmask, order, rare, self.pb, 2 * self.stop, used=used)
                 use = lambda j, B: acc[j, B, T + 1] + acc[j + nb_, B, T + 1]
                 use_ok = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0] + acc[j + nb_, B, 0]
@@ -568,7 +577,7 @@ if nb is not None:
                 spare = _popcounts(hk >> PBITS) >= nW
                 J = T + 1
                 acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, J,
-                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1, used=used)
+                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1 | 2 * self.stop, used=used)
                 use = lambda j, B: acc[j, B, J + 1] + acc[j + nb_, B, J + 1]
                 use_ok = lambda j, B: acc[j, B, J + 1]
                 n_sp = np.bincount(hp[spare], minlength=nb_)
@@ -602,7 +611,7 @@ if nb is not None:
             for L in range(self.start_level, self.max_level + 1):
                 S, _, _ = _many30(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
                                   self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, L,
-                                  switch_at, coupon == "planned")
+                                  switch_at, coupon == "planned", self.stop, self.max_level)
                 out[L] = float(_popcounts(S).mean())
             return out
 

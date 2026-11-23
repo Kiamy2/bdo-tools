@@ -321,7 +321,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
           and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
     sug = re.search(r"^20\t(from lvl \d+, V[02] until [^\t]+, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
-                    r"([\d.]+)%\t(\d)\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
+                    r"([\d.]+)%\t(\d\+?)\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
     check("horse_skills --optimize: suggested plan per budget (20 coupons, rechecked with fresh horses: within 1 point "
           "of the best, and below the search's lucky best + 0.5; full set <= missing 1 <= missing 2)",
           sug is not None and (sug.group(7) is None or float(sug.group(2)) >= float(sug.group(7)) - 1.0)
@@ -329,11 +329,13 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           and float(sug.group(2)) <= float(sug.group(3)) <= float(sug.group(4)), out)
     fr = [l.split("\t") for l in out.split("# Plans compared on three criteria")[-1].split("# Average learned")[0].splitlines()
           if re.match(r"^(from|no swaps)", l)]
+    a30 = [x for x in fr if x[0].startswith("no swaps")]
     check("horse_skills --optimize: three-criteria comparison by default (hard case: 2+ plans, stuck horses shown, "
-          "a pick per criterion, at30 beaten with about 16% stuck)",
+          "a pick per criterion; with --when-stuck stop, at30 listed as the cheapest, about 16% stuck)",
           "# Plans compared on three criteria, with up to 20 coupons" in out and len(fr) >= 2
           and all(re.match(r"^[\d.]+%\*?$", x[2]) for x in fr) and {"chance", "coupons", "safe"} <= set(",".join(x[-1] for x in fr).split(","))
-          and re.search(r"# at30 .*beaten by a listed plan: full set 4\d\.\d%, stuck 1[4-8]\.\d%", out), out)
+          and "unless its name ends with '| not stuck' or '| successes'" in out and "# when stuck (fewer learned" in out
+          and len(a30) == 1 and re.match(r"^1[4-8]\.\d%$", a30[0][2]) and "coupons" in a30[0][-1], out)
     sugrow = lambda o, B: next((l.split("\t") for l in o.splitlines() if l.startswith(f"{B}\tfrom lvl")), None)
     pct = lambda x: float(x.rstrip("%"))
     T8 = "T8 example (bdolytics icon horse_71)"
@@ -420,6 +422,32 @@ for p in ps:
     ok &= abs(a[p]["used_ok"][20] - py["used_ok"][20]) < 0.4 and 0 < a[p]["stuck"] < 0.3
 print(ok, [round(a[p]["stuck"], 3) for p in ps], [round(a[p]["used_ok"][20], 2) for p in ps])
 """)
+    code2, out2 = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(H.training_bonus("Skilled 1"))
+ps = [("at30", 1, 0, 0), ("coursier_switch", 10, 14, 12), ("coursier", 5, 20, 0)]
+r = {m: F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET, when_stuck=m).plans(ps, 20000, 3, used=True, tails=True,
+     stuck=True) for m in ("stop", "continue")}
+ok = all(r["stop"][p]["full"] == r["continue"][p]["full"] and r["stop"][p]["stuck"] == r["continue"][p]["stuck"]
+         and r["stop"][p]["used_ok"] == r["continue"][p]["used_ok"]
+         and r["stop"][p]["used"][20] < r["continue"][p]["used"][20] - 0.3
+         and r["stop"][p]["tails"][20][1] < r["continue"][p]["tails"][20][1] for p in ps)
+st = r["stop"][ps[0]]
+ok &= abs(st["used"][20] - (1 - st["stuck"]) * st["used_ok"][20]) < 1e-6        # at30: stuck horses spend 0
+for p in ps:
+    py = H.simulate_plan(h, M, *p[:3], 20, runs=4000, seed=8, switch_at=p[3], wanted=H.TRAVEL_SET, when_stuck="stop")
+    ok &= abs(py["used"][20] - r["stop"][p]["used"][20]) < 0.45 and abs(py["full"][20] - r["stop"][p]["full"][20]) < 0.035
+kw = dict(wanted=H.TRAVEL_SET, start_level=25, learned=["Hind Kick", "Fore Chop", "Drift"])   # certainly stuck at 25
+q = ("coursier", 26, 10, 0)
+u = [F.Evaluator(h, M, max_budget=10, when_stuck=m, **kw).plans([q], 2000, 1, used=True)[q]["used"][10] for m in ("stop", "continue")]
+v = [H.simulate_plan(h, M, "coursier", 26, 10, 10, runs=1000, seed=1, when_stuck=m, **kw)["used"][10] for m in ("stop", "continue")]
+ok &= u[0] == 0 and v[0] == 0 and u[1] > 3 and v[1] > 3
+print(ok, u, v)
+""")
+    check("--when-stuck stop: same full set, stuck share and non-stuck average as continue; fewer coupons; at30's stuck "
+          "horses spend 0; a horse certainly stuck while leveling stops swapping (both engines); Python vs fast within noise",
+          code2 == 0 and out2.startswith("True"), out2)
     check("horses_fast stuck share and used_ok (horses not stuck): split doesn't change full / used, agrees with "
           "bdo.horses simulate_plan within noise, same stuck share with a Selection Coupon", code == 0 and out.startswith("True"), out)
     code, out = run("-c", """
@@ -461,6 +489,10 @@ check("effective_plan: a reached switch threshold is V2, a passed start level is
       "from lvl 10, V2 until lvl 30, keep 1", out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons-used")
 check("horse_skills: --coupons-used without --optimize exits 2", code == 2 and "--optimize" in out, out)
+code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--coupons", "10", "--strategy", "at30", "--runs", "200",
+                "--when-stuck", "continue")
+check("horse_skills --when-stuck continue: stated in the header", code == 0 and "# when stuck (fewer learned skills than "
+      "wanted ones: the full set can't be reached any more): continue" in out, out)
 code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--prefer", "safe")
 check("horse_skills: --prefer without --optimize exits 2", code == 2 and "--optimize" in out, out)
 code, out = run("-c", """

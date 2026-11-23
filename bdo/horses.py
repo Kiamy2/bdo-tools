@@ -229,6 +229,22 @@ def horse_from_sim_file(path, resolve):
 
 # --- simulation ----------------------------------------------------------------------------------------------
 
+WHEN_STUCK = """A horse is stuck when it reaches level 30 with fewer learned skills than wanted ones: no Change Coupon can
+then complete the set (a coupon never changes the skill count; a Selection Coupon needs an unwanted skill to change).
+when_stuck='stop' (default): every plan stops spending as soon as the horse is certainly stuck: while leveling, once
+its learned skills plus the level-ups left are fewer than the wanted skills (a level-up teaches at most one skill,
+a Level Down Ticket only redoes an empty one); at level 30, a stuck horse doesn't start the cleanup. Every number
+then describes that way of playing. 'continue': as before 2026-11-23: the plan's swaps go on, and the level-30
+cleanup swaps unwanted skills until none is left or the coupons run out (for a player who'd still improve a stuck
+horse: more wanted skills, never the full set)."""
+
+
+def _halt(when_stuck):
+    if when_stuck not in ("stop", "continue"):
+        raise DataError(f"when_stuck must be 'stop' or 'continue', not {when_stuck!r}")
+    return when_stuck == "stop"
+
+
 def _cycle_skill(fodder, wt):
     """V2 cycles exactly one fodder skill, the heaviest, and keeps the others: a swap of it can then never draw
     another fodder skill back, so coupons don't churn between them. On ties: Hind Kick if it's one of them, else the
@@ -255,8 +271,9 @@ def _draw(rng, items, weights):
 
 def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(), wanted=None, fodder=None,
              point_bonus=0.25, points=0, runs=5000, seed=1, max_level=30, reserve=0, swap_from=1,
-             switch_at=DEFAULT_SWITCH_AT):
+             switch_at=DEFAULT_SWITCH_AT, when_stuck="stop"):
     """Monte Carlo of leveling start_level -> max_level. Returns averages over runs.
+    when_stuck: see WHEN_STUCK.
 
     reserve: coupons the coursier/once/hard strategies keep for the level-30 cleanup (no swaps while leveling below it).
     swap_from: horse level from which coursier/once/hard start swapping while leveling (before it, they wait).
@@ -267,6 +284,7 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
     pool = list(horse.weights)
     wt = horse.weights
     wanted = set(TRAVEL_SET if wanted is None else wanted) & set(pool)
+    halt = _halt(when_stuck)
     fodder = [s for s in (CLASSIC_FODDER if fodder is None else fodder) if s in wt and s not in wanted]
     rare = sorted(pool, key=lambda s: wt[s])
     rank = {s: (wt[s], i) for i, s in enumerate(pool)}
@@ -315,6 +333,8 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                 have = set(rare[:len(have)])
             elif _lvl + 1 < swap_from:                 # level just reached is below swap_from: no swaps yet
                 pass
+            elif halt and len(have) + max_level - (_lvl + 1) < len(wanted):
+                pass                                 # certainly stuck: no swap can help any more
             elif strategy == "coursier" or (strategy == "coursier_switch" and not latched):
                 for s in fodder:
                     if s in have and c > reserve:
@@ -336,7 +356,8 @@ def simulate(horse, M, strategy, coupons=30, tickets=0, start_level=1, learned=(
                             slot = swap(slot)
                             if slot is None:
                                 break
-        if strategy in ("at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard"):
+        if (strategy in ("at30", "coursier", "coursier_v2", "coursier_switch", "once", "hard")
+                and not (halt and len(have) < len(wanted))):     # a stuck horse stops (when_stuck = stop)
             while c > 0 and not wanted <= have:      # level-30 cleanup (see _rarest_unwanted)
                 out = _rarest_unwanted(have, wanted, rank)
                 if out is None or swap(out) is None:
@@ -389,8 +410,9 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
 
 def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
                   wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30,
-                  switch_at=DEFAULT_SWITCH_AT, coupon=None):
-    """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate().
+                  switch_at=DEFAULT_SWITCH_AT, coupon=None, when_stuck="stop", end_level=None):
+    """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate(). when_stuck: see
+    WHEN_STUCK (end_level: the level the 'certainly stuck' test counts level-ups to; default max_level).
     coupon: a Mount Skill Selection Coupon used at the very end on the last missing skill, if the horse holds an
     unwanted skill to change (at least as many learned skills as wanted ones). 'planned': every Change Coupon keeps
     the rarest missing skill for it (desired skill = the second rarest missing); 'fallback': only the level-30
@@ -408,6 +430,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     pool = list(horse.weights)
     wt = horse.weights
     wanted = set(TRAVEL_SET if wanted is None else wanted) & set(pool)
+    halt = _halt(when_stuck)
+    end = max_level if end_level is None else end_level
     fodder = [s for s in (CLASSIC_FODDER if fodder is None else fodder) if s in wt and s not in wanted]
     rank = {s: (wt[s], i) for i, s in enumerate(pool)}
     cyc = _cycle_skill(fodder, wt)
@@ -455,6 +479,8 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 have.add(got)
             if _lvl + 1 < swap_from or spent >= spend_cap:
                 continue
+            if halt and len(have) + end - (_lvl + 1) < len(wanted):
+                continue                             # certainly stuck: no swap can help any more
             if strategy == "coursier_switch" and len(have) >= switch_at:
                 latched = True                       # from now on, V2 swaps only
             kp = coupon == "planned"
@@ -483,7 +509,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
         spare = sel and len(have) >= len(wanted)     # an unwanted skill for the Selection Coupon to change
         stop = 1 if sel else 0                       # with it, the cleanup stops at one missing skill
         traj = [len(have & wanted)]                  # wanted skills after 0, 1, 2... cleanup coupons
-        if strategy != "natural":
+        if strategy != "natural" and not (halt and not ok):              # a stuck horse stops (when_stuck = stop)
             while len(wanted - have) > stop and len(traj) < 100000:      # level-30 cleanup (see _rarest_unwanted)
                 out = _rarest_unwanted(have, wanted, rank)
                 if out is None or swap(out, sel) is None:
@@ -529,7 +555,7 @@ def learned_by_level(horse, M, plan, runs=1000, seed=1, start_level=1, max_level
     one plan (strategy, swap_from, spend_cap, switch_at): {level: average}. kw: as simulate_plan."""
     st, lv, cap, T = plan
     return {L: simulate_plan(horse, M, st, lv, cap, 0, runs=runs, seed=seed, start_level=start_level, max_level=L,
-                             switch_at=T, **kw)["skills"] for L in range(start_level, max_level + 1)}
+                             switch_at=T, end_level=max_level, **kw)["skills"] for L in range(start_level, max_level + 1)}
 
 
 def percentile(sorted_values, p):
