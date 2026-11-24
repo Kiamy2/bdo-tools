@@ -410,9 +410,13 @@ def coupons_needed(horse, M, strategy, target, max_coupons=150, cache=None, **kw
 
 def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, tickets=0, start_level=1, learned=(),
                   wanted=None, fodder=None, point_bonus=0.25, points=0, runs=4000, seed=1, max_level=30,
-                  switch_at=DEFAULT_SWITCH_AT, coupon=None, when_stuck="stop", end_level=None):
+                  switch_at=DEFAULT_SWITCH_AT, coupon=None, when_stuck="stop", end_level=None, ticket_from=0,
+                  ticket_curve=None):
     """Monte Carlo of one plan for every budget 0..max_budget. switch_at: see simulate(). when_stuck: see
     WHEN_STUCK (end_level: the level the 'certainly stuck' test counts level-ups to; default max_level).
+    Level Down Tickets: on a level-up that teaches nothing, from level ticket_from on, and (with ticket_curve, indexed
+    by level) only while the horse has fewer learned skills than ticket_curve[level reached] (see
+    horses_fast.Evaluator.ticket_curve). The result has tickets_used (average).
     coupon: a Mount Skill Selection Coupon used at the very end on the last missing skill, if the horse holds an
     unwanted skill to change (at least as many learned skills as wanted ones). 'planned': every Change Coupon keeps
     the rarest missing skill for it (desired skill = the second rarest missing); 'fallback': only the level-30
@@ -438,7 +442,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
     if strategy == "at30":
         spend_cap = 0
     nb = max_budget + 1
-    full_n, wanted_sum, used_sum, used_ok, n_ok = [0] * nb, [0] * nb, [0] * nb, [0] * nb, 0
+    full_n, wanted_sum, used_sum, used_ok, n_ok, tickets_used = [0] * nb, [0] * nb, [0] * nb, [0] * nb, 0, 0
     tail_n = [[0] * TAILS for _ in range(nb)]
     needed, counts = [], []
     for _ in range(runs):
@@ -472,8 +476,9 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                     if x < 0:
                         got = s
                         break
-                if got or t == 0:
-                    break
+                if got or t == 0 or _lvl + 1 < ticket_from or (
+                        ticket_curve is not None and len(have) >= ticket_curve[_lvl + 1]):
+                    break                                # (ticket policy: from ticket_from, while behind the curve)
                 t -= 1
             if got:
                 have.add(got)
@@ -502,6 +507,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                     while slot is not None and slot not in wanted and slot in have and spent < spend_cap:
                         slot = swap(slot, kp)
         counts.append(len(have))
+        tickets_used += tickets - t
         ok = len(have) >= len(wanted)                # not stuck: enough skills for the full set
         n_ok += ok
         base = spent
@@ -540,6 +546,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             "used": [used_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "at_most": [bisect.bisect_right(needed, B) / runs for B in range(nb)],
             "stuck": 1 - n_ok / runs,
+            "tickets_used": tickets_used / runs,
             "used_ok": [used_ok[B] / n_ok if B >= spend_cap and n_ok else None for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
 

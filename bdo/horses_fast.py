@@ -109,7 +109,7 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                   rare, pb, points, max_level, switch_at, keep, stop=False, end_level=30):
+                   rare, pb, points, max_level, switch_at, keep, stop, end_level, ticket_from, curve):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
@@ -117,6 +117,8 @@ if nb is not None:
         stop: no more swaps once the horse is certainly stuck: its learned skills + the level-ups left until
         end_level are fewer than the wanted skills (a level-up teaches at most one skill, a coupon none).
         Skill Change Points: + 1 per coupon, back to 0 when it gives the desired skill.
+        Level Down Tickets redo a level-up that taught nothing, from level ticket_from on, and only while the horse
+        has fewer learned skills than curve[level reached] (a large value: always).
         Returns (held skills, coupons spent while leveling, Skill Change Points, Level Down Tickets left)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
@@ -144,8 +146,8 @@ if nb is not None:
                         if x < 0:
                             got = i
                             break
-                if got >= 0 or t == 0:
-                    break
+                if got >= 0 or t == 0 or lvl + 1 < ticket_from or _pop(have) >= curve[lvl + 1]:
+                    break                                 # (ticket policy: from ticket_from, while behind curve)
                 t -= 1
             if got >= 0:
                 have |= np.int64(1) << got
@@ -205,13 +207,16 @@ if nb is not None:
         """_level30_t without the tickets left (the 3 values older scripts expect)."""
         have, spent, pts, _ = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask,
                                          wmask, fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
-                                         end_level)
+                                         end_level, 0, np.full(32, 1e9))
         return have, spent, pts
 
     @nb.njit(cache=True, parallel=True)
     def _many30_t(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
-                  order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1):
-        """Many horses (_level30_t): arrays of held skills, coupons spent, Skill Change Points, tickets left."""
+                  order, rare, pb, points, max_level, switch_at=0, keep=False, stop=False, end_level=-1, ticket_from=0,
+                  curve=None):
+        """Many horses (_level30_t): arrays of held skills, coupons spent, Skill Change Points, tickets left.
+        ticket_from, curve: the Level Down Ticket policy (see _level30_t; curve None: no condition)."""
+        cv = np.full(32, 1e9) if curve is None else curve
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
@@ -219,7 +224,7 @@ if nb is not None:
         for r in nb.prange(runs):
             a, b, c, d = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
                                     fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
-                                    max_level if end_level < 0 else end_level)
+                                    max_level if end_level < 0 else end_level, ticket_from, cv)
             S[r] = a
             base[r] = b
             pts[r] = c
@@ -493,7 +498,8 @@ if nb is not None:
         as 16-bit numbers (less memory, results within about 0.001 points)."""
 
         def __init__(self, horse, M, max_budget=40, tickets=0, start_level=1, learned=(), wanted=None,
-                     fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False, when_stuck="stop"):
+                     fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False, when_stuck="stop",
+                     ticket_from=0, ticket_behind=None, ticket_ref="none"):
             pool = list(horse.weights)
             self.pool = pool
             idx = {s: i for i, s in enumerate(pool)}
@@ -512,6 +518,46 @@ if nb is not None:
             self.pb, self.max_level, self.n_wanted = point_bonus, max_level, len(wanted)
             self.low_memory = low_memory
             self.stop = H._halt(when_stuck)          # see bdo.horses.WHEN_STUCK
+            # Level Down Ticket policy (default: on every level-up that teaches nothing): from level ticket_from on;
+            # with ticket_behind = d, only while the horse has fewer learned skills than the plan's average at that
+            # level minus d (the average without tickets with ticket_ref 'none', with tickets on every empty
+            # level-up with 'always')
+            if ticket_ref not in ("none", "always"):
+                raise H.DataError(f"ticket_ref must be 'none' or 'always', not {ticket_ref!r}")
+            self.ticket_from, self.ticket_behind, self.ticket_ref = ticket_from, ticket_behind, ticket_ref
+            self._curves = {}
+
+        def ticket_curve(self, plan, coupon=None, runs=4000, seed=7777):
+            """The learned-skill threshold per level of the 'behind' ticket policy for one plan (None without it):
+            the plan's average learned skills at each level (see ticket_ref) minus ticket_behind."""
+            if self.ticket_behind is None:
+                return None
+            key = (plan, coupon)
+            if key not in self._curves:
+                w, n, W, M = self.args
+                lmask, wmask, fod, cyc, order, rare = self.masks
+                strategy, swap_from, spend_cap, switch_at = plan
+                st = CODES[strategy]
+                tk = self.tickets if self.ticket_ref == "always" else 0
+                curve = np.full(32, 1e9)
+                for L in range(self.start_level + 1, self.max_level + 1):
+                    S, _, _, _ = _many30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, tk,
+                                           self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
+                                           L, switch_at, coupon == "planned", self.stop, self.max_level)
+                    curve[L] = float(_popcounts(S).mean()) - self.ticket_behind
+                self._curves[key] = curve
+            return self._curves[key]
+
+        def _level(self, plan, runs, seed, coupon, level):
+            """_many30_t for one plan up to `level`, with this evaluator's ticket policy."""
+            w, n, W, M = self.args
+            lmask, wmask, fod, cyc, order, rare = self.masks
+            strategy, swap_from, spend_cap, switch_at = plan
+            st = CODES[strategy]
+            return _many30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
+                             self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, level,
+                             switch_at, coupon == "planned", self.stop, self.max_level, self.ticket_from,
+                             self.ticket_curve(plan, coupon))
 
         def plans(self, plans, runs=4000, seed=1, progress=None, label="plans", tails=False, coupon=None,
                   used=False, at_most=False, stuck=False):
@@ -543,11 +589,9 @@ if nb is not None:
                 st = CODES[strategy]
                 if st == 0:
                     spend_cap = 0
-                S, base, pts = _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, self.tickets,
-                                       self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
-                                       self.max_level, switch_at, coupon == "planned", self.stop)
+                S, base, pts, tl = self._level(p, runs, seed, coupon, self.max_level)
                 res = {"skills": float(_popcounts(S).mean()), "wanted_total": nW,
-                       "stuck": float((_popcounts(S) < nW).mean())}
+                       "stuck": float((_popcounts(S) < nW).mean()), "tickets_used": float(self.tickets - tl.mean())}
                 out[p] = res
                 if st == 4:                                              # natural: no cleanup, no coupon
                     miss = nW - _popcounts(S & wmask)
@@ -631,10 +675,7 @@ if nb is not None:
             st = CODES[strategy]
             out = {}
             for L in range(self.start_level, self.max_level + 1):
-                S, _, _ = _many30(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
-                                  self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points, L,
-                                  switch_at, coupon == "planned", self.stop, self.max_level)
-                out[L] = float(_popcounts(S).mean())
+                out[L] = float(_popcounts(self._level(plan, runs, seed, coupon, L)[0]).mean())
             return out
 
         def states_at(self, plan, level, runs=4000, seed=1, coupon=None):
@@ -645,9 +686,7 @@ if nb is not None:
             lmask, wmask, fod, cyc, order, rare = self.masks
             strategy, swap_from, spend_cap, switch_at = plan
             st = CODES[strategy]
-            S, base, pts, tl = _many30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap,
-                                         self.tickets, self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb,
-                                         self.points, level, switch_at, coupon == "planned", self.stop, self.max_level)
+            S, base, pts, tl = self._level(plan, runs, seed, coupon, level)
             pool = self.pool
             return [([pool[i] for i in range(n) if (int(S[r]) >> i) & 1], int(base[r]), int(pts[r]), int(tl[r]))
                     for r in range(runs)]

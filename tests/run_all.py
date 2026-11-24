@@ -420,6 +420,26 @@ c = np.array([len(x[0]) for x in st]); t = np.array([x[3] for x in st]); low = c
 print(all((x == y).all() for x, y in zip(a, b[:3])), list(b[3]) == list(t), 0 <= t.min() <= t.max() <= 4,
       t[low].mean() <= t[~low].mean(), t.mean() > 0)
 """)
+    code8, out8 = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(H.training_bonus("Skilled 1"))
+p = ("coursier_v2", 10, 19, 0)
+ok = True
+base = F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET, tickets=5).plans([p], 20000, 3)[p]
+for pol in (dict(), dict(ticket_from=15), dict(ticket_behind=0.0), dict(ticket_behind=1.0, ticket_ref="always")):
+    ev = F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET, tickets=5, **pol)
+    r = ev.plans([p], 20000, 3)[p]
+    c = ev.ticket_curve(p)
+    py = H.simulate_plan(h, M, *p[:3], 20, runs=4000, seed=4, wanted=H.TRAVEL_SET, tickets=5,
+                         ticket_from=pol.get("ticket_from", 0), ticket_curve=None if c is None else list(c))
+    ok &= abs(r["full"][20] - py["full"][20]) < 0.03 and abs(r["tickets_used"] - py["tickets_used"]) < 0.1
+    ok &= 0 <= r["tickets_used"] <= 5 and (r["tickets_used"] < 4.9) == ("ticket_behind" in pol)
+ok &= base["full"] == F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET, tickets=5, ticket_from=0).plans([p], 20000, 3)[p]["full"]
+print(ok)
+""")
+    check("ticket policies (from level L; only while behind the plan's average minus d, the average without tickets or "
+          "with them): fast vs Python within noise, tickets_used, the default unchanged", code8 == 0 and out8.strip() == "True", out8)
     check("_many30 (3 values, kept for older scripts) = _many30_t's first 3; states_at has the tickets left (0-4, the "
           "unlucky horses no more than the others)", code7 == 0 and out7.split() == ["True"] * 5, out7)
     code6, out6 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted",

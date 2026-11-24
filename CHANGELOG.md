@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-24
+- Engine: Level Down Ticket policies (`Evaluator(ticket_from=L, ticket_behind=d, ticket_ref='none'|'always')`, `simulate_plan(ticket_from, ticket_curve)`): tickets only from level L on, and/or only while the horse has fewer learned skills than the plan's average at that level minus d. Defaults unchanged (every level-up that teaches nothing). Results have `tickets_used`; `Evaluator.ticket_curve()`. Not in the CLI yet.
 - Docs: the Selection Coupon rechecked with the points reset (C25r): `planned` vs `fallback`, what the plan search changes, and whether one is worth buying (its worth in Change Coupons vs its price; stuck horses).
 
 ## 2026-11-23
