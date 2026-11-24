@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-24
+- Docs: the Selection Coupon rechecked with the points reset (C25r): `planned` vs `fallback`, what the plan search changes, and whether one is worth buying (its worth in Change Coupons vs its price; stuck horses).
+
 ## 2026-11-23
 - `--replan-check` works with `--tickets`: each unlucky horse keeps the tickets it has left at that level. Library: `horses_fast._level30_t` / `_many30_t` also return the tickets left; `_level30` / `_many30` are now wrappers returning the same 3 values as before; `Evaluator.states_at()` gives (learned, coupons spent, points, tickets left).
 - `--replan-check L` (with `--optimize`, fast engine): for 30 of the 10% unluckiest horses at level L (fewest learned skills) under the suggested plan, the plan kept vs a new search from their state, on the same fresh horses: the average gain, coupons used, how often the plan changes. `Evaluator.states_at()`.

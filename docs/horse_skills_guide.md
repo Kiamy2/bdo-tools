@@ -64,7 +64,7 @@ The player reports the level-up's result: a skill, or nothing.
 
 - **Stuck:** if the horse reaches level 30 with fewer learned skills than wanted ones (innate ones not counted), the full set can't be reached: say so, and stop spending coupons, unless a partial set is worth it to the player (then `--when-stuck continue` gives the numbers for that). The same holds earlier: once learned skills plus the level-ups left are fewer than the wanted skills, no swap can help (the tool's default `--when-stuck stop` plays it that way). A failed horse is either stuck or unfinished (out of coupons).
 - **Cleanup:** swap the rarest unwanted skill held, with the rarest missing wanted skill as the desired one, until every wanted skill is held or the coupons run out.
-- **Selection Coupon:** at the very end, on the last missing wanted skill. It needs an unwanted skill to change.
+- **Selection Coupon:** at the very end, on the last missing wanted skill. It needs an unwanted skill to change. If the player isn't sure to use it, they can decide at level 30: committing in advance gains at most a few tenths of a point. If they are sure, run the plan with `--selection-coupon planned`: with few Change Coupons (courser, 2-5) the best plan is then usually no swaps while leveling. Whether to buy one: see "Is a Selection Coupon worth buying?" in `docs/horse_skills.md` (worth more than its price in Change Coupons only from about 15-20 coupons, and extra Change Coupons can leave fewer horses stuck).
 - **When any swap is a sure hit** (the horse can only learn wanted skills, plus the skill swapped out), the real choice is which skill to give up, because level-ups may teach it back. Holding a heavy fodder skill (Fore Chop) is what makes such swaps likely hits earlier on.
 
 ## 6. Being reliable
@@ -77,4 +77,4 @@ The player reports the level-up's result: a skill, or nothing.
 - **Label every budget** in a table, and say that an average under a budget counts failed horses at the full budget.
 - **Say plainly when a decision makes no difference** (e.g. two options both near 0% failure: choose by coupons).
 - **Rules, stated explicitly:** "once per level", "never Fore Chop in S2", "learned skills don't count innate ones", "the spending cap counts every coupon used while leveling". A player once looped 6 swaps at one level because S1 wasn't stated as once per level.
-- **Being rechecked:** the advice on tickets (which level-ups to use them on) and on the Selection Coupon's targeting comes from studies done before the Skill Change Points reset was modelled; the tool's own numbers include the reset.
+- **Being rechecked:** the advice on which level-ups to use Level Down Tickets on comes from a study done before the Skill Change Points reset was modelled; the tool's own numbers include the reset.
