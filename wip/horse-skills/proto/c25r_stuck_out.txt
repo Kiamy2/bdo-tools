@@ -1,0 +1,118 @@
+set	horse	training	B	worth	stuck: B + coupon	stuck: B + k coupons	full: B + coupon (fallback)	full: B + k
+courser	T8 Type 1	Beginner 1	2	5.2	0.00	0.00	7.8	10.3
+courser	T8 Type 1	Beginner 1	5	6.6	0.00	0.00	22.4	24.0
+courser	T8 Type 1	Beginner 1	10	10.5	0.00	0.00	57.5	59.3
+courser	T8 Type 1	Beginner 1	15	13.6	0.00	0.00	80.8	81.7
+courser	T8 Type 1	Skilled 1	2	5.0	0.00	0.00	10.8	10.7
+courser	T8 Type 1	Skilled 1	5	6.4	0.00	0.00	28.8	31.1
+courser	T8 Type 1	Skilled 1	10	10.6	0.00	0.00	65.7	67.1
+courser	T8 Type 1	Skilled 1	15	13.5	0.00	0.00	86.0	86.9
+courser	T8 Type 1	Artisan 7	2	4.6	0.00	0.00	19.1	21.1
+courser	T8 Type 1	Artisan 7	5	6.3	0.00	0.00	44.3	48.1
+courser	T8 Type 1	Artisan 7	10	10.8	0.00	0.00	80.2	80.7
+courser	T8 Type 1	Artisan 7	15	13.5	0.00	0.00	93.6	94.1
+courser	T8 Type 1	Guru 20	2	2.6	0.00	0.00	76.6	80.5
+courser	T8 Type 1	Guru 20	5	5.5	0.00	0.00	97.0	97.6
+courser	T8 Type 1	Guru 20	10	11.9	0.00	0.00	99.9	99.9
+courser	T8 Type 1	Guru 20	15	15.3	0.00	0.00	100.0	100.0
+courser	T8 Type 2	Beginner 1	2	5.0	0.00	0.00	7.6	7.6
+courser	T8 Type 2	Beginner 1	5	6.6	0.00	0.00	22.6	24.1
+courser	T8 Type 2	Beginner 1	10	10.7	0.00	0.00	57.3	58.4
+courser	T8 Type 2	Beginner 1	15	13.8	0.00	0.00	80.0	80.5
+courser	T8 Type 2	Skilled 1	2	4.7	0.00	0.00	10.4	11.3
+courser	T8 Type 2	Skilled 1	5	6.5	0.00	0.00	29.4	31.3
+courser	T8 Type 2	Skilled 1	10	10.8	0.00	0.00	65.5	66.3
+courser	T8 Type 2	Skilled 1	15	13.8	0.00	0.00	85.5	85.9
+courser	T8 Type 2	Artisan 7	2	4.4	0.00	0.00	19.3	22.5
+courser	T8 Type 2	Artisan 7	5	6.4	0.00	0.00	45.7	48.5
+courser	T8 Type 2	Artisan 7	10	11.1	0.00	0.00	80.6	82.5
+courser	T8 Type 2	Artisan 7	15	13.8	0.00	0.00	93.5	93.6
+courser	T8 Type 2	Guru 20	2	2.7	0.00	0.00	76.8	80.1
+courser	T8 Type 2	Guru 20	5	6.1	0.00	0.00	97.0	97.7
+courser	T8 Type 2	Guru 20	10	12.2	0.00	0.00	99.8	99.8
+courser	T8 Type 2	Guru 20	15	15.5	0.00	0.00	100.0	100.0
+courser	T8 Type 4	Beginner 1	2	4.3	0.00	0.00	10.2	12.4
+courser	T8 Type 4	Beginner 1	5	6.0	0.00	0.00	28.2	28.1
+courser	T8 Type 4	Beginner 1	10	10.0	0.00	0.00	64.1	64.1
+courser	T8 Type 4	Beginner 1	15	13.0	0.00	0.00	84.6	84.6
+courser	T8 Type 4	Skilled 1	2	4.1	0.00	0.00	14.2	18.3
+courser	T8 Type 4	Skilled 1	5	5.9	0.00	0.00	36.7	37.1
+courser	T8 Type 4	Skilled 1	10	10.1	0.00	0.00	72.9	75.3
+courser	T8 Type 4	Skilled 1	15	13.0	0.00	0.00	89.7	89.7
+courser	T8 Type 4	Artisan 7	2	3.5	0.00	0.00	25.8	29.2
+courser	T8 Type 4	Artisan 7	5	5.8	0.00	0.00	56.3	57.3
+courser	T8 Type 4	Artisan 7	10	10.3	0.00	0.00	86.7	87.9
+courser	T8 Type 4	Artisan 7	15	13.2	0.00	0.00	96.1	96.6
+courser	T8 Type 4	Guru 20	2	1.9	0.00	0.00	86.5	87.6
+courser	T8 Type 4	Guru 20	5	4.9	0.00	0.00	99.3	99.3
+courser	T8 Type 4	Guru 20	10	12.9	0.00	0.00	100.0	100.0
+courser	T8 Type 4	Guru 20	15	15.1	0.00	0.00	100.0	100.0
+courser	T8 Type 5	Beginner 1	2	5.6	0.00	0.00	5.9	6.5
+courser	T8 Type 5	Beginner 1	5	7.6	0.00	0.00	18.2	19.4
+courser	T8 Type 5	Beginner 1	10	11.6	0.00	0.00	49.0	50.5
+courser	T8 Type 5	Beginner 1	15	15.0	0.00	0.00	73.5	73.6
+courser	T8 Type 5	Skilled 1	2	5.7	0.00	0.00	8.4	9.2
+courser	T8 Type 5	Skilled 1	5	7.7	0.00	0.00	23.4	24.5
+courser	T8 Type 5	Skilled 1	10	11.7	0.00	0.00	56.1	57.2
+courser	T8 Type 5	Skilled 1	15	15.1	0.00	0.01	79.2	81.0
+courser	T8 Type 5	Artisan 7	2	5.5	0.00	0.00	15.0	16.5
+courser	T8 Type 5	Artisan 7	5	7.8	0.00	0.00	36.1	36.9
+courser	T8 Type 5	Artisan 7	10	12.1	0.00	0.00	70.3	72.8
+courser	T8 Type 5	Artisan 7	15	15.2	0.00	0.00	88.2	89.3
+courser	T8 Type 5	Guru 20	2	4.3	0.00	0.00	72.5	74.4
+courser	T8 Type 5	Guru 20	5	9.2	0.00	0.00	92.4	93.4
+courser	T8 Type 5	Guru 20	10	14.3	0.00	0.00	98.9	99.1
+courser	T8 Type 5	Guru 20	15	17.4	0.00	0.00	99.8	99.8
+travel	Mythical Diné	Beginner 1	10	9.3	3.40	3.03	57.8	59.9
+travel	Mythical Diné	Beginner 1	15	13.5	3.03	1.37	80.1	80.9
+travel	Mythical Diné	Beginner 1	20	16.4	3.03	1.37	89.9	90.3
+travel	Mythical Diné	Beginner 1	25	20.2	1.37	1.37	94.9	95.2
+travel	Mythical Diné	Beginner 1	30	24.5	1.37	1.37	97.1	97.2
+travel	Mythical Diné	Skilled 1	10	9.2	1.19	1.12	69.6	71.7
+travel	Mythical Diné	Skilled 1	15	13.4	1.12	0.42	87.9	88.6
+travel	Mythical Diné	Skilled 1	20	16.3	1.12	0.42	94.7	95.0
+travel	Mythical Diné	Skilled 1	25	20.1	0.42	0.42	97.7	97.9
+travel	Mythical Diné	Skilled 1	30	24.4	0.42	0.42	98.9	98.9
+travel	Mythical Diné	Artisan 7	10	9.4	0.06	0.05	87.8	88.7
+travel	Mythical Diné	Artisan 7	15	13.3	0.05	0.01	96.6	96.9
+travel	Mythical Diné	Artisan 7	20	16.4	0.05	0.01	99.0	99.0
+travel	Mythical Diné	Artisan 7	25	19.4	0.01	0.01	99.7	99.7
+travel	Mythical Diné	Artisan 7	30	23.7	0.01	0.01	99.9	99.9
+travel	Mythical Diné	Guru 20	10	7.7	0.00	0.00	100.0	100.0
+travel	Mythical Diné	Guru 20	15	12.9	0.00	0.00	100.0	100.0
+travel	Mythical Diné	Guru 20	20	13.9	0.00	0.00	100.0	100.0
+travel	Mythical Doom	Beginner 1	10	8.4	0.23	0.14	66.6	68.4
+travel	Mythical Doom	Beginner 1	15	13.5	0.14	0.03	86.3	86.9
+travel	Mythical Doom	Beginner 1	20	16.7	0.14	0.03	94.2	94.4
+travel	Mythical Doom	Beginner 1	25	17.9	0.03	0.03	97.1	97.1
+travel	Mythical Doom	Beginner 1	30	21.8	0.03	0.03	98.9	98.9
+travel	Mythical Doom	Skilled 1	10	8.5	0.02	0.01	80.3	81.3
+travel	Mythical Doom	Skilled 1	15	13.5	0.01	0.00	93.4	93.8
+travel	Mythical Doom	Skilled 1	20	16.5	0.01	0.00	97.6	97.8
+travel	Mythical Doom	Skilled 1	25	17.8	0.00	0.00	99.0	99.0
+travel	Mythical Doom	Skilled 1	30	21.5	0.00	0.00	99.7	99.7
+travel	Mythical Doom	Artisan 7	10	8.9	0.00	0.00	96.1	96.2
+travel	Mythical Doom	Artisan 7	15	13.6	0.00	0.00	99.1	99.2
+travel	Mythical Doom	Artisan 7	20	16.2	0.00	0.00	99.8	99.8
+travel	Mythical Doom	Artisan 7	25	18.2	0.00	0.00	99.9	99.9
+travel	Mythical Doom	Artisan 7	30	21.6	0.00	0.00	100.0	100.0
+travel	Mythical Arduanatt	Beginner 1	10	9.9	5.29	4.87	56.1	56.5
+travel	Mythical Arduanatt	Beginner 1	15	13.8	4.87	2.69	78.4	78.7
+travel	Mythical Arduanatt	Beginner 1	20	16.5	4.87	2.69	88.3	88.7
+travel	Mythical Arduanatt	Beginner 1	25	21.2	2.69	2.69	93.9	94.2
+travel	Mythical Arduanatt	Beginner 1	30	25.3	2.69	2.69	96.0	96.1
+travel	Mythical Arduanatt	Skilled 1	10	9.9	1.96	1.85	67.2	67.5
+travel	Mythical Arduanatt	Skilled 1	15	13.7	1.85	0.84	86.2	86.6
+travel	Mythical Arduanatt	Skilled 1	20	16.6	1.85	0.84	93.7	93.9
+travel	Mythical Arduanatt	Skilled 1	25	21.0	0.84	0.84	97.2	97.2
+travel	Mythical Arduanatt	Skilled 1	30	25.1	0.84	0.84	98.5	98.5
+travel	Mythical Arduanatt	Artisan 7	10	9.9	0.18	0.20	84.8	85.1
+travel	Mythical Arduanatt	Artisan 7	15	13.5	0.20	0.06	95.3	95.7
+travel	Mythical Arduanatt	Artisan 7	20	16.5	0.20	0.06	98.4	98.5
+travel	Mythical Arduanatt	Artisan 7	25	20.6	0.06	0.06	99.5	99.5
+travel	Mythical Arduanatt	Artisan 7	30	24.9	0.06	0.06	99.8	99.8
+travel	Mythical Arduanatt	Guru 20	10	11.4	0.00	0.00	100.0	100.0
+travel	Mythical Arduanatt	Guru 20	15	13.2	0.00	0.00	100.0	100.0
+travel	Mythical Arduanatt	Guru 20	20	17.0	0.00	0.00	100.0	100.0
+travel	Mythical Arduanatt	Guru 20	25	20.3	0.00	0.00	100.0	100.0
+travel	Mythical Arduanatt	Guru 20	30	24.0	0.00	0.00	100.0	100.0
