@@ -477,6 +477,15 @@ print(worst == 0)
                         "--ticket-policy", "behind")
     code13, out13 = run("horse_skills.py", "Mythical Diné", "--training", "Artisan 7", "--tickets", "2",
                         "--ticket-policy", "behind")
+    code14, out14 = run(*tk_args[:-2], "--precision", "0.5", "--search-runs", "300,900")
+    code15, out15 = run("horse_skills.py", "Mythical Diné", "--training", "Artisan 7", "--optimize", "3", "--search-runs", "5")
+    code16, out16 = run("horse_skills.py", "Mythical Diné", "--training", "Artisan 7", "--search-runs", "300,900")
+    check("--precision / --search-runs: the header gives the counts used (search 300 then 900, recheck and tables "
+          "x 0.5); --search-runs refused when malformed or without --optimize",
+          code14 == 0 and "# Simulated horses: search 300 then 900 per plan | recheck 10,000 | per-level tables 2,000"
+          in out14 and "(--precision 0.5)" in out14 and "# Simulated horses: search 1,000 then 4,000 per plan | "
+          "recheck 20,000" in out10 and code15 == 2 and "--search-runs takes two numbers" in out15 and code16 == 2
+          and "works with --optimize" in out16, out14[:1500] + out15 + out16)
     check("--ticket-policy behind: refused without --tickets, and without --optimize",
           code12 != 0 and "--tickets N" in out12 and code13 == 2 and "works with --optimize" in out13, out12 + out13)
     code6, out6 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted",

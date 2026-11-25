@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-25
+- `--precision X`: every default number of simulated horses times X (an explicit `--runs` / `--search-runs` / `--recheck-runs` wins); `--search-runs A,B` (with `--optimize`): horses per plan in the search's two stages. The `--optimize` header prints the counts used. With `--ticket-policy behind`, each search stage computes the thresholds from its own number of horses (as before with the defaults). Library: `horses_fast.optimize(runs=...)` sets the curves too.
 - `--ticket-policy always|behind` (with `--optimize` and `--tickets`, fast engine; not with `--boosts` or `--replan-check`): `behind` uses a Level Down Ticket only on a level-up that teaches nothing while the horse has fewer learned skills than the plan's average horse without tickets at that level; every number (search, suggested plans, comparison, `--coupons-used`, averages) uses it, and the suggested plans get a `tickets used` column. The search computes each plan's threshold from 1,000 horses in its first stage, 4,000 after (about 1.3x the time of `always`).
 - With `--tickets`, `--optimize` ends with a `ticket if <=` table: per level and suggested plan, the most learned skills at which the `behind` policy still uses a ticket.
 - Docs: the Level Down Ticket advice rechecked with the points reset (C40r: when to use them, 'only while behind', one more ticket or one more Change Coupon), with the cases and budgets measured; how to split a Pearl budget between Change Coupons and tickets (C44).

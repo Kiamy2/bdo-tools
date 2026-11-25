@@ -753,10 +753,8 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
-    # with the 'behind' ticket policy, stage 1 computes each plan's curve from runs[0] horses (cheaper; the plans
-    # kept are then rerun with the default curve)
-    ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level,
-                   **dict(kw, curve_runs=min(runs[0], kw.get("curve_runs", 4000))))
+    # with the 'behind' ticket policy, each stage computes each plan's curve from its own number of horses
+    ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **dict(kw, curve_runs=runs[0]))
     plans = search_grid(start_level, max_budget, strategies)
     s1 = {}
 
@@ -782,5 +780,5 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
         stage1.update(s1)
     final = promising() | {H.rule_plan(B, start_level, kw.get("wanted")) for B in range(max_budget + 1)}
     if kw.get("ticket_behind") is not None:
-        ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **kw)
+        ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **dict(kw, curve_runs=runs[1]))
     return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon, used=True)
