@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-25
+- `--ticket-policy always|behind` (with `--optimize` and `--tickets`, fast engine; not with `--boosts` or `--replan-check`): `behind` uses a Level Down Ticket only on a level-up that teaches nothing while the horse has fewer learned skills than the plan's average horse without tickets at that level; every number (search, suggested plans, comparison, `--coupons-used`, averages) uses it, and the suggested plans get a `tickets used` column. The search computes each plan's threshold from 1,000 horses in its first stage, 4,000 after (about 1.3x the time of `always`).
+- With `--tickets`, `--optimize` ends with a `ticket if <=` table: per level and suggested plan, the most learned skills at which the `behind` policy still uses a ticket.
+- Docs: the Level Down Ticket advice rechecked with the points reset (C40r: when to use them, 'only while behind', one more ticket or one more Change Coupon), with the cases and budgets measured.
+- Library: `horses_fast._counts30_t` (average learned skills at every level in one pass; `_level30_t` takes a `rec` array); `Evaluator.learned_by_level()` and `ticket_curve()` use it (same values, one simulation instead of one per level); `Evaluator(curve_runs=)`.
+
 ## 2026-11-24
 - Engine: Level Down Ticket policies (`Evaluator(ticket_from=L, ticket_behind=d, ticket_ref='none'|'always')`, `simulate_plan(ticket_from, ticket_curve)`): tickets only from level L on, and/or only while the horse has fewer learned skills than the plan's average at that level minus d. Defaults unchanged (every level-up that teaches nothing). Results have `tickets_used`; `Evaluator.ticket_curve()`. Not in the CLI yet.
 - Docs: the Selection Coupon rechecked with the points reset (C25r): `planned` vs `fallback`, what the plan search changes, and whether one is worth buying (its worth in Change Coupons vs its price; stuck horses).

@@ -54,6 +54,10 @@ def main():
                     help="search the best plan (strategy, level to start swapping, coupons to keep) for every "
                     "budget from 0 to MAX_COUPONS, for the full set and for the most wanted skills")
     ap.add_argument("--tickets", type=int, default=0, help="Mount Level Down Tickets (used on level-ups that teach nothing)")
+    ap.add_argument("--ticket-policy", choices=["always", "behind"], default="always",
+                    help="with --optimize and --tickets: 'always' (default) = a ticket on every level-up that teaches "
+                         "nothing; 'behind' = only while the horse has fewer learned skills than the plan's average "
+                         "horse without tickets at that level (keeps tickets for another horse; fast engine only)")
     ap.add_argument("--strategy", help="comma-separated subset (default all): "
                     + "; ".join(f"{k} = {v}" for k, v in H.STRATEGY_HELP.items()))
     ap.add_argument("--wanted", help="wanted skills, comma-separated, or a named set: 'courser' (what a T8 needs for "
@@ -165,6 +169,14 @@ def main():
         if len(a.tol) != 3 or min(a.tol) < 0:
             raise H.DataError(f"--frontier-tol takes 3 numbers like 0.3,0.03,0.3, not {a.frontier_tol!r}")
         a.user_plans = list(dict.fromkeys(H.parse_plan(x) for x in (a.plan or [])))
+        if a.ticket_policy == "behind":
+            if not a.tickets:
+                raise H.DataError("--ticket-policy behind: give your tickets with --tickets N")
+            if a.boosts or a.replan_check is not None:
+                raise H.DataError("--ticket-policy behind: not with --boosts or --replan-check")
+            if a.engine == "python" or (a.optimize is not None and not _fast_available()):
+                raise H.DataError("--ticket-policy behind needs the fast engine (numba: pip install -r "
+                                  "requirements-optional.txt)")
         if a.replan_check is not None:
             if not a.level < a.replan_check < 30:
                 raise H.DataError(f"--replan-check: the level must be between the current level ({a.level}) and 30")
@@ -272,7 +284,8 @@ def main():
     opt = next((o for o, v in (("--selection-coupon", a.selection_coupon), ("--always-best", a.always_best),
                                ("--no-frontier", a.no_frontier), ("--prefer", a.prefer),
                                ("--frontier-tol", a.frontier_tol), ("--recheck-runs", a.recheck_runs),
-                               ("--plan", a.plan), ("--boosts", a.boosts), ("--replan-check", a.replan_check))
+                               ("--plan", a.plan), ("--boosts", a.boosts), ("--replan-check", a.replan_check),
+                               ("--ticket-policy behind", a.ticket_policy == "behind"))
                 if v), None)
     if opt:
         print(f"ERROR: {opt} works with --optimize", file=sys.stderr)
@@ -330,6 +343,9 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     M = horse.M(bonus, a.gear, a.brand)
     kw = dict(tickets=a.tickets, start_level=a.level, learned=learned, wanted=wanted, fodder=fodder,
               point_bonus=a.point_bonus, points=a.points, when_stuck=a.when_stuck)
+    behind = a.ticket_policy == "behind"
+    if behind:
+        kw["ticket_behind"] = 0.0                   # bdo.horses_fast.Evaluator: the plan's average without tickets
     engine = a.engine
     if engine == "auto":
         engine = "numba" if HF.available() else "python"
@@ -368,7 +384,8 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
                     "spending cap and threshold around the best ones (plain-Python engine)")
     nw = next(iter(res.values()))["wanted_total"]
     print(head)
-    print(f"# level {a.level} -> 30 | tickets {a.tickets} | wanted: {nw} skills | {len(res)} plans in stage 2 | "
+    tpol = " (only while behind the plan's average)" if behind else ""
+    print(f"# level {a.level} -> 30 | tickets {a.tickets}{tpol} | wanted: {nw} skills | {len(res)} plans in stage 2 | "
           f"{time.time() - t0:.0f}s")
     print(f"# {a.learned_text}")
     n = len(learned)
@@ -425,6 +442,10 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     print(f"# horses miss ({H.TAILS}+ = {H.TAILS} or more); used: coupons used on average (a horse that doesn't get the")
     print("# full set counts every coupon it used); per full set: used / full set (more failures make it higher).")
     print("# Every column is over all horses (stuck ones included, as played under --when-stuck).")
+    if behind:
+        print("# --ticket-policy behind: every chance uses Level Down Tickets only on a level-up that teaches nothing")
+        print("# while the horse has fewer learned skills than the plan's average horse without tickets at that level")
+        print("# (the 'ticket if <=' table at the end); tickets used: on average (the rest are kept).")
     sug = {B: H.suggested_plan(r3, B, 0.01, a.level, best_only, wanted, SAFE_MARGIN, CHEAPER)
            for B in range(1, a.optimize + 1)}
     extra_head, extras = "", []
@@ -436,9 +457,12 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
         extras.append(evaluate([v[0] for v in sug.values()], coupon="fallback"))
     if a.tickets:
         print(f"# keeping tickets: the full-set chance if you don't use your {a.tickets} Level Down Ticket(s) (the same")
-        print("# plan); the other columns use them on every level-up that teaches nothing, from now on.")
+        print("# plan); the other columns use them " + ("as --ticket-policy behind says." if behind else
+                                                       "on every level-up that teaches nothing, from now on."))
         extra_head += "\tkeeping tickets"
         extras.append(evaluate([v[0] for v in sug.values()], coupon=planned, tickets=0))
+    if behind:
+        extra_head += "\ttickets used"
     print("coupons\tsuggested plan\tfull set\t<=1 missing\t<=2 missing\tworst 5%\tused\tper full set" + extra_head
           + "\tsource")
     for B in range(1, a.optimize + 1):
@@ -451,6 +475,8 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
         tl = r3[plan]["tails"][B]
         w5 = H.worst5(tl)
         ex = "".join(f"\t{_p(e[plan]['full'][B], recheck)}" for e in extras)
+        if behind:
+            ex += f"\t{r3[plan]['tickets_used']:.2f}"
         u, f = r3[plan]["used"][B], r3[plan]["full"][B]
         print(f"{B}\t{H.plan_name(plan, B, n, a.level)}\t{_p(f, recheck)}\t{_p(tl[1], recheck)}\t{_p(tl[2], recheck)}\t"
               f"{w5 if w5 is not None else f'{H.TAILS}+'}\t{u:.2f}\t{f'{u / f:.2f}' if f else '-'}{ex}\t{note}")
@@ -485,14 +511,47 @@ def optimize_report(a, horse, bonus, learned, wanted, fodder, head, show=lambda 
     print("# Average learned skills (innate ones not counted) when reaching each level, for the suggested plans (the")
     print("# columns: coupon budgets; plans within 0.2 skills of each other share a column). Compare your horse at its")
     print("# level: below average means leveling is going worse than usual."
-          + (" Level Down Tickets are used on every level-up that teaches nothing." if a.tickets else ""))
+          + (" Level Down Tickets are used " + ("as --ticket-policy behind says." if behind else
+                                                  "on every level-up that teaches nothing.") if a.tickets else ""))
     print("level\t" + "\t".join(f"{span(sorted(bs))} coupons" for _, bs in cols))
     for L in range(a.level, 31):
         print(f"{L}\t" + "\t".join(f"{curves[p][L]:.1f}" for p, _ in cols))
+    if a.tickets and a.level < 30:
+        ticket_table(a, horse, M, kw, engine, planned, cols, span)
     return 0
 
 
+def ticket_table(a, horse, M, kw, engine, planned, cols, span):
+    """The 'only while behind' ticket thresholds per level for the suggested plans: the most learned skills at which
+    a ticket is still used, i.e. below the plan's average horse without tickets at that level."""
+    import math
+    if engine == "numba":
+        from bdo import horses_fast as HF
+        ev = HF.Evaluator(horse, M, max_budget=a.optimize, **dict(kw, ticket_behind=0.0))
+        avg = {p: ev.ticket_curve(p, planned) for p, _ in cols}         # the curve --ticket-policy behind uses
+    else:
+        k = {k2: v for k2, v in kw.items() if k2 not in ("start_level", "tickets")}
+        avg = {p: H.learned_by_level(horse, M, p, 1000, 7777, a.level, coupon=planned, tickets=0, **k) for p, _ in cols}
+    print()
+    print("# Level Down Tickets only while behind: when the level-up TO this level teaches nothing, use a ticket only")
+    print("# if the horse has at most this many learned skills (innate ones not counted): fewer than the plan's")
+    print("# average horse without tickets there" + (" (what --ticket-policy behind plays)." if a.ticket_policy ==
+                                                     "behind" else "."))
+    print("# Only worth it if unused tickets are worth something (another horse). Measured: a gain on the travel set at")
+    print("# 20-30 coupons and the courser set at 15, a loss on the courser set at 5 (docs/horse_skills.md).")
+    print("# Columns as in the table above (coupon budgets); the cells are 'ticket if <=' counts.")
+    print("level\t" + "\t".join(f"{span(sorted(bs))} coupons" for _, bs in cols))
+    for L in range(a.level + 1, 31):
+        ks = [math.ceil(avg[p][L] - 1e-9) - 1 for p, _ in cols]
+        print(f"{L}\t" + "\t".join(str(k) if k >= 0 else "-" for k in ks))
+
+
 BOOSTS = {"none": (False, False), "gear": (True, False), "brand": (False, True), "both": (True, True)}
+
+
+def _fast_available():
+    from bdo import horses_fast as HF
+    return HF.available()
 
 
 def _engine(a):

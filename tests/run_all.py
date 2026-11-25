@@ -442,6 +442,43 @@ print(ok)
           "with them): fast vs Python within noise, tickets_used, the default unchanged", code8 == 0 and out8.strip() == "True", out8)
     check("_many30 (3 values, kept for older scripts) = _many30_t's first 3; states_at has the tickets left (0-4, the "
           "unlucky horses no more than the others)", code7 == 0 and out7.split() == ["True"] * 5, out7)
+    code9, out9 = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "Mythical Diné"); M = h.M(H.training_bonus("Beginner 1"))
+worst = 0
+for lv, pol in ((1, dict()), (1, dict(ticket_behind=0.0)), (9, dict(ticket_behind=1.0, ticket_ref="always"))):
+    ev = F.Evaluator(h, M, max_budget=20, tickets=4, start_level=lv, learned=["High Jump"] if lv > 1 else [], points=2, **pol)
+    for p in (("coursier_v2", 10, 11, 0), ("coursier_switch", 10, 14, 12), ("at30", 1, 0, 0)):
+        new = ev.learned_by_level(p, 2000, 5)
+        old = {L: float(F._popcounts(ev._level(p, 2000, 5, None, L)[0]).mean()) for L in range(lv, 31)}
+        worst = max(worst, max(abs(new[L] - old[L]) for L in old))
+print(worst == 0)
+""")
+    check("learned_by_level in one pass (_counts30_t) = stopping the horses at each level (any ticket policy)",
+          code9 == 0 and out9.strip() == "True", out9)
+    tk_args = ("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted", "travel",
+               "--level", "18", "--learned", "Hind Kick,Fore Chop,High Jump,Quick Back,Roar,Two-seater,Charge,Drift",
+               "--optimize", "5", "--no-frontier", "--tickets", "3")
+    code10, out10 = run(*tk_args)
+    code11, out11 = run(*tk_args, "--ticket-policy", "behind")
+    def ttable(out):
+        part = out.split("# Level Down Tickets only while behind")[-1]
+        return [l.split("\t") for l in part.splitlines() if re.match(r"^\d+\t", l)]
+    t10, t11 = ttable(out10), ttable(out11)
+    sug11 = [l.split("\t") for l in out11.split("\ttickets used\tsource\n")[-1].splitlines()[:5]]
+    mono = all(all(int(a[c]) <= int(b[c]) for c in range(1, len(a))) for a, b in zip(t10, t10[1:]))
+    check("horse_skills --tickets: 'ticket if <=' table for levels 19-30 (counts never decrease); --ticket-policy "
+          "behind: same table, a tickets-used column (0-3), the header says so",
+          code10 == 0 and code11 == 0 and [r[0] for r in t10] == [str(L) for L in range(19, 31)] and mono
+          and t10 == t11 and "(only while behind the plan's average)" in out11 and len(sug11) == 5
+          and all(0 <= float(r[-2]) <= 3 for r in sug11), out11[-1500:])
+    code12, out12 = run("horse_skills.py", "Mythical Diné", "--training", "Artisan 7", "--optimize", "3",
+                        "--ticket-policy", "behind")
+    code13, out13 = run("horse_skills.py", "Mythical Diné", "--training", "Artisan 7", "--tickets", "2",
+                        "--ticket-policy", "behind")
+    check("--ticket-policy behind: refused without --tickets, and without --optimize",
+          code12 != 0 and "--tickets N" in out12 and code13 == 2 and "works with --optimize" in out13, out12 + out13)
     code6, out6 = run("horse_skills.py", "T8 example (bdolytics icon horse_71)", "--training", "Skilled 1", "--wanted",
                       "travel", "--optimize", "6", "--no-frontier", "--replan-check", "26", "--tickets", "2")
     rows6 = [l.split("\t") for l in out6.split("re-planned plan\n")[-1].splitlines() if re.match(r"^\d+\t\d+\t\d+\t\d\t", l)]

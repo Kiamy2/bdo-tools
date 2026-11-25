@@ -109,7 +109,7 @@ if nb is not None:
 
     @nb.njit(cache=True)
     def _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc, order,
-                   rare, pb, points, max_level, switch_at, keep, stop, end_level, ticket_from, curve):
+                   rare, pb, points, max_level, switch_at, keep, stop, end_level, ticket_from, curve, rec):
         """One horse from start_level to max_level, without the level-30 cleanup.
         st: 0 at30, 1 coursier, 2 once, 3 hard, 4 natural, 6 coursier_v2 (cycles skill 'cyc'), 7 coursier_switch
         (coursier until the horse holds switch_at learned skills, checked once swapping is allowed, then
@@ -119,6 +119,8 @@ if nb is not None:
         Skill Change Points: + 1 per coupon, back to 0 when it gives the desired skill.
         Level Down Tickets redo a level-up that taught nothing, from level ticket_from on, and only while the horse
         has fewer learned skills than curve[level reached] (a large value: always).
+        rec: an empty array, or one of size > max_level that gets the learned skills when reaching each level from
+        start_level to max_level (the same as stopping the horse there: same random numbers).
         Returns (held skills, coupons spent while leveling, Skill Change Points, Level Down Tickets left)."""
         a = _mix(np.uint64(seed) * np.uint64(0xD1B54A32D192ED03))
         b = _mix(np.uint64(r) ^ np.uint64(0xA0761D6478BD642F))
@@ -128,7 +130,10 @@ if nb is not None:
         t = tickets
         pts = points
         latched = False
+        rc = rec.shape[0] > 0
         for lvl in range(start_level, max_level):
+            if rc:
+                rec[lvl] = _pop(have)
             got = -1
             while True:
                 su = 0.0
@@ -199,6 +204,8 @@ if nb is not None:
                         slot, have, state, pts = _swap_r(slot, have, pts, state, w, n, rare, pb, keep)
                         if slot >= 0:
                             spent += 1
+        if rc:
+            rec[max_level] = _pop(have)
         return have, spent, pts, t
 
     @nb.njit(cache=True)
@@ -207,7 +214,7 @@ if nb is not None:
         """_level30_t without the tickets left (the 3 values older scripts expect)."""
         have, spent, pts, _ = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask,
                                          wmask, fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
-                                         end_level, 0, np.full(32, 1e9))
+                                         end_level, 0, np.full(32, 1e9), np.zeros(0, np.int64))
         return have, spent, pts
 
     @nb.njit(cache=True, parallel=True)
@@ -217,6 +224,7 @@ if nb is not None:
         """Many horses (_level30_t): arrays of held skills, coupons spent, Skill Change Points, tickets left.
         ticket_from, curve: the Level Down Ticket policy (see _level30_t; curve None: no condition)."""
         cv = np.full(32, 1e9) if curve is None else curve
+        no = np.zeros(0, np.int64)
         S = np.empty(runs, np.int64)
         base = np.empty(runs, np.int64)
         pts = np.empty(runs, np.int64)
@@ -224,12 +232,27 @@ if nb is not None:
         for r in nb.prange(runs):
             a, b, c, d = _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask,
                                     fod, cyc, order, rare, pb, points, max_level, switch_at, keep, stop,
-                                    max_level if end_level < 0 else end_level, ticket_from, cv)
+                                    max_level if end_level < 0 else end_level, ticket_from, cv, no)
             S[r] = a
             base[r] = b
             pts[r] = c
             tl[r] = d
         return S, base, pts, tl
+
+    @nb.njit(cache=True, parallel=True)
+    def _counts30_t(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
+                    order, rare, pb, points, max_level, switch_at, keep, stop, end_level, ticket_from, curve):
+        """Many horses (_level30_t) in one pass: the average learned skills when reaching each level (index = level,
+        start_level to max_level; the same values as stopping the horses at each level, like _many30_t with that
+        max_level and end_level)."""
+        R = np.zeros((runs, 32), np.int64)
+        for r in nb.prange(runs):
+            _level30_t(r, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
+                       order, rare, pb, points, max_level, switch_at, keep, stop, end_level, ticket_from, curve, R[r])
+        out = np.zeros(32)
+        for L in range(32):
+            out[L] = R[:, L].sum() / runs
+        return out
 
     @nb.njit(cache=True)
     def _many30(runs, seed, w, n, W, M, st, swap_from, spend_cap, tickets, start_level, lmask, wmask, fod, cyc,
@@ -499,7 +522,7 @@ if nb is not None:
 
         def __init__(self, horse, M, max_budget=40, tickets=0, start_level=1, learned=(), wanted=None,
                      fodder=None, point_bonus=0.25, points=0, max_level=30, low_memory=False, when_stuck="stop",
-                     ticket_from=0, ticket_behind=None, ticket_ref="none"):
+                     ticket_from=0, ticket_behind=None, ticket_ref="none", curve_runs=4000):
             pool = list(horse.weights)
             self.pool = pool
             idx = {s: i for i, s in enumerate(pool)}
@@ -525,13 +548,16 @@ if nb is not None:
             if ticket_ref not in ("none", "always"):
                 raise H.DataError(f"ticket_ref must be 'none' or 'always', not {ticket_ref!r}")
             self.ticket_from, self.ticket_behind, self.ticket_ref = ticket_from, ticket_behind, ticket_ref
+            self.curve_runs = curve_runs                 # horses for each plan's 'behind' curve (seed 7777)
             self._curves = {}
 
-        def ticket_curve(self, plan, coupon=None, runs=4000, seed=7777):
+        def ticket_curve(self, plan, coupon=None, runs=None, seed=7777):
             """The learned-skill threshold per level of the 'behind' ticket policy for one plan (None without it):
-            the plan's average learned skills at each level (see ticket_ref) minus ticket_behind."""
+            the plan's average learned skills at each level (see ticket_ref) minus ticket_behind, from runs horses
+            (default: curve_runs)."""
             if self.ticket_behind is None:
                 return None
+            runs = self.curve_runs if runs is None else runs
             key = (plan, coupon)
             if key not in self._curves:
                 w, n, W, M = self.args
@@ -539,12 +565,13 @@ if nb is not None:
                 strategy, swap_from, spend_cap, switch_at = plan
                 st = CODES[strategy]
                 tk = self.tickets if self.ticket_ref == "always" else 0
+                avg = _counts30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, tk,
+                                  self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
+                                  self.max_level, switch_at, coupon == "planned", self.stop, self.max_level, 0,
+                                  np.full(32, 1e9))
                 curve = np.full(32, 1e9)
                 for L in range(self.start_level + 1, self.max_level + 1):
-                    S, _, _, _ = _many30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, tk,
-                                           self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
-                                           L, switch_at, coupon == "planned", self.stop, self.max_level)
-                    curve[L] = float(_popcounts(S).mean()) - self.ticket_behind
+                    curve[L] = float(avg[L]) - self.ticket_behind
                 self._curves[key] = curve
             return self._curves[key]
 
@@ -673,10 +700,12 @@ if nb is not None:
             lmask, wmask, fod, cyc, order, rare = self.masks
             strategy, swap_from, spend_cap, switch_at = plan
             st = CODES[strategy]
-            out = {}
-            for L in range(self.start_level, self.max_level + 1):
-                out[L] = float(_popcounts(self._level(plan, runs, seed, coupon, L)[0]).mean())
-            return out
+            cv = self.ticket_curve(plan, coupon)
+            avg = _counts30_t(runs, seed, w, n, W, M, st, swap_from, 0 if st == 0 else spend_cap, self.tickets,
+                              self.start_level, lmask, wmask, fod, cyc, order, rare, self.pb, self.points,
+                              self.max_level, switch_at, coupon == "planned", self.stop, self.max_level,
+                              self.ticket_from, np.full(32, 1e9) if cv is None else cv)
+            return {L: float(avg[L]) for L in range(self.start_level, self.max_level + 1)}
 
         def states_at(self, plan, level, runs=4000, seed=1, coupon=None):
             """The horses of one plan when they reach `level` (same horses as plans() with the same seed, up to that
@@ -724,7 +753,10 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     Returns {plan: result} for the stage-2 plans; plan = (strategy, swap_from, spend_cap, switch_at)."""
     if not available():
         raise H.DataError("the fast engine needs numba (pip install -r requirements-optional.txt)")
-    ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **kw)
+    # with the 'behind' ticket policy, stage 1 computes each plan's curve from runs[0] horses (cheaper; the plans
+    # kept are then rerun with the default curve)
+    ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level,
+                   **dict(kw, curve_runs=min(runs[0], kw.get("curve_runs", 4000))))
     plans = search_grid(start_level, max_budget, strategies)
     s1 = {}
 
@@ -749,4 +781,6 @@ def optimize(horse, M, max_budget=40, strategies=("coursier", "coursier_v2", "co
     if stage1 is not None:
         stage1.update(s1)
     final = promising() | {H.rule_plan(B, start_level, kw.get("wanted")) for B in range(max_budget + 1)}
+    if kw.get("ticket_behind") is not None:
+        ev = Evaluator(horse, M, max_budget=max_budget, start_level=start_level, **kw)
     return ev.plans(sorted(final), runs[1], seed + 1000, progress, "recheck", tails=True, coupon=coupon, used=True)
