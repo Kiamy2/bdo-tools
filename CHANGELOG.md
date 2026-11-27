@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-28
+- Data: `skill_order` in `data/horse_skills.json`, the game's order of every skill (the first 29 read from the in-game Horse Market skill filter on 2026-11-27; the rest in the bdolytics column order, which matches it). French names added for Wings of Wind (Ailes du vent) and Wings of Freedom (Ailes de liberté). Test.
+
 ## 2026-11-25
 - `--precision X`: every default number of simulated horses times X (an explicit `--runs` / `--search-runs` / `--recheck-runs` wins); `--search-runs A,B` (with `--optimize`): horses per plan in the search's two stages. The `--optimize` header prints the counts used. With `--ticket-policy behind`, each search stage computes the thresholds from its own number of horses (as before with the defaults). Library: `horses_fast.optimize(runs=...)` sets the curves too.
 - `--ticket-policy always|behind` (with `--optimize` and `--tickets`, fast engine; not with `--boosts` or `--replan-check`): `behind` uses a Level Down Ticket only on a level-up that teaches nothing while the horse has fewer learned skills than the plan's average horse without tickets at that level; every number (search, suggested plans, comparison, `--coupons-used`, averages) uses it, and the suggested plans get a `tickets used` column. The search computes each plan's threshold from 1,000 horses in its first stage, 4,000 after (about 1.3x the time of `always`).

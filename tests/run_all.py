@@ -442,6 +442,21 @@ print(ok)
           "with them): fast vs Python within noise, tickets_used, the default unchanged", code8 == 0 and out8.strip() == "True", out8)
     check("_many30 (3 values, kept for older scripts) = _many30_t's first 3; states_at has the tickets left (0-4, the "
           "unlucky horses no more than the others)", code7 == 0 and out7.split() == ["True"] * 5, out7)
+    code17, out17 = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H
+d = H.load_data(); o = d["skill_order"]; fr = d["skills_fr"]
+market = ["Ruade", "Cabrade", "Dérapage", "Sprint", "Accélérer", "Saut haut", "Arrêt d'urgence", "Accél. Fulgurante",
+          "Charge", "Pas latéraux", "Recul rapide", "Sauts continus", "Hurlement de cheval", "Prudence",
+          "Brève chevauchée", "S : Ruade", "S : Cabrade", "S : Accél. Fulgurante", "S : Pas latéraux", "Deux places",
+          "Esprit de destrier", "Double saut", "S : Charge", "Trot infernal", "Terre de vie", "Ailes du vent",
+          "Ailes de liberté", "Terre de Protection", "Galop funeste"]   # Horse Market skill filter, read in game 2026-11-27
+r = H.skill_resolver(d)
+print(len(o) == len(set(o)) == len(fr) and set(o) == set(fr) and [fr[x] for x in o[:29]] == market
+      and r("Ailes du vent") == "Wings of Wind" and r("ailes de liberte") == "Wings of Freedom")
+""")
+    check("data: skill_order lists every skill once; its first 29 are the in-game Horse Market filter order (French)",
+          code17 == 0 and out17.strip() == "True", out17)
     code9, out9 = run("-c", """
 import sys; sys.path.insert(0, ".")
 from bdo import horses as H, horses_fast as F
