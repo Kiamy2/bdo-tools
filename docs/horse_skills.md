@@ -14,11 +14,13 @@ python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --odds --gear
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --check "Ruade=15.1844" "none=10.7826"
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --optimize 30            # best plan per budget
 python3 -I horse_skills.py "Mythical Diné" --training "Artisan 7" --target 50,90 --strategy coursier_v2
+python3 -I horse_skills.py --identify "none=28.0678" "Ruade=7.6976" --training "Artisan 10"  # which horse is this reading?
+python3 -I horse_skills.py --compare horses.csv --training "Artisan 10" --optimize 40 --prefer coupons  # several horses
 ```
 
 ## Inputs
 
-- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below). T8s by type number: `T8 Type 1` to `T8 Type 22` for the default horses read so far (Sprint as the only innate skill; types sharing the same weights are aliases); a horse with other innate skills: `--innate` (below) or its own reading.
+- **Horse:** a name from `--list` (accents and case optional), or `--horse-file` with your own reading of the in-game simulator (below). T8s by type number: `T8 Type 1` to `T8 Type 22` for the default horses read so far (Sprint as the only innate skill; types sharing the same weights are aliases); a horse with other innate skills: `--innate` (below) or its own reading. A type you can't find in `--list`: give a simulator reading to `--identify` (below) before concluding it isn't in the data (Type 8 turned out to be Type 5's data).
 - `--training`: your Training level, in English or French (`Artisan 7`, `Master 20`, `Gourou 57`), or the bonus itself (`21.7`).
 - `--learned`: skills the horse already has, besides its innate ones. Skill names in English or French, comma-separated (`"High Jump, Dérapage"`).
 - `--level`: the horse's current level (default 1). Leveling always ends at 30, since skills aren't learned past 30.
@@ -153,6 +155,24 @@ Last, a table of the **average learned skills when reaching each level** (innate
 
 - **Fast engine** (`--engine numba`, the default when numba is installed: `pip install -r requirements-optional.txt`): tries every plan (`at30`, and `coursier` / `coursier_v2` with every start level and spending cap; `coursier_switch` with every start level and threshold, on a grid of spending caps refined around the best) and computes the level-30 cleanup exactly instead of simulating it. About 20 seconds and 0.5 GB of memory for 20 coupons, 45 seconds and 1.2 GB for 40 (measured on the T8 example, 2 cores). `--low-memory` keeps the level-30 values as 16-bit numbers: about 0.4 GB less at 40 coupons, same speed, chances within 0.001 points (a plan right at the edge of a tied range can move in or out of it).
 - **Plain Python** (`--engine python`, or when numba isn't installed): a grid of plans refined around the best ones (`coursier_switch` thresholds 9, 11, 13, 15, then their neighbors), simulated. Several minutes and noisier, same model.
+
+**A horse at level 30** (`--level 30`): no level-up is left, so every plan is the same, every coupon in the level-30 cleanup. `--optimize N` prints one row (for the N coupons you have) instead of one per budget, then the comparison (its `at most B` columns give the chance with fewer coupons) and `--coupons-used` with one column. With nothing left to simulate, every number is exact (standard error 0).
+
+**Standard errors** (the `±` columns): next to every average of coupons used (`used` in the suggested plans, `coupons avg` in the comparison, `average` in `--coupons-used`, `--compare`), the standard error of that average over the simulated horses (each horse's own expected number of coupons is exact; they differ from horse to horse). Checked against the spread of the average over 30 independent seeds (2,000 horses each: within the noise of that check). Every plan is played on the same horses, so the noise of a difference between two plans is usually smaller than these (reasoning, not measured). Example: the T8 buy comparison of 2026-11-27 (20,000 horses, Artisan 10, courser set): 0.013-0.018 coupons on averages of 3-6.
+
+## Which horse is this reading? (`--identify`)
+
+`--identify SKILL=PCT ... --training LEVEL` compares a growth-simulator reading with every horse in the data file (no horse name needed; `--gear`, `--brand`, `--learned` and `--innate` apply to every horse) and lists them from the closest, with the largest difference in points. `match` = every value within the data's rounding, as `--check`. Exit 0 with a match, 1 without. The reading's 'no skill' line (`none=...`) helps most; a few values are enough (the 2026-11-27 Type 8 reading: 5 values, one match, `T8 Type 5 (also T8 Type 8)`). Horses sharing the same data (aliases) can't be told apart, and don't need to be. No match: a type not in the data, a special horse (try `--innate` with the extra innate skills), or other settings (Training, boosts, learned skills); the reading can also be used as it is, with `--horse-file`.
+
+## Several horses at once (`--compare FILE`)
+
+`--compare horses.csv --training LEVEL --optimize N` runs the search and the three-criteria comparison for every horse of a CSV file, and prints one row each: the best plan by `--prefer` (default `chance`; `coupons` for the fewest coupons on average), the full set within N coupons, the stuck share, the coupons used on average with its standard error, the median, and the chance of the full set with at most 1, 2, 3, 5, 10 coupons. Rows are sorted by that criterion. The file (UTF-8, a header row): `horse` (a name from `--list`), `level`, `learned` (separated by `;` or `,` inside quotes; French names work), and optionally `name`, `points` (Skill Change Points; default `--points`), `tickets` (default `--tickets`), `innate` (extra innate skills). `--training`, `--gear`, `--brand`, `--wanted` (default: each horse's own default set) and `--lang` apply to every horse. Fast engine only; about 1-12 s per horse for `--optimize 40`. A row the tool can't read (an unknown horse, a bad level) prints as an error row (exit 1). Example:
+```
+name,horse,level,learned,points
+F0,T8 Type 9,17,"Ruade;Cabrade;Dérapage;Accélérer;Saut haut;Arrêt d'urgence;Accél. Fulgurante;Charge;Sauts continus;Hurlement de cheval;Prudence;Brève chevauchée;S : Ruade;S : Cabrade;S : Accél. Fulgurante",0
+M0,T8 Type 8,30,"Ruade;Cabrade;Accélérer;Saut haut;Arrêt d'urgence;Accél. Fulgurante;Charge;Recul rapide;Sauts continus;Hurlement de cheval;Prudence;Brève chevauchée;S : Ruade;S : Cabrade;S : Accél. Fulgurante;S : Pas latéraux",0
+```
+With `--training "Artisan 10" --optimize 40 --prefer coupons`: F0 first (from lvl 19, S2, spend <= 2 while leveling: 3.00 coupons on average, ± 0.013), then M0 (level 30: 4.32, exact).
 
 ## Your own horse (`--horse-file`)
 

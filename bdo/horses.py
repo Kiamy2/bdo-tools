@@ -443,6 +443,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
         spend_cap = 0
     nb = max_budget + 1
     full_n, wanted_sum, used_sum, used_ok, n_ok, tickets_used = [0] * nb, [0] * nb, [0] * nb, [0] * nb, 0, 0
+    used_sq = [0] * nb
     tail_n = [[0] * TAILS for _ in range(nb)]
     needed, counts = [], []
     for _ in range(runs):
@@ -532,6 +533,7 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
                 j = 0
             wanted_sum[B] += traj[min(j, last)]
             used_sum[B] += base + min(j, last)
+            used_sq[B] += (base + min(j, last)) ** 2
             if ok:
                 used_ok[B] += base + min(j, last)
             full_n[B] += traj[min(j, last)] == len(wanted)
@@ -544,11 +546,20 @@ def simulate_plan(horse, M, strategy, swap_from=1, spend_cap=0, max_budget=60, t
             "wanted": [wanted_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
             "tails": [[x / runs for x in tail_n[B]] if B >= spend_cap else None for B in range(nb)],
             "used": [used_sum[B] / runs if B >= spend_cap else None for B in range(nb)],
+            "used_se": [_se_mean(used_sum[B], used_sq[B], runs) if B >= spend_cap else None for B in range(nb)],
             "at_most": [bisect.bisect_right(needed, B) / runs for B in range(nb)],
             "stuck": 1 - n_ok / runs,
             "tickets_used": tickets_used / runs,
             "used_ok": [used_ok[B] / n_ok if B >= spend_cap and n_ok else None for B in range(nb)],
             "skills": sum(counts) / runs, "needed": needed, "skill_counts": counts, "wanted_total": len(wanted)}
+
+
+def _se_mean(total, total_sq, n):
+    """Standard error of a mean from the sum and the sum of squares of n values."""
+    if n < 2:
+        return 0.0
+    var = max(0.0, (total_sq - total * total / n) / (n - 1))
+    return (var / n) ** 0.5
 
 
 def worst5(tails):
@@ -608,10 +619,13 @@ def rule_plan(budget, start_level=1, wanted=None):
 def effective_plan(plan, learned_count=0, start_level=0):
     """The plan as it plays out for a horse at start_level that already has learned_count learned skills (innate
     ones not counted): coursier_switch with a threshold the horse has reached is plain coursier_v2, and a start
-    level already passed is the next level."""
+    level already passed is the next level. A plan whose swaps would start after level 30 (e.g. any plan for a
+    level-30 horse) is at30."""
     st, lv, cap, T = plan
     if st in ("natural", "at30"):
         return plan
+    if max(lv, start_level + 1) > 30:
+        return ("at30", 1, 0, 0)
     if st == "coursier_switch" and learned_count >= T:
         st, T = "coursier_v2", 0
     return (st, max(lv, start_level + 1), cap, T)

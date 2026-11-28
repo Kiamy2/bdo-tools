@@ -445,14 +445,26 @@ if nb is not None:
                 for t in range(acc.shape[2]):
                     acc[plan[i], B, t] += V[r + B - base[i], t] * dec[t]
 
+    @nb.njit(cache=True)
+    def _accumulate_sq(hkeys, base, plan, cap, idx, K, off, V, dec, C, tu, acc2):
+        """Adds each horse's (coupons spent while leveling + expected cleanup coupons)^2 to acc2[plan, budget]: for
+        the standard error of the expected coupons used (each horse's value is exact; they vary between horses)."""
+        for i in idx:
+            r = off[np.searchsorted(K, hkeys[i])]
+            for B in range(max(cap[i], base[i]), C + 1):
+                u = base[i] + V[r + B - base[i], tu] * dec[tu]
+                acc2[plan[i], B] += u * u
+
     def cleanup_values(hkeys, base, plan, cap, nplans, C, J, low_memory, w, n, wmask, order, rare, pb, sel=0,
-                       stats=None, used=False):
+                       stats=None, used=False, sq=None):
         """Sums over the horses of each plan of the exact cleanup values, per budget: acc[plan, B, t] (see above).
         used: one more value, acc[..., J + 1]: the expected number of Change Coupons the cleanup uses.
         hkeys: end-of-leveling keys (held skills << PBITS | points); base: coupons spent while leveling.
         The states are split in blocks (wanted skills g, points p); block (g, p) needs (g, p + 1), (g + 1, p + 1)
         and (g + 1, 0), so a block of group g + 1 is dropped as soon as group g no longer needs it.
-        stats: a dict, filled with the number of states and the most values held at once."""
+        stats: a dict, filled with the number of states and the most values held at once.
+        sq: with used=True, an array (nplans, C + 1) that gets each plan's sum of squared coupons used per horse
+        (coupons spent while leveling + expected cleanup coupons), for standard errors."""
         if int((hkeys & PMASK).max()) + C > PMASK:
             raise ValueError(f"Skill Change Points above {PMASK}")
         nv = J + 1 + bool(used)
@@ -495,6 +507,8 @@ if nb is not None:
                 idx = np.nonzero((hg == g) & (hpts == p))[0]
                 if len(idx):
                     _accumulate(hkeys, base, plan, cap, idx, K, off, V, dec, C, acc)
+                    if sq is not None and used:
+                        _accumulate_sq(hkeys, base, plan, cap, idx, K, off, V, dec, C, J + 1, sq)
                 done[(g, p)] = (K, off, V)
                 if (g + 1, p + 1) in done:                        # only block (g, p) needed it
                     held -= len(done.pop((g + 1, p + 1))[2])
@@ -627,6 +641,7 @@ if nb is not None:
                         res["tails"] = [[float((miss <= t).mean()) for t in range(TAILS)]] * (C + 1)
                     if used:
                         res["used"] = [0.0] * (C + 1)
+                        res["used_se"] = [0.0] * (C + 1)
                         if stuck:
                             res["used_ok"] = [0.0] * (C + 1)
                     if at_most:
@@ -648,9 +663,10 @@ if nb is not None:
             n_ok = np.bincount(hp[ok], minlength=nb_)
             ok_sum = np.bincount(hp[ok], weights=hb[ok], minlength=nb_)      # their coupons spent while leveling
             split = stuck and used
+            sq = np.zeros((2 * nb_, C + 1)) if used else None       # sums of squared coupons used (standard errors)
             if not sel and not split:
                 acc = cleanup_values(hk, hb, hp, hc, nb_, C, T, self.low_memory, w, n, wmask, order,
-                                     rare, self.pb, 2 * self.stop, used=used)
+                                     rare, self.pb, 2 * self.stop, used=used, sq=sq)
                 use = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0]
                 wanted = lambda j, B: acc[j, B, T]
@@ -658,7 +674,7 @@ if nb is not None:
             elif not sel:
                 # the same values, the horses that aren't stuck in plan j, the stuck ones in j + nb_
                 acc = cleanup_values(hk, hb, np.where(ok, hp, hp + nb_), hc, 2 * nb_, C, T, self.low_memory, w, n,
-                                     wmask, order, rare, self.pb, 2 * self.stop, used=used)
+                                     wmask, order, rare, self.pb, 2 * self.stop, used=used, sq=sq)
                 use = lambda j, B: acc[j, B, T + 1] + acc[j + nb_, B, T + 1]
                 use_ok = lambda j, B: acc[j, B, T + 1]
                 full = lambda j, B: acc[j, B, 0] + acc[j + nb_, B, 0]
@@ -670,7 +686,8 @@ if nb is not None:
                 spare = _popcounts(hk >> PBITS) >= nW
                 J = T + 1
                 acc = cleanup_values(hk, hb, np.where(spare, hp, hp + nb_), hc, 2 * nb_, C, J,
-                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1 | 2 * self.stop, used=used)
+                                     self.low_memory, w, n, wmask, order, rare, self.pb, 1 | 2 * self.stop, used=used,
+                                     sq=sq)
                 use = lambda j, B: acc[j, B, J + 1] + acc[j + nb_, B, J + 1]
                 use_ok = lambda j, B: acc[j, B, J + 1]
                 n_sp = np.bincount(hp[spare], minlength=nb_)
@@ -681,6 +698,8 @@ if nb is not None:
             for j, (p, cap) in enumerate(batch):
                 if used:
                     out[p]["used"] = [float((bsum[j] + use(j, B)) / runs) if B >= cap else None for B in range(C + 1)]
+                    out[p]["used_se"] = [H._se_mean(bsum[j] + use(j, B), sq[j, B] + sq[j + nb_, B], runs)
+                                         if B >= cap else None for B in range(C + 1)]
                 if split:
                     out[p]["used_ok"] = [float((ok_sum[j] + use_ok(j, B)) / n_ok[j]) if B >= cap and n_ok[j] else None
                                          for B in range(C + 1)]

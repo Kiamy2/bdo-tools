@@ -1,6 +1,12 @@
 # Changelog
 
 ## 2026-11-28
+- `--identify SKILL=PCT ...` (with `--training`): a simulator reading compared with every horse in the data file; lists the matches (exit 1 without one).
+- `--compare FILE` (with `--optimize N`, fast engine): one summary row per horse of a CSV file (horse, level, learned; optional name, points, tickets, innate): the best plan by `--prefer`, full set, stuck, coupons used on average with its standard error, median, at most 1/2/3/5/10; sorted by that criterion.
+- Standard errors of the coupons used on average: a `±` column in the suggested plans, the comparison, `--coupons-used` and `--compare` (both engines: `used_se` in the results; `horses_fast.cleanup_values(..., sq=...)`).
+- A level-30 horse: `--optimize` prints one row (every plan is at30) instead of one per budget, and `--coupons-used` one column; the values are exact (no simulation): '0%' where it's exactly 0, never '100%'. `effective_plan`: a plan whose swaps would start after level 30 is at30.
+- Data: `T8 Type 8` = an alias of Type 5 (its 2026-11-27 reading matches exactly; `tests/data/sim_t8_type8_2026-11-27.csv`, checked by the T8 readings test).
+- Guide: ask for the type (not on market screenshots) and the Skill Change Points before running; `--identify` before saying a type isn't in the data; reading market screenshots with the skill order and the in-game count; `--compare`; the `±` columns.
 - Data: `skill_order` in `data/horse_skills.json`, the game's order of every skill (the first 29 read from the in-game Horse Market skill filter on 2026-11-27; the rest in the bdolytics column order, which matches it). French names added for Wings of Wind (Ailes du vent) and Wings of Freedom (Ailes de liberté). Test.
 
 ## 2026-11-25

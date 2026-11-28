@@ -431,7 +431,9 @@
    "tier": 8,
    "source": "bdolytics.com/en/training/horse-skills (T8 tab, saved 2026-11-17: weights as its 4-decimal tooltips), row with icon horse_83",
    "date": "2026-11-21",
-   "aliases": [],
+   "aliases": [
+    "T8 Type 8"
+   ],
    "born_with": [
     "Sprint"
    ],

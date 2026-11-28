@@ -124,12 +124,14 @@ code, out = run("-c", "import sys; sys.path.insert(0, '.'); from bdo import hors
                 "H._cycle_skill(H.CLASSIC_FODDER, d.weights))")
 check("S1 swaps Fore Chop first; S2 cycles the heavier fodder, Hind Kick on ties (T8)", code == 0 and out.strip() ==
       "['Fore Chop', 'Hind Kick'] Hind Kick Hind Kick", out)
-# T8 types: every value of the in-game simulator readings (tests/data/sim_t8_types_2026-11-21.csv, default horses)
+# T8 types: every value of the in-game simulator readings (tests/data/sim_t8_types_2026-11-21.csv and
+# sim_t8_type8_2026-11-27.csv, default horses)
 code, out = run("-c", """
 import csv, re, sys; sys.path.insert(0, '.')
 from bdo import horses as H
 d = H.load_data(); res = H.skill_resolver(d); worst, n = 0, 0
-rows = [r for r in csv.reader(l for l in open('tests/data/sim_t8_types_2026-11-21.csv') if not l.startswith('#'))][1:]
+rows = [r for f in ('tests/data/sim_t8_types_2026-11-21.csv', 'tests/data/sim_t8_type8_2026-11-27.csv')
+        for r in list(csv.reader(l for l in open(f) if not l.startswith('#')))[1:]]
 for reading, typ, tr, lvl, boosts, innate, skill, pct in rows:
     if reading.startswith('special') or pct == 'base':
         continue
@@ -321,7 +323,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           sorted(lv) == list(range(1, 31)) and all(lv[L][0] <= lv[L + 1][0] for L in range(1, 30))
           and all(12 <= x <= 16 for x in lv[30]), out[-1500:])
     sug = re.search(r"^20\t(from lvl \d+, S[12] until [^\t]+, keep \d+)\t([\d.]+)%\t([\d.]+)%\t"
-                    r"([\d.]+)%\t(\d\+?)\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
+                    r"([\d.]+)%\t(\d\+?)\t[\d.]+\t[\d.]+\t[\d.]+\t(rule \(best ([\d.]+)%\)|best)", out, re.M)
     check("horse_skills --optimize: suggested plan per budget (20 coupons, rechecked with fresh horses: within 1 point "
           "of the best, and below the search's lucky best + 0.5; full set <= missing 1 <= missing 2)",
           sug is not None and (sug.group(7) is None or float(sug.group(2)) >= float(sug.group(7)) - 1.0)
@@ -348,7 +350,7 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
                     "--tickets", "2")
     rows = [sugrow(out, B) for B in (8, 10, 12)]
     check("--selection-coupon fallback and --tickets: extra columns (with the coupon >= without; keeping the tickets "
-          "<= using them, within noise)", code == 0 and all(rows) and all(pct(x[8]) >= pct(x[2]) and pct(x[9]) <= pct(x[2]) + 1
+          "<= using them, within noise)", code == 0 and all(rows) and all(pct(x[9]) >= pct(x[2]) and pct(x[10]) <= pct(x[2]) + 1
                                                             for x in rows), out)
     code, out = run("horse_skills.py", D, "--training", "Artisan 7", "--optimize", "10", "--engine", "numba")
     m = dict(re.findall(r"^(\d+)\t([\d.]+)%\t", out, re.M))
@@ -373,8 +375,8 @@ for p, cp in ((("coursier", 10, 6, 0), None), (("at30", 1, 0, 0), "fallback")):
           code == 0 and len(sug) == 5 and am and am[2][0] == pct(sug["2"][2]) and am[3][1] == pct(sug["3"][2])
           and all(am[B][j] <= am[B + 1][j] for B in range(len(am) - 1) for j in (0, 1)), out)
     check("horse_skills --coupons-used: spread table (average, median, 90% / 99%), used and per full set columns",
-          re.search(r"^plan for 2 coupons\t[\d.]+\t\d+\t\d+\t\d+\t[<>]?[\d.]+%$", out, re.M)
-          and all(abs(float(sug[B][6]) / float(sug[B][7]) - pct(sug[B][2]) / 100) < 0.01 for B in sug), out)
+          re.search(r"^plan for 2 coupons\t[\d.]+\t[\d.]+\t\d+\t\d+\t\d+\t[<>]?[\d.]+%$", out, re.M)
+          and all(abs(float(sug[B][6]) / float(sug[B][8]) - pct(sug[B][2]) / 100) < 0.01 for B in sug), out)
     check("horse_skills: effective plan (a switch threshold already reached prints as S2), alias as typed, in-game "
           "count, French names in learned:, sure-hit note, innate skill in --learned ignored with a note",
           "S1 until 9 learned" not in out and "T8 Type 6 (an alias of T8 Type 4" in out
@@ -442,6 +444,55 @@ print(ok)
           "with them): fast vs Python within noise, tickets_used, the default unchanged", code8 == 0 and out8.strip() == "True", out8)
     check("_many30 (3 values, kept for older scripts) = _many30_t's first 3; states_at has the tickets left (0-4, the "
           "unlucky horses no more than the others)", code7 == 0 and out7.split() == ["True"] * 5, out7)
+    # item 18: a level-30 horse (every plan is at30): one row, exact values; item 23: the standard error column
+    M0L = ("Ruade,Cabrade,Accélérer,Saut haut,Arrêt d'urgence,Accél. Fulgurante,Charge,Recul rapide,Sauts continus,"
+           "Hurlement de cheval,Prudence,Brève chevauchée,S : Ruade,S : Cabrade,S : Accél. Fulgurante,S : Pas latéraux")
+    code18, out18 = run("horse_skills.py", "T8 Type 8", "--training", "Artisan 10", "--level", "30", "--learned", M0L,
+                        "--optimize", "6", "--coupons-used", "--lang", "fr")
+    rows18 = [l.split("\t") for l in out18.splitlines() if re.match(r"^\d+\tno swaps", l)]
+    check("level 30: one row (at30), exact values (standard error 0, '0%' with 1 coupon for 2 missing skills), no "
+          "'from lvl 31'; --coupons-used one column",
+          code18 == 0 and len(rows18) == 1 and rows18[0][0] == "6" and rows18[0][7] == "0.000" and "lvl 31" not in out18
+          and "every number here is exact" in out18 and "every plan (level 30)" in out18
+          and re.search(r"^no swaps[^\t]*\[at30\]\t[^\t]+\t0%\t[^\t]+\t3\.88\t0\.000\t4\t0%\t26\.6%", out18, re.M),
+          out18[-2500:])
+    code19, out19 = run("-c", """
+import sys; sys.path.insert(0, ".")
+from bdo import horses as H, horses_fast as F
+h = H.get_horse(H.load_data(), "T8 example (bdolytics icon horse_71)"); M = h.M(H.training_bonus("Skilled 1"))
+p = ("coursier_v2", 10, 11, 0)
+se = [F.Evaluator(h, M, max_budget=20, wanted=H.TRAVEL_SET).plans([p], n, 7, used=True, stuck=True)[p]["used_se"][20]
+      for n in (1000, 4000)]
+py = H.simulate_plan(h, M, *p[:3], 20, runs=2000, seed=3, wanted=H.TRAVEL_SET)["used_se"][20]
+print(all(x > 0 for x in se) and 1.6 < se[0] / se[1] < 2.5 and 0.05 < py < 0.3, se, py)
+""")
+    check("standard error of coupons used: positive, shrinks like 1/sqrt(horses) (fast engine); the Python engine has it "
+          "too", code19 == 0 and out19.startswith("True"), out19)
+    # item 20: --identify
+    T8R = ["none=28.0678", "Ruade=7.6976", "Dérapage=4.2016", "Pas latéraux=0.8419", "S : Pas latéraux=0.2405"]
+    code20, out20 = run("horse_skills.py", "--identify", *T8R, "--training", "Artisan 10")
+    code21, out21 = run("horse_skills.py", "--identify", "none=28.0678", "Ruade=7.9", "--training", "Artisan 10")
+    code22, out22 = run("horse_skills.py", "--identify", *T8R)
+    check("--identify: the Type 8 reading matches T8 Type 5 (also Type 8) and nothing else; a wrong value: no match "
+          "(exit 1); needs --training",
+          code20 == 0 and "# Match: T8 Type 5 (also T8 Type 8)." in out20 and out20.count("\tmatch") == 1
+          and code21 == 1 and "# No match" in out21 and code22 == 2, out20 + out21 + out22)
+    # item 19: --compare
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False, encoding="utf-8") as f:
+        f.write('name,horse,level,learned\nM0,T8 Type 8,30,"' + M0L.replace(",", ";") + '"\n'
+                'F0,T8 Type 9,17,"Ruade;Cabrade;Dérapage;Accélérer;Saut haut;Arrêt d\'urgence;Accél. Fulgurante;Charge;'
+                'Sauts continus;Hurlement de cheval;Prudence;Brève chevauchée;S : Ruade;S : Cabrade;S : Accél. Fulgurante"\n'
+                'bad,T8 Type 99,10,\n')
+    code23, out23 = run("horse_skills.py", "--compare", f.name, "--training", "Artisan 10", "--optimize", "10",
+                        "--prefer", "coupons", "--lang", "fr")
+    os.unlink(f.name)
+    cr = [l.split("\t") for l in out23.splitlines() if re.match(r"^(M0|F0|bad)\t", l)]
+    check("--compare: one row per horse sorted by coupons avg (F0 about 2.9 before M0 4.26 with up to 10), the level-30 "
+          "horse exact, an "
+          "unknown horse as an error row (exit 1)",
+          code23 == 1 and [x[0] for x in cr] == ["F0", "M0", "bad"] and 2.7 < float(cr[0][7]) < 3.1 and cr[1][7] == "4.26"
+          and cr[1][8] == "0.000" and cr[1][3] == "16 + 1 = 17" and "ERROR: unknown horse" in cr[2][4], out23)
     code17, out17 = run("-c", """
 import sys; sys.path.insert(0, ".")
 from bdo import horses as H

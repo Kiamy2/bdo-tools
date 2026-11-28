@@ -16,13 +16,18 @@ pip install --break-system-packages numba==0.68.1 llvmlite==0.50.0 numpy==2.5.3
 
 ## 2. Ask the player once (all of it)
 
-- **Horse:** a name from `--list` (T8s as `T8 Type N`, the type shown in game). A T8 type that isn't listed, or a special horse with extra innate skills: ask for an in-game growth simulator screenshot at level 1, no boosts (the top of the list: 'no skill' and Hind Kick chances). A special horse is often a known one with extra innate skills: try `--innate "..." --check none=... Ruade=...` (see the tool doc); on a mismatch, build a `--horse-file` from the reading.
+- **Horse, before running anything:** a name from `--list` (T8s as `T8 Type N`, the type shown in game). Ask for the type: it isn't on Horse Market skill-list screenshots. If the player doesn't know it, or the type isn't listed, or it's a special horse (extra innate skills): ask for an in-game growth simulator reading (the 'no skill' line and a few skills are enough) and run `--identify none=... Ruade=... --training ...`: it compares the reading with every horse in the data and names the matches. Never say a type isn't in the data without this check (Type 8 turned out to be Type 5's data). A special horse is often a known one with extra innate skills: add `--innate "..."` to `--identify` or `--check`; on a mismatch, build a `--horse-file` from the reading.
 - **Training level** (e.g. Artisan 7) and **boosts** (Pearl horse gear: `--gear`; Mount Brand Spell Stone: `--brand`).
-- **Current level, learned skills** (French names work), and the **Skill Change Points** shown in the coupon window.
+- **Current level, learned skills** (French names work), and the **Skill Change Points** shown in the coupon window. For a horse not yet bought, the points aren't visible: ask, and if nobody knows, use 0 and say so (whether they reset on purchase isn't known).
 - **The skill count shown in game**, as a check: in-game count = learned skills + innate skills (a default T8 shows 16 for 15 learned + the innate Sprint). Never put innate skills in `--learned` (the tool ignores them, with a note).
 - **Mount Skill Change Coupons** available and how many they're willing to spend; **Level Down Tickets** (only for this horse, or worth keeping for another?); a **Mount Skill Selection Coupon** (none / sure to use it = `planned` / a safety net = `fallback`).
 - **Target set:** `courser` (a T8 for courser training into a Dream Horse: Charge, Drift, Sprint, Instant Accel, Sideways, S: Instant Accel, S: Sideways, + level 30), `travel` (an example set for a finished T10), or their own list. The tool's default: courser for a T8, travel otherwise. Say which one you use.
 - **Goal:** the highest chance with the coupons given, a target chance with as few coupons as possible, or the fewest coupons on average. They lead to different plans: ask.
+
+**Comparing horses to buy from Horse Market screenshots:**
+- The skill list there shows only the skills the horse holds, in the game's fixed order: `skill_order` in `data/horse_skills.json`; in French: `python3 -I -c "import sys; sys.path.insert(0,'.'); from bdo import horses as H; d=H.load_data(); print('\n'.join(d['skills_fr'][s] for s in d['skill_order']))"`. A skill missing between two visible neighbours isn't held; a row cut at the top or bottom of a screenshot is placed by the order.
+- Check every transcription: the number of rows must equal X in the in-game `X / Y` skill count (X = learned + innate).
+- Ask for the type and the points (above), then compare them all in one run: `--compare horses.csv --prefer coupons` (one row per horse; file format in the tool doc).
 
 ## 3. The plan
 
@@ -74,6 +79,7 @@ The player reports the level-up's result: a skill, or nothing.
 - **Say which numbers are conditional:** every column of the tool's tables is over all horses, unless its name ends with `| not stuck` or `| successes`; and the numbers depend on `--when-stuck` (stated in the header).
 - **Say what a table covers:** which plans, start levels and budgets were checked, and which were not.
 - **Noise:** the table of tied plans uses 4,000 simulated horses shared by every plan (more with `--precision X`: about X times the time, see the tool doc), so its chances can be a point or so off, every plan in the same direction. The suggested plans, `--coupons-used` and the three-criteria comparison are rechecked on 20,000 fresh horses (fast engine; `--recheck-runs` for more): about 0.3-0.4 points of noise near 50%. Differences between plans are more precise than the chances themselves. Don't present differences of a few tenths of a point as real; when it matters, rerun through the engine with more horses (e.g. 100,000).
+- **Standard errors:** the `±` column next to every average of coupons used. Treat averages within about 2 × `±` of each other as tied (a rough rule; plans are played on the same horses, which usually makes a difference less noisy). At level 30 there is nothing to simulate: the numbers are exact (± 0).
 - **Label every budget** in a table, and say that an average under a budget counts failed horses at the full budget.
 - **Say plainly when a decision makes no difference** (e.g. two options both near 0% failure: choose by coupons).
 - **Rules, stated explicitly:** "once per level", "never Fore Chop in S2", "learned skills don't count innate ones", "the spending cap counts every coupon used while leveling". A player once looped 6 swaps at one level because S1 wasn't stated as once per level.

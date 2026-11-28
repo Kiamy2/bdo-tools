@@ -1,0 +1,25 @@
+# In-game growth simulator reading of a T8 Type 8 (female; French client), sent by the user as screenshots on
+# 2026-11-27: simulator level 26, Artisan 10, no boosts, no skills toggled. Transcribed by hand; it matches the
+# T8 Type 5 data exactly ('no skill' included), so Type 8 is an alias of Type 5. Columns: as in
+# sim_t8_types_2026-11-21.csv.
+reading,type,training,horse_level,boosts,innate,skill,percent
+t8_a10,8,Artisan 10,26,none,Sprint,Compétence non apprise,28.0678
+t8_a10,8,Artisan 10,26,none,Sprint,Ruade,7.6976
+t8_a10,8,Artisan 10,26,none,Sprint,Cabrade,7.6976
+t8_a10,8,Artisan 10,26,none,Sprint,Dérapage,4.2016
+t8_a10,8,Artisan 10,26,none,Sprint,Sprint,base
+t8_a10,8,Artisan 10,26,none,Sprint,Accélérer,5.6128
+t8_a10,8,Artisan 10,26,none,Sprint,Saut haut,3.8488
+t8_a10,8,Artisan 10,26,none,Sprint,Arrêt d'urgence,3.8488
+t8_a10,8,Artisan 10,26,none,Sprint,Accél. Fulgurante,1.8816
+t8_a10,8,Artisan 10,26,none,Sprint,Charge,2.4055
+t8_a10,8,Artisan 10,26,none,Sprint,Pas latéraux,0.8419
+t8_a10,8,Artisan 10,26,none,Sprint,Recul rapide,5.6663
+t8_a10,8,Artisan 10,26,none,Sprint,Sauts continus,5.6128
+t8_a10,8,Artisan 10,26,none,Sprint,Hurlement de cheval,3.8488
+t8_a10,8,Artisan 10,26,none,Sprint,Prudence,3.8488
+t8_a10,8,Artisan 10,26,none,Sprint,Brève chevauchée,5.6128
+t8_a10,8,Artisan 10,26,none,Sprint,S : Ruade,4.0626
+t8_a10,8,Artisan 10,26,none,Sprint,S : Cabrade,4.0626
+t8_a10,8,Artisan 10,26,none,Sprint,S : Accél. Fulgurante,0.9408
+t8_a10,8,Artisan 10,26,none,Sprint,S : Pas latéraux,0.2405
